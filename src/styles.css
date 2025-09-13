@@ -2,6 +2,10 @@
    BASE STYLES & TYPOGRAPHY
    ============================================================================= */
 
+:root {
+    --gray-background: #f0f0f0;
+}
+
 @font-face {
     font-family: 'PlaywriteAUSA';
     src: url('./assets/fonts/PlaywriteAUSA-Regular.ttf') format('truetype');
@@ -13,7 +17,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: rgb(251, 249, 240);
+    background: rgb(251, 251, 251);
     margin: 0;
     padding: 20px;
     min-height: 100vh;
@@ -321,7 +325,7 @@ h4 {
     display: none;
     margin: 15px 0;
     padding: 10px;
-    background: #f8f9fa;
+    background: var(--gray-background);
     border-radius: 5px;
 }
 
@@ -479,7 +483,7 @@ h4 {
    ============================================================================= */
 
 .activity-times {
-    background: #f0f0f0;
+    background: var(--gray-background);
     padding: 15px;
     border-radius: 5px;
     margin: 10px 0;
