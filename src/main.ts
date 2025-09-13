@@ -9,7 +9,7 @@ import { FitData } from './types/app-types';
 
 // Core functionality imports
 import { decodeFitFile, extractActivityTimes } from './core/fit-parser';
-import { findSlowPeriodsWithRanges, findTimestampGaps, processSlowSequence } from './core/data-analyzer';
+import { findSlowPeriodsWithRanges, findTimestampGaps, processSlowSequence, mergeNearbySlowPeriods, mergeNearbyRecordingGaps } from './core/data-analyzer';
 import { formatDuration, getSelectedRanges, getSelectedRangeText, matchesTimeRange, getCurrentTimestampGapThreshold } from './core/time-utils';
 
 // UI functionality imports
@@ -204,5 +204,7 @@ export {
   processSlowSequence,
   formatDuration,
   matchesTimeRange,
-  convertGpsCoordinates
+  convertGpsCoordinates,
+  mergeNearbySlowPeriods,
+  mergeNearbyRecordingGaps
 };

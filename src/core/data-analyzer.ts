@@ -21,9 +21,11 @@ export function findSlowPeriodsWithRanges(records: FitRecord[], selectedRanges: 
   if (selectedRanges.length === 0) return [];
 
   const slowPeriods = findSpeedBasedSlowPeriods(records, selectedRanges);
+  const mergedSlowPeriods = mergeNearbySlowPeriods(slowPeriods);
   const gapPeriods = findMatchingRecordingGaps(records, selectedRanges);
+  const mergedGapPeriods = mergeNearbyRecordingGaps(gapPeriods);
 
-  return [...slowPeriods, ...gapPeriods].sort((a, b) => a.startTime - b.startTime);
+  return [...mergedSlowPeriods, ...mergedGapPeriods].sort((a, b) => a.startTime - b.startTime);
 }
 
 /**
@@ -234,4 +236,100 @@ export function processSlowSequence(currentSlowSequence: FitRecord[], selectedRa
 
   // Return null if this slow period doesn't match the user's selected time ranges
   return null;
+}
+
+/**
+ * Merges slow periods that are less than 2 minutes apart into single periods.
+ * This helps consolidate nearby stops that are logically part of the same break.
+ *
+ * @param {Array} slowPeriods - Array of slow period objects sorted by start time
+ * @returns {Array} Array of merged slow periods
+ */
+export function mergeNearbySlowPeriods(slowPeriods: SlowPeriod[]): SlowPeriod[] {
+  if (slowPeriods.length <= 1) return slowPeriods;
+
+  const mergedPeriods: SlowPeriod[] = [];
+  let currentPeriod = slowPeriods[0];
+
+  for (let i = 1; i < slowPeriods.length; i++) {
+    const nextPeriod = slowPeriods[i];
+    const timeBetween = nextPeriod.startTime.getTime() - currentPeriod.endTime.getTime();
+    const twoMinutesMs = 1 * 60 * 1000;
+
+    if (timeBetween < twoMinutesMs) {
+      // Merge periods
+      currentPeriod = {
+        startTime: currentPeriod.startTime,
+        endTime: nextPeriod.endTime,
+        recordCount: currentPeriod.recordCount + nextPeriod.recordCount,
+        startDistance: currentPeriod.startDistance,
+        endDistance: nextPeriod.endDistance,
+        gpsPoints: [...currentPeriod.gpsPoints, ...nextPeriod.gpsPoints]
+      };
+    } else {
+      // Periods are too far apart, add current to results and start new one
+      mergedPeriods.push(currentPeriod);
+      currentPeriod = nextPeriod;
+    }
+  }
+
+  // Add the final period
+  mergedPeriods.push(currentPeriod);
+
+  return mergedPeriods;
+}
+
+/**
+ * Merges recording gaps that are less than 2 minutes apart into single periods.
+ * This helps consolidate nearby device pauses that are logically part of the same break.
+ *
+ * @param {Array} gapPeriods - Array of gap period objects sorted by start time
+ * @returns {Array} Array of merged gap periods
+ */
+export function mergeNearbyRecordingGaps(gapPeriods: SlowPeriod[]): SlowPeriod[] {
+  if (gapPeriods.length <= 1) return gapPeriods;
+
+  const mergedPeriods: SlowPeriod[] = [];
+  let currentPeriod = gapPeriods[0];
+
+  for (let i = 1; i < gapPeriods.length; i++) {
+    const nextPeriod = gapPeriods[i];
+    const timeBetween = nextPeriod.startTime.getTime() - currentPeriod.endTime.getTime();
+    const oneMinuteMs = 1 * 60 * 1000;
+
+    if (timeBetween < oneMinuteMs) {
+      // Merge gap periods
+      const mergedGapData = currentPeriod.gapData && nextPeriod.gapData ? {
+        startTime: currentPeriod.gapData.startTime,
+        endTime: nextPeriod.gapData.endTime,
+        gapDuration: nextPeriod.gapData.endTime.getTime() - currentPeriod.gapData.startTime.getTime(),
+        gapDurationMinutes: Math.round((nextPeriod.gapData.endTime.getTime() - currentPeriod.gapData.startTime.getTime()) / (1000 * 60)),
+        gapDurationHours: Math.round((nextPeriod.gapData.endTime.getTime() - currentPeriod.gapData.startTime.getTime()) / (1000 * 60)) / 60,
+        startDistance: currentPeriod.gapData.startDistance,
+        endDistance: nextPeriod.gapData.endDistance,
+        startGpsPoint: currentPeriod.gapData.startGpsPoint,
+        endGpsPoint: nextPeriod.gapData.endGpsPoint
+      } : undefined;
+
+      currentPeriod = {
+        startTime: currentPeriod.startTime,
+        endTime: nextPeriod.endTime,
+        recordCount: 0, // Gaps have no records
+        startDistance: currentPeriod.startDistance,
+        endDistance: nextPeriod.endDistance,
+        gpsPoints: [...currentPeriod.gpsPoints, ...nextPeriod.gpsPoints],
+        isGap: true,
+        gapData: mergedGapData
+      };
+    } else {
+      // Gaps are too far apart, add current to results and start new one
+      mergedPeriods.push(currentPeriod);
+      currentPeriod = nextPeriod;
+    }
+  }
+
+  // Add the final period
+  mergedPeriods.push(currentPeriod);
+
+  return mergedPeriods;
 }
