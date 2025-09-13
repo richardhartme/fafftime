@@ -187,7 +187,7 @@ function createSlowPeriodElement(period: SlowPeriod, index: number, commonData: 
   const locationLink = createSlowPeriodLocationLink(period);
 
   const slowPeriodElement = createElementFromTemplate('slow-period-item-template', {
-    'title': `🐌 Slow Period ${index + 1}:`,
+    'title': `🐌 Faff Period ${index + 1}:`,
     'time-range': `${commonData.startTime} - ${commonData.endTime}`,
     'duration': commonData.durationText,
     'record-count': period.recordCount,

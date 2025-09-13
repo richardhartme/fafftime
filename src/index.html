@@ -65,7 +65,7 @@
   </div>
 
   <div id="analysisControls">
-    <label>Slow Period Thresholds:</label>
+    <label>Faff Period Thresholds:</label>
     <div>
       <label>
         <input type="checkbox" id="threshold_2to5" value="2to5" checked> 2-5 minutes
@@ -98,7 +98,7 @@
     </div>
     <div class="map-overlay-control">
       <label>
-        <input type="checkbox" id="showPeriodsOnMap" checked> Show slow periods & gaps on main map
+        <input type="checkbox" id="showPeriodsOnMap" checked> Show faff periods & gaps on main map
       </label>
     </div>
   </div>
@@ -123,9 +123,9 @@
 
 <template id="slow-periods-container-template">
   <div class="slow-periods">
-    <h3>🐌 Slow Periods & Recording Gaps</h3>
+    <h3>🐌 Faff Periods & Recording Gaps</h3>
     <p>Found <span data-field="total-periods"></span> period(s) in selected ranges (<span data-field="range-text"></span>)</p>
-    <p><strong>Breakdown:</strong> <span data-field="slow-count"></span> slow period(s) (speed &lt; 1 m/s), <span data-field="gap-count"></span> recording gap(s)</p>
+    <p><strong>Breakdown:</strong> <span data-field="slow-count"></span> faff period(s) (speed &lt; 1 m/s), <span data-field="gap-count"></span> recording gap(s)</p>
     <p><strong>Total duration:</strong> <span data-field="total-duration"></span></p>
     <div data-field="periods-list"></div>
   </div>
@@ -153,7 +153,7 @@
 
 <template id="no-slow-periods-template">
   <div class="no-slow-periods">
-    <h3>✅ No Slow Periods or Recording Gaps Detected</h3>
+    <h3>✅ No Faff Periods or Recording Gaps Detected</h3>
     <p>No periods found in selected ranges (<span data-field="range-text"></span>) where speed was &lt; 1 m/s or where recording gaps occurred.</p>
     <p>Great job maintaining your pace and consistent recording! 🚴‍♀️💨</p>
   </div>
