@@ -22,18 +22,22 @@ body {
     align-items: center;
 }
 
-.container {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
 header {
     text-align: center;
 }
 
 h1 {
     font-family: 'PlaywriteAUSA', cursive;
+}
+
+h3 {
+    margin-top: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 /* =============================================================================
