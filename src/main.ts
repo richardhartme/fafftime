@@ -41,6 +41,7 @@ import {
 
 // Utility imports
 import { convertGpsCoordinates } from './utils/gps-utils';
+import { trackFitFileParsed } from './utils/analytics';
 
 // =============================================================================
 // APPLICATION INITIALIZATION
@@ -73,6 +74,9 @@ async function parseFitFile(file: File): Promise<void> {
  * Processes successfully parsed FIT data and updates the application state
  */
 function processSuccessfulFitParsing(fitData: FitData, fileName: string): void {
+  // Track successful FIT file parsing
+  trackFitFileParsed();
+
   // Store data for reanalysis
   setCurrentFitData(fitData, fileName);
 

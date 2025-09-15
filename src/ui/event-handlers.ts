@@ -6,6 +6,7 @@ import { TimeRange, FitData } from '../types/app-types';
 import { decodeFitFile } from '../core/fit-parser';
 import { prepareUIForParsing, handleFitParsingError } from './dom-manager';
 import { updateMapOverlays, getActivityMap } from './map-manager';
+import { trackExampleFileLoaded } from '../utils/analytics';
 
 // Global State
 let currentFitData: FitData | null = null;
@@ -97,6 +98,7 @@ export function initializeEventHandlers(
   // Example file load handler
   loadExampleFileLink?.addEventListener('click', async function(event: Event) {
     event.preventDefault();
+    trackExampleFileLoaded();
     await loadExampleFileCallback();
   });
 
