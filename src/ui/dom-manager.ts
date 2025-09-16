@@ -2,8 +2,15 @@
 // TEMPLATE & DOM HELPER FUNCTIONS
 // =============================================================================
 
-import { SlowPeriod, TimestampGap, FitRecord, FitSession } from '../types/app-types';
-import { formatDuration } from '../core/time-utils';
+import {SlowPeriod, TimestampGap, FitRecord, FitSession, TimeRange} from '../types/app-types';
+import {formatDuration, matchesTimeRange} from '../core/time-utils';
+import {RANGE_LABELS} from '../utils/constants';
+
+interface RangeBreakdownEntry {
+  range?: TimeRange;
+  label: string;
+  count: number;
+}
 
 /**
  * Creates a DOM element from a template and populates it with data
@@ -60,12 +67,16 @@ export function createGoogleMapsLink(lat: number, lng: number, text: string = 'ð
 /**
  * Creates the complex slow periods display UI using templates
  */
-export function createSlowPeriodsDisplay(slowPeriods: SlowPeriod[], selectedRangeText: string): DocumentFragment | null {
+export function createSlowPeriodsDisplay(
+  slowPeriods: SlowPeriod[],
+  selectedRangeText: string,
+  selectedRanges: TimeRange[]
+): DocumentFragment | null {
   if (slowPeriods.length === 0) {
     return createNoSlowPeriodsDisplay(selectedRangeText);
   }
 
-  const containerElement = createSlowPeriodsContainer(slowPeriods, selectedRangeText);
+  const containerElement = createSlowPeriodsContainer(slowPeriods, selectedRangeText, selectedRanges);
   const periodsListContainer = containerElement.querySelector('[data-field="periods-list"]');
 
   slowPeriods.forEach((period, index) => {
@@ -88,25 +99,32 @@ function createNoSlowPeriodsDisplay(selectedRangeText: string): DocumentFragment
 /**
  * Creates the slow periods container with summary statistics
  */
-function createSlowPeriodsContainer(slowPeriods: SlowPeriod[], selectedRangeText: string): DocumentFragment {
-  const stats = calculateSlowPeriodStatistics(slowPeriods);
+function createSlowPeriodsContainer(
+  slowPeriods: SlowPeriod[],
+  selectedRangeText: string,
+  selectedRanges: TimeRange[]
+): DocumentFragment {
+  const stats = calculateSlowPeriodStatistics(slowPeriods, selectedRanges);
+  const rangeBreakdownList = buildRangeBreakdownList(stats.rangeBreakdown);
 
   return createElementFromTemplate('slow-periods-container-template', {
     'total-periods': slowPeriods.length,
     'range-text': selectedRangeText,
     'slow-count': stats.slowCount,
     'gap-count': stats.gapCount,
-    'total-duration': stats.formattedTotalDuration
+    'total-duration': stats.formattedTotalDuration,
+    'range-breakdown': rangeBreakdownList
   });
 }
 
 /**
  * Calculates statistics for slow periods and gaps
  */
-function calculateSlowPeriodStatistics(slowPeriods: SlowPeriod[]): {
+function calculateSlowPeriodStatistics(slowPeriods: SlowPeriod[], selectedRanges: TimeRange[]): {
   slowCount: number;
   gapCount: number;
   formattedTotalDuration: string;
+  rangeBreakdown: RangeBreakdownEntry[];
 } {
   const slowCount = slowPeriods.filter(period => !period.isGap).length;
   const gapCount = slowPeriods.filter(period => period.isGap).length;
@@ -115,11 +133,45 @@ function calculateSlowPeriodStatistics(slowPeriods: SlowPeriod[]): {
     return total + Math.round((period.endTime - period.startTime) / 1000);
   }, 0);
 
+  const rangeBreakdown = selectedRanges.map(range => ({
+    range,
+    label: RANGE_LABELS[range],
+    count: slowPeriods.filter(period => !period.isGap && isPeriodInRange(period, range)).length
+  }))
+
   return {
     slowCount,
     gapCount,
-    formattedTotalDuration: formatDuration(totalSlowDuration)
+    formattedTotalDuration: formatDuration(totalSlowDuration),
+    rangeBreakdown
   };
+}
+
+function buildRangeBreakdownList(entries: RangeBreakdownEntry[]): DocumentFragment {
+  const fragment = document.createDocumentFragment();
+
+  if (entries.length === 0) {
+    const emptyItem = document.createElement('li');
+    emptyItem.textContent = 'No thresholds selected';
+    fragment.appendChild(emptyItem);
+    return fragment;
+  }
+
+  entries.forEach(entry => {
+    const item = document.createElement('li');
+    item.textContent = `${entry.label}: ${entry.count}`;
+    fragment.appendChild(item);
+  });
+
+  return fragment;
+}
+
+function isPeriodInRange(period: SlowPeriod, range: TimeRange): boolean {
+  const durationMs = period.endTime.getTime() - period.startTime.getTime();
+  const durationMinutes = durationMs / (1000 * 60);
+  const durationHours = durationMinutes / 60;
+
+  return matchesTimeRange(range, durationMinutes, durationHours);
 }
 
 /**
@@ -158,7 +210,7 @@ function extractCommonPeriodData(period: SlowPeriod, index: number): {
   const durationText = formatDuration(duration);
   const startDistanceKm = (period.startDistance / 1000).toFixed(2);
 
-  return { startTime, endTime, durationText, startDistanceKm };
+  return {startTime, endTime, durationText, startDistanceKm};
 }
 
 /**

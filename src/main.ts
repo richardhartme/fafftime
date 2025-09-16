@@ -5,12 +5,24 @@
 import './styles.css';
 
 // Type imports
-import { FitData } from './types/app-types';
+import {FitData} from './types/app-types';
 
 // Core functionality imports
-import { decodeFitFile, extractActivityTimes } from './core/fit-parser';
-import { findSlowPeriodsWithRanges, findTimestampGaps, processSlowSequence, mergeNearbySlowPeriods, mergeNearbyRecordingGaps } from './core/data-analyzer';
-import { formatDuration, getSelectedRanges, getSelectedRangeText, matchesTimeRange, getCurrentTimestampGapThreshold } from './core/time-utils';
+import {decodeFitFile, extractActivityTimes} from './core/fit-parser';
+import {
+  findSlowPeriodsWithRanges,
+  findTimestampGaps,
+  processSlowSequence,
+  mergeNearbySlowPeriods,
+  mergeNearbyRecordingGaps
+} from './core/data-analyzer';
+import {
+  formatDuration,
+  getSelectedRanges,
+  getSelectedRangeText,
+  matchesTimeRange,
+  getCurrentTimestampGapThreshold
+} from './core/time-utils';
 
 // UI functionality imports
 import {
@@ -40,8 +52,8 @@ import {
 } from './ui/event-handlers';
 
 // Utility imports
-import { convertGpsCoordinates } from './utils/gps-utils';
-import { trackFitFileParsed } from './utils/analytics';
+import {convertGpsCoordinates} from './utils/gps-utils';
+import {trackFitFileParsed} from './utils/analytics';
 
 // =============================================================================
 // APPLICATION INITIALIZATION
@@ -123,7 +135,7 @@ async function loadExampleFile(): Promise<void> {
 
     // Get the file as array buffer and decode
     const arrayBuffer = await response.arrayBuffer();
-    const file = new File([arrayBuffer], 'GreatBritishEscapades2025.fit', { type: 'application/octet-stream' });
+    const file = new File([arrayBuffer], 'GreatBritishEscapades2025.fit', {type: 'application/octet-stream'});
     const fitData = await decodeFitFile(file);
 
     processSuccessfulFitParsing(fitData, 'GreatBritishEscapades2025.fit');
@@ -145,7 +157,7 @@ function displayActivityData(fitData: FitData, fileName: string): void {
   const records = fitData.recordMesgs || [];
   const timestampGaps = findTimestampGaps(records);
 
-  const { startTime, endTime, movingTime, totalDistance } = extractActivityTimes(sessions, records);
+  const {startTime, endTime, movingTime, totalDistance} = extractActivityTimes(sessions, records);
   const activitySummaryElement = createActivitySummaryHeader(fileName);
 
   if (startTime && endTime) {
@@ -182,7 +194,7 @@ function processSlowPeriodsAnalysis(records: any[], startTime: Date, endTime: Da
   setCurrentSlowPeriods(slowPeriods);
 
   const selectedRangeText = getSelectedRangeText(selectedRanges);
-  const slowPeriodsDataElement = createSlowPeriodsDisplay(slowPeriods, selectedRangeText);
+  const slowPeriodsDataElement = createSlowPeriodsDisplay(slowPeriods, selectedRangeText, selectedRanges);
 
   if (slowPeriods.length > 0) {
     setTimeout(() => {
@@ -194,7 +206,7 @@ function processSlowPeriodsAnalysis(records: any[], startTime: Date, endTime: Da
     return total + Math.round((period.endTime - period.startTime) / 1000);
   }, 0);
 
-  return { slowPeriodsDataElement, totalSlowDuration };
+  return {slowPeriodsDataElement, totalSlowDuration};
 }
 
 // =============================================================================

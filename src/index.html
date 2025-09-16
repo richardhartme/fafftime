@@ -125,7 +125,12 @@
   <div class="slow-periods">
     <h3>🐌 Faff Periods & Recording Gaps</h3>
     <p>Found <span data-field="total-periods"></span> period(s) in selected ranges (<span data-field="range-text"></span>)</p>
-    <p><strong>Breakdown:</strong> <span data-field="slow-count"></span> faff period(s) (speed &lt; 1 m/s), <span data-field="gap-count"></span> recording gap(s)</p>
+    <p><strong>Faff periods:</strong> <span data-field="slow-count"></span> (speed &lt; 1 m/s)</p>
+    <div class="threshold-breakdown">
+      <strong>Faff periods by threshold:</strong>
+      <ul data-field="range-breakdown"></ul>
+    </div>
+    <p><strong>Recording gaps:</strong> <span data-field="gap-count"></span></p>
     <p><strong>Total duration:</strong> <span data-field="total-duration"></span></p>
     <div data-field="periods-list"></div>
   </div>

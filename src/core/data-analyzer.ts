@@ -25,7 +25,8 @@ export function findSlowPeriodsWithRanges(records: FitRecord[], selectedRanges: 
   const gapPeriods = findMatchingRecordingGaps(records, selectedRanges);
   const mergedGapPeriods = mergeNearbyRecordingGaps(gapPeriods);
 
-  return [...mergedSlowPeriods, ...mergedGapPeriods].sort((a, b) => a.startTime - b.startTime);
+  return [...slowPeriods, ...gapPeriods].sort((a, b) => a.startTime - b.startTime);
+  // return [...mergedSlowPeriods, ...mergedGapPeriods].sort((a, b) => a.startTime - b.startTime);
 }
 
 /**
