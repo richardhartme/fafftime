@@ -4,7 +4,7 @@ Ultra Cycling faff time Analyser - Find where you spent time stopped instead of 
 
 Use the tool live [https://fafftime.com](https://fafftime.com)
 
-> 🤖 This project was generated with the help of [Claude Code](https://claude.ai/code)
+> 🤖 This project was generated with the help of [Claude Code](https://claude.ai/code) and [OpenAI Codex](https://openai.com/codex/)
 
 ## Screenshot
 
