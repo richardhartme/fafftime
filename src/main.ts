@@ -12,9 +12,7 @@ import {decodeFitFile, extractActivityTimes} from './core/fit-parser';
 import {
   findSlowPeriodsWithRanges,
   findTimestampGaps,
-  processSlowSequence,
-  mergeNearbySlowPeriods,
-  mergeNearbyRecordingGaps
+  processSlowSequence
 } from './core/data-analyzer';
 import {
   formatDuration,
@@ -220,7 +218,5 @@ export {
   processSlowSequence,
   formatDuration,
   matchesTimeRange,
-  convertGpsCoordinates,
-  mergeNearbySlowPeriods,
-  mergeNearbyRecordingGaps
+  convertGpsCoordinates
 };
