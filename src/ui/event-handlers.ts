@@ -16,9 +16,6 @@ let currentFileName: string | null = null;
 const fileInput = document.getElementById('fitFile') as HTMLInputElement | null;
 const fileDropArea = document.getElementById('fileDropArea') as HTMLElement | null;
 const fileSelectButton = document.getElementById('fileSelectButton') as HTMLButtonElement | null;
-const selectedFileDiv = document.getElementById('selectedFile') as HTMLElement | null;
-const fileNameSpan = document.getElementById('fileName') as HTMLSpanElement | null;
-const removeFileButton = document.getElementById('removeFile') as HTMLButtonElement | null;
 const showPeriodsOnMapCheckbox = document.getElementById('showPeriodsOnMap') as HTMLInputElement | null;
 const loadExampleFileLink = document.getElementById('loadExampleFile') as HTMLAnchorElement | null;
 const timestampGapThresholdSelect = document.getElementById('timestampGapThreshold') as HTMLSelectElement | null;
@@ -51,13 +48,6 @@ export function initializeEventHandlers(
   // File select button click handler
   fileSelectButton?.addEventListener('click', function() {
     fileInput?.click();
-  });
-
-  // Remove file button handler
-  removeFileButton?.addEventListener('click', function() {
-    if (fileInput) fileInput.value = '';
-    if (selectedFileDiv) selectedFileDiv.style.display = 'none';
-    if (fileDropArea) fileDropArea.style.display = 'block';
   });
 
   // Drag and drop handlers
@@ -132,17 +122,19 @@ export function initializeEventHandlers(
  */
 async function handleFileSelection(file: File | null, parseFitFileCallback: (file: File) => Promise<void>): Promise<void> {
   if (file && file.name.toLowerCase().endsWith('.fit')) {
-    // Show selected file
-    if (fileNameSpan) fileNameSpan.textContent = file.name;
-    if (selectedFileDiv) selectedFileDiv.style.display = 'flex';
-    if (fileDropArea) fileDropArea.style.display = 'none';
-
     // Automatically parse the file
     await parseFitFileCallback(file);
   } else if (file) {
     // Invalid file type
     alert('Please select a .fit file');
   }
+}
+
+/**
+ * Updates the file selection UI for the example file
+ */
+export function updateUIForExampleFile(fileName: string): void {
+  // No-op placeholder retained for compatibility with existing initialization
 }
 
 /**
@@ -158,13 +150,4 @@ export function setCurrentFitData(fitData: FitData, fileName: string): void {
  */
 export function getCurrentFitData(): { fitData: FitData | null; fileName: string | null } {
   return { fitData: currentFitData, fileName: currentFileName };
-}
-
-/**
- * Updates the file selection UI for the example file
- */
-export function updateUIForExampleFile(fileName: string): void {
-  if (fileNameSpan) fileNameSpan.textContent = `${fileName} (example)`;
-  if (selectedFileDiv) selectedFileDiv.style.display = 'flex';
-  if (fileDropArea) fileDropArea.style.display = 'none';
 }

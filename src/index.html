@@ -15,97 +15,114 @@
         crossorigin=""/>
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1>Ultra Cycling Faff Time</h1>
-    <h4>Find where you spent time stopped (faffing) instead of riding.</h4>
-    <span class="description">After realising there was a 20 hour difference between my elapsed time and moving time during my last ultra event. I wanted a tool to be able to see where all that time went!</span>
-  </header>
+<div class="page-header">
+  <div class="container">
+    <header>
+      <h1>Ultra Cycling Faff Time</h1>
+      <h4>Find where you spent time stopped (faffing) instead of riding.</h4>
+      <span class="description">After realising there was a 20-hour difference between my elapsed time and moving time during my last ultra event. I wanted a tool to be able to see where all that time went!</span>
+    </header>
+  </div>
+</div>
 
-  <div class="file-selection-box">
-    <div class="file-drop-area" id="fileDropArea">
-      <div class="drop-zone-content">
-        <div class="drop-zone-icon">📁</div>
-        <h3>Drop your FIT file here</h3>
-        <p>or <button type="button" class="file-select-button" id="fileSelectButton">choose a file</button></p>
-        <p class="file-types">Accepts .fit files</p>
+<div class="app-layout">
+  <aside class="app-sidebar">
+    <div class="app-sidebar-content">
+      <div class="sidebar-section">
+        <div class="file-selection-box">
+          <div class="file-drop-area" id="fileDropArea">
+          <div class="drop-zone-content">
+            <h3>Drop your FIT file here</h3>
+            <p>or <button type="button" class="file-select-button" id="fileSelectButton">choose a file</button></p>
+            <p class="file-types">Accepts .fit files</p>
+          </div>
+          <input type="file" id="fitFile" accept=".fit" style="display: none;" />
+        </div>
+
+          <div class="example-file-link">
+            <a href="#" id="loadExampleFile">💁 Load example FIT file</a>
+          </div>
+
+        </div>
       </div>
-      <input type="file" id="fitFile" accept=".fit" style="display: none;" />
-    </div>
-    
-    <div class="selected-file" id="selectedFile" style="display: none;">
-      <span class="file-name" id="fileName"></span>
-      <button type="button" class="remove-file" id="removeFile">❌</button>
-    </div>
 
-    <div class="example-file-link">
-      <a href="#" id="loadExampleFile">💁 Load example FIT file</a>
-    </div>
+      <div class="sidebar-section" id="sidebarActivitySummary">
+        <div id="activitySummary"></div>
+      </div>
 
-    <span class="disclaimer">
-        <strong>Please send any example files that do not work for debugging. Use the feedback link below to send them.</strong>
-        <br>
-        <br>
-        FIT files are processed in your browser. Nothing is sent to the server.<br>
-        Built using <a href="https://developer.garmin.com/fit/overview/" target="_blank">Garmin FIT SDK</a> and <a href="https://leafletjs.com/" target="_blank">Leaflet</a>.<br>
-        <a href="https://github.com/Hates/fafftime" target="_blank">🐙 github.com/Hates/fafftime</a> | <a href="mailto:info@fafftime.com?subject=Faff%20Time%20Feedback">✉️ send feedback</a> 
-      </span>
+      <div class="sidebar-section">
+        <div id="analysisControls">
+          <label>Faff Period Thresholds:</label>
+          <div>
+            <label>
+              <input type="checkbox" id="threshold_2to5" value="2to5" checked> 2-5 minutes
+            </label>
+            <label>
+              <input type="checkbox" id="threshold_5to10" value="5to10" checked> 5-10 minutes
+            </label>
+            <label>
+              <input type="checkbox" id="threshold_10to30" value="10to30" checked> 10-30 minutes
+            </label>
+            <label>
+              <input type="checkbox" id="threshold_30to60" value="30to60" checked> 30-60 minutes
+            </label>
+            <label>
+              <input type="checkbox" id="threshold_1to2hours" value="1to2hours" checked> 1-2 hours
+            </label>
+            <label>
+              <input type="checkbox" id="threshold_over2hours" value="over2hours" checked> Over 2 hours
+            </label>
+          </div>
+          <div class="timestamp-gap-control">
+            <label for="timestampGapThreshold">Gap Threshold:</label>
+            <select id="timestampGapThreshold">
+              <option value="60000">1 minute</option>
+              <option value="120000" selected>2 minutes</option>
+              <option value="240000">3 minutes</option>
+              <option value="300000">5 minutes</option>
+              <option value="600000">10 minutes</option>
+            </select> (Increase if using something like auto-pause, which can create a lot of gaps)
+          </div>
+          <div class="map-overlay-control">
+            <label>
+              <input type="checkbox" id="showPeriodsOnMap" checked> Show on main activity map
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <span class="disclaimer">
+              <strong>Please send any example files that do not work for debugging. Use the feedback link below to send them.</strong>
+              <br>
+              <br>
+              FIT files are processed in your browser. Nothing is sent to the server.<br>
+              Built using <a href="https://developer.garmin.com/fit/overview/" target="_blank">Garmin FIT SDK</a> and <a
+              href="https://leafletjs.com/" target="_blank">Leaflet</a>.<br>
+              <a href="https://github.com/Hates/fafftime" target="_blank">🐙 github.com/Hates/fafftime</a> | <a
+              href="mailto:info@fafftime.com?subject=Faff%20Time%20Feedback">✉️ send feedback</a>
+          </span>
+    </div>
+  </aside>
+
+  <div class="app-content">
+    <div class="container">
+      <div id="screenshot">
+        <div class="screenshotContents">
+          <h3>Example Output</h3>
+          <img src="screenshot.png">
+        </div>
+      </div>
+
+      <div id="mapContainer">
+        <h3>📍 Activity Map</h3>
+        <div id="map"></div>
+      </div>
+
+      <div id="slowPeriodData"></div>
+      <div id="timestampGapData"></div>
+      <div id="activityData"></div>
+    </div>
   </div>
-
-  <div id="screenshot">
-    <h3>Example Output</h3>
-    <img src="screenshot.png">
-  </div>
-
-  <div id="activitySummary"></div>
-
-  <div id="mapContainer">
-    <h3>📍 Activity Map</h3>
-    <div id="map"></div>
-  </div>
-
-  <div id="analysisControls">
-    <label>Faff Period Thresholds:</label>
-    <div>
-      <label>
-        <input type="checkbox" id="threshold_2to5" value="2to5" checked> 2-5 minutes
-      </label>
-      <label>
-        <input type="checkbox" id="threshold_5to10" value="5to10" checked> 5-10 minutes
-      </label>
-      <label>
-        <input type="checkbox" id="threshold_10to30" value="10to30" checked> 10-30 minutes
-      </label>
-      <label>
-        <input type="checkbox" id="threshold_30to60" value="30to60" checked> 30-60 minutes
-      </label>
-      <label>
-        <input type="checkbox" id="threshold_1to2hours" value="1to2hours" checked> 1-2 hours
-      </label>
-      <label>
-        <input type="checkbox" id="threshold_over2hours" value="over2hours" checked> Over 2 hours
-      </label>
-    </div>
-    <div class="timestamp-gap-control">
-      <label for="timestampGapThreshold">Recording Gap Threshold:</label>
-      <select id="timestampGapThreshold">
-        <option value="60000">1 minute</option>
-        <option value="120000" selected>2 minutes</option>
-        <option value="240000">3 minutes</option>
-        <option value="300000">5 minutes</option>
-        <option value="600000">10 minutes</option>
-      </select> (Increase if using something like auto-pause, which can create a lot of gaps)
-    </div>
-    <div class="map-overlay-control">
-      <label>
-        <input type="checkbox" id="showPeriodsOnMap" checked> Show faff periods & gaps on main map
-      </label>
-    </div>
-  </div>
-
-  <div id="slowPeriodData"></div>
-  <div id="timestampGapData"></div>
-  <div id="activityData"></div>
 </div>
 
 <!-- Templates -->
@@ -118,7 +135,7 @@
 </template>
 
 <template id="activity-summary-template">
-  <h2 data-field="title"></h2>
+  <h4 data-field="title"></h4>
 </template>
 
 <template id="slow-periods-container-template">

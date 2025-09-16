@@ -30,10 +30,6 @@ header {
     text-align: center;
 }
 
-h1 {
-    font-family: 'PlaywriteAUSA', cursive;
-}
-
 h3 {
     margin-top: 0;
 }
@@ -42,6 +38,82 @@ h3 {
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
+}
+
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.page-header {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 30px auto;
+}
+
+.app-sidebar {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 38, 92, 0.08);
+    padding: 30px 24px;
+}
+
+.app-sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.app-sidebar h2 {
+    margin-top: 0;
+    font-size: 1.6rem;
+}
+
+.app-sidebar p {
+    margin-bottom: 16px;
+    color: #444;
+}
+
+.sidebar-info ul {
+    margin-top: 0;
+}
+
+.app-sidebar ul {
+    padding-left: 20px;
+    margin: 0;
+    color: #333;
+}
+
+.app-sidebar li {
+    margin-bottom: 10px;
+}
+
+.sidebar-section {
+    width: 100%;
+}
+
+.app-sidebar .file-selection-box {
+    margin: 0;
+}
+
+.app-sidebar #analysisControls {
+    margin: 0;
+}
+
+.app-sidebar #analysisControls > div {
+    margin-top: 10px;
+}
+
+.app-content {
+    flex: 1;
+    min-width: 0;
+}
+
+#activitySummary h4 {
+    margin-top: 0;
 }
 
 /* =============================================================================
@@ -56,6 +128,10 @@ h3 {
 
     .container {
         max-width: 100%;
+    }
+
+    .app-layout {
+        gap: 20px;
     }
 
     h1 {
@@ -75,10 +151,6 @@ h3 {
 
     .file-drop-area {
         padding: 30px 15px;
-    }
-
-    .drop-zone-icon {
-        font-size: 2.5rem;
     }
 
     .file-drop-area h3 {
@@ -110,6 +182,24 @@ h3 {
         max-width: 750px;
     }
 
+    .app-layout {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 30px;
+    }
+
+    .app-sidebar {
+        flex: 0 0 240px;
+        position: sticky;
+        top: 25px;
+        max-height: calc(100vh - 50px);
+        overflow-y: auto;
+    }
+
+    .app-content {
+        flex: 1;
+    }
+
     h1 {
         font-size: 2.2rem;
     }
@@ -127,6 +217,24 @@ h3 {
 
     h1 {
         font-size: 2.5rem;
+    }
+
+    .app-layout {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 40px;
+    }
+
+    .app-sidebar {
+        flex: 0 0 320px;
+        position: sticky;
+        top: 30px;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+    }
+
+    .app-content {
+        flex: 1;
     }
 }
 
@@ -173,7 +281,7 @@ h4 {
     border: 2px solid #0066cc;
     border-radius: 8px;
     padding: 20px;
-    margin: 20px 0;
+    margin: 0 0 20px 0;
     background: #f8f9ff;
     box-shadow: 0 2px 4px rgba(0, 102, 204, 0.1);
 }
@@ -181,7 +289,7 @@ h4 {
 .file-drop-area {
     border: 2px dashed #0066cc;
     border-radius: 8px;
-    padding: 40px 20px;
+    padding: 20px;
     text-align: center;
     background: #fdfdff;
     transition: all 0.3s ease;
@@ -202,12 +310,6 @@ h4 {
 
 .drop-zone-content {
     pointer-events: none;
-}
-
-.drop-zone-icon {
-    font-size: 3rem;
-    margin-bottom: 15px;
-    color: #0066cc;
 }
 
 .file-drop-area h3 {
@@ -242,44 +344,9 @@ h4 {
     color: #999;
 }
 
-.selected-file {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #e8f4f8;
-    border: 1px solid #b3d9e6;
-    border-radius: 4px;
-    padding: 12px 16px;
-    margin: 15px 0;
-}
-
-.file-name {
-    font-weight: 500;
-    color: #333;
-    flex: 1;
-}
-
-.remove-file {
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s;
-}
-
-.remove-file:hover {
-    background: #c82333;
-}
-
 
 .example-file-link {
-    margin: 20px 0;
+    margin: 20px 0 0 0;
     font-size: 0.9em;
 }
 
@@ -290,7 +357,7 @@ h4 {
     border: 1px solid #ddd;
     border-radius: 3px;
     background: #f8f9fa;
-    display: inline-block;
+    display: block;
     transition: background-color 0.2s;
 }
 
@@ -303,16 +370,19 @@ h4 {
    SCREENSHOT & DOCUMENTATION
    ============================================================================= */
 
-#screenshot {
-    margin-top: 20px;
+.screenshotContents {
+    padding: 20px;
     text-align: center;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 38, 92, 0.08);
 }
 
-#screenshot img {
+.screenshotContents img {
     border: 1px solid #DDD;
+    border-radius: 12px;
     padding: 10px;
-    width: 100%;
-    max-width: 600px;
+    width: 90%;
     height: auto;
     box-sizing: border-box;
 }
