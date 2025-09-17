@@ -5,11 +5,11 @@
 import { FitData, SlowPeriod, TimestampGap } from '../types/app-types';
 import { convertGpsCoordinates } from '../utils/gps-utils';
 import { formatDuration } from '../core/time-utils';
-import { createElementFromTemplate } from './dom-manager';
 
 // Global State
 let activityMap: L.Map | null = null;
 let currentSlowPeriods: SlowPeriod[] | null = null;
+const miniMapsById = new Map<string, L.Map>();
 
 interface FullRouteOverlay {
   polyline: L.Polyline;
@@ -29,6 +29,11 @@ export function initializeMap(fitData: FitData): void {
   const mapContainerElement = document.getElementById('mapContainer') as HTMLElement | null;
   const records = fitData.recordMesgs || [];
   const gpsPoints = convertGpsCoordinates(records);
+
+  if (!mapContainerElement) {
+    console.warn('Map container element not found');
+    return;
+  }
 
   if (gpsPoints.length === 0) {
     console.log('No GPS data found in FIT file');
@@ -76,17 +81,12 @@ export function initializeMap(fitData: FitData): void {
 
   // Fit map to show entire route
   activityMap.fitBounds(polyline.getBounds(), { padding: [10, 10] });
-
-  // Add slow periods and gaps overlay if enabled
-  updateMapOverlays();
 }
 
 /**
  * Updates map overlays to show/hide slow periods and recording gaps
  */
-export function updateMapOverlays(): void {
-  const showPeriodsOnMapCheckbox = document.getElementById('showPeriodsOnMap') as HTMLInputElement | null;
-
+export function updateMapOverlays(showOverlays: boolean = true): void {
   if (!activityMap || !currentSlowPeriods) {
     return;
   }
@@ -99,7 +99,7 @@ export function updateMapOverlays(): void {
   });
 
   // Only add overlays if checkbox is checked
-  if (!showPeriodsOnMapCheckbox.checked) {
+  if (!showOverlays) {
     return;
   }
 
@@ -181,6 +181,8 @@ export function setCurrentSlowPeriods(slowPeriods: SlowPeriod[]): void {
  * Creates mini-maps for individual slow periods and recording gaps
  */
 export function initializeCombinedMiniMaps(periods: SlowPeriod[], fullRoute: [number, number][]): void {
+  const activeMapIds = new Set<string>();
+
   periods.forEach((period, index) => {
     const mapId = `miniMap${index}`;
     const mapElement = document.getElementById(mapId);
@@ -189,10 +191,20 @@ export function initializeCombinedMiniMaps(periods: SlowPeriod[], fullRoute: [nu
       return;
     }
 
+    activeMapIds.add(mapId);
+    destroyMiniMap(mapId);
+
     if (period.isGap) {
       initializeGapMiniMap(period, index, mapElement, mapId, fullRoute);
     } else {
       initializeSlowPeriodMiniMap(period, index, mapElement, mapId, fullRoute);
+    }
+  });
+
+  // Clean up any mini-maps that are no longer active
+  Array.from(miniMapsById.keys()).forEach(mapId => {
+    if (!activeMapIds.has(mapId)) {
+      destroyMiniMap(mapId);
     }
   });
 }
@@ -268,6 +280,8 @@ function createBasicMiniMap(mapId: string): L.Map {
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: ''
   }).addTo(miniMap);
+
+  miniMapsById.set(mapId, miniMap);
 
   return miniMap;
 }
@@ -372,12 +386,13 @@ function plotFullRouteOnMiniMap(miniMap: L.Map, fullRoute: [number, number][]): 
  * Shows a "no GPS data" message in the map element
  */
 function showNoGpsMessage(mapElement: HTMLElement, message: string): void {
+  destroyMiniMap(mapElement.id);
   while (mapElement.firstChild) {
     mapElement.removeChild(mapElement.firstChild);
   }
-  const noGpsElement = createElementFromTemplate('no-gps-message-template', {
-    message: message
-  });
+  const noGpsElement = document.createElement('div');
+  noGpsElement.className = 'no-gps-message';
+  noGpsElement.textContent = message;
   mapElement.appendChild(noGpsElement);
 }
 
@@ -549,4 +564,21 @@ function addDirectionalChevrons(miniMap: L.Map, polyline: L.Polyline): L.Layer |
  */
 export function getActivityMap(): L.Map | null {
   return activityMap;
+}
+
+function destroyMiniMap(mapId: string): void {
+  const existingMap = miniMapsById.get(mapId);
+  if (existingMap) {
+    existingMap.off();
+    existingMap.remove();
+    miniMapsById.delete(mapId);
+  }
+
+  const mapElement = document.getElementById(mapId);
+  if (mapElement && (mapElement as any)._leaflet_id) {
+    delete (mapElement as any)._leaflet_id;
+  }
+  if (mapElement) {
+    mapElement.innerHTML = '';
+  }
 }

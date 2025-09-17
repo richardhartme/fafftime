@@ -32,9 +32,8 @@ h4 {
 }
 
 .container {
-  width: 100%;
-  max-width: 1000px;
   margin: 0 auto;
+  max-width: 100%;
 }
 
 .app-layout {
@@ -100,10 +99,6 @@ h4 {
     padding: 15px;
   }
 
-  .container {
-    max-width: 100%;
-  }
-
   .app-layout {
     gap: 20px;
   }
@@ -151,10 +146,6 @@ h4 {
     padding: 25px;
   }
 
-  .container {
-    max-width: 750px;
-  }
-
   .app-layout {
     flex-direction: row;
     align-items: flex-start;
@@ -181,10 +172,6 @@ h4 {
 @media (min-width: 1025px) {
   body {
     padding: 30px;
-  }
-
-  .container {
-    max-width: 1000px;
   }
 
   h1 {

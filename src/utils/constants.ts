@@ -14,3 +14,14 @@ export const RANGE_LABELS: Record<TimeRange, string> = {
 };
 
 export const SPEED_THRESHOLD: number = 0.75; // m/s threshold for slow periods
+
+export const DEFAULT_GAP_THRESHOLD_MS = 120000;
+
+export const DEFAULT_SELECTED_RANGES: TimeRange[] = [
+  '2to5',
+  '5to10',
+  '10to30',
+  '30to60',
+  '1to2hours',
+  'over2hours'
+];
