@@ -187,6 +187,7 @@ function processSlowPeriodsAnalysis(records: any[], startTime: Date, endTime: Da
 } {
   const selectedRanges = getSelectedRanges();
   const slowPeriods = findSlowPeriodsWithRanges(records, selectedRanges);
+  const activityRoute = convertGpsCoordinates(records);
 
   setCurrentSlowPeriods(slowPeriods);
 
@@ -195,7 +196,7 @@ function processSlowPeriodsAnalysis(records: any[], startTime: Date, endTime: Da
 
   if (slowPeriods.length > 0) {
     setTimeout(() => {
-      initializeCombinedMiniMaps(slowPeriods);
+      initializeCombinedMiniMaps(slowPeriods, activityRoute);
     }, 100);
   }
 

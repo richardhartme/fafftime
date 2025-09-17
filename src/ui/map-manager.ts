@@ -123,7 +123,7 @@ function addGapOverlayToMap(period: SlowPeriod, index: number): void {
     // Add dashed line for gap if both points exist
     L.polyline([gap.startGpsPoint, gap.endGpsPoint], {
       color: '#dc3545',
-      weight: 4,
+      weight: 3,
       opacity: 0.8,
       dashArray: '15, 10',
       isGapOverlay: true
@@ -151,7 +151,7 @@ function addSlowPeriodOverlayToMap(period: SlowPeriod, index: number): void {
     if (period.gpsPoints.length > 1) {
       L.polyline(period.gpsPoints, {
         color: '#ffc107',
-        weight: 6,
+        weight: 3,
         opacity: 0.9,
         isSlowPeriodOverlay: true
       }).addTo(activityMap);
@@ -169,7 +169,7 @@ export function setCurrentSlowPeriods(slowPeriods: SlowPeriod[]): void {
 /**
  * Creates mini-maps for individual slow periods and recording gaps
  */
-export function initializeCombinedMiniMaps(periods: SlowPeriod[]): void {
+export function initializeCombinedMiniMaps(periods: SlowPeriod[], fullRoute: [number, number][]): void {
   periods.forEach((period, index) => {
     const mapId = `miniMap${index}`;
     const mapElement = document.getElementById(mapId);
@@ -179,9 +179,9 @@ export function initializeCombinedMiniMaps(periods: SlowPeriod[]): void {
     }
 
     if (period.isGap) {
-      initializeGapMiniMap(period, index, mapElement, mapId);
+      initializeGapMiniMap(period, index, mapElement, mapId, fullRoute);
     } else {
-      initializeSlowPeriodMiniMap(period, index, mapElement, mapId);
+      initializeSlowPeriodMiniMap(period, index, mapElement, mapId, fullRoute);
     }
   });
 }
@@ -189,7 +189,13 @@ export function initializeCombinedMiniMaps(periods: SlowPeriod[]): void {
 /**
  * Initializes a mini-map for a recording gap
  */
-function initializeGapMiniMap(period: SlowPeriod, index: number, mapElement: HTMLElement, mapId: string): void {
+function initializeGapMiniMap(
+  period: SlowPeriod,
+  index: number,
+  mapElement: HTMLElement,
+  mapId: string,
+  fullRoute: [number, number][]
+): void {
   const gap = period.gapData;
 
   if (!gap.startGpsPoint && !gap.endGpsPoint) {
@@ -198,6 +204,7 @@ function initializeGapMiniMap(period: SlowPeriod, index: number, mapElement: HTM
   }
 
   const miniMap = createBasicMiniMap(mapId);
+  plotFullRouteOnMiniMap(miniMap, fullRoute);
   const availablePoints = collectAvailableGpsPoints(gap);
 
   if (availablePoints.length === 1) {
@@ -210,13 +217,20 @@ function initializeGapMiniMap(period: SlowPeriod, index: number, mapElement: HTM
 /**
  * Initializes a mini-map for a slow period
  */
-function initializeSlowPeriodMiniMap(period: SlowPeriod, index: number, mapElement: HTMLElement, mapId: string): void {
+function initializeSlowPeriodMiniMap(
+  period: SlowPeriod,
+  index: number,
+  mapElement: HTMLElement,
+  mapId: string,
+  fullRoute: [number, number][]
+): void {
   if (period.gpsPoints.length === 0) {
     showNoGpsMessage(mapElement, 'No GPS data for this period');
     return;
   }
 
   const miniMap = createBasicMiniMap(mapId);
+  plotFullRouteOnMiniMap(miniMap, fullRoute);
 
   if (period.gpsPoints.length === 1) {
     setupSinglePointSlowPeriodMap(miniMap, period, index);
@@ -246,6 +260,23 @@ function createBasicMiniMap(mapId: string): L.Map {
 }
 
 /**
+ * Plots the full activity route on a mini-map when GPS data is available
+ */
+function plotFullRouteOnMiniMap(miniMap: L.Map, fullRoute: [number, number][]): void {
+  if (!fullRoute || fullRoute.length < 2) {
+    return;
+  }
+
+  L.polyline(fullRoute, {
+    color: 'red',
+    weight: 3,
+    opacity: 0.6,
+    interactive: false,
+    className: 'full-route-overlay'
+  }).addTo(miniMap);
+}
+
+/**
  * Shows a "no GPS data" message in the map element
  */
 function showNoGpsMessage(mapElement: HTMLElement, message: string): void {
@@ -271,9 +302,12 @@ function collectAvailableGpsPoints(gap: TimestampGap): [number, number][] {
 /**
  * Sets up a gap mini-map with a single GPS point
  */
-function setupSinglePointGapMap(miniMap: L.Map, gap: TimestampGap, index: number, point: [number, number]): void {
-  miniMap.setView(point, 15);
-
+function setupSinglePointGapMap(
+  miniMap: L.Map,
+  gap: TimestampGap,
+  index: number,
+  point: [number, number]
+): void {
   const isStartPoint = gap.startGpsPoint && !gap.endGpsPoint;
   const markerConfig = isStartPoint
     ? { className: 'gap-start-marker', html: '<div class="gap-start-marker">Gap Start</div>', size: [70, 25], popup: `Recording Gap ${index + 1} - Recording stopped here` }
@@ -286,12 +320,22 @@ function setupSinglePointGapMap(miniMap: L.Map, gap: TimestampGap, index: number
       iconSize: markerConfig.size
     })
   }).addTo(miniMap).bindPopup(markerConfig.popup);
+
+  miniMap.setView(point, 15);
 }
 
 /**
  * Sets up a gap mini-map with both start and end GPS points
  */
-function setupDualPointGapMap(miniMap: L.Map, gap: TimestampGap, index: number): void {
+function setupDualPointGapMap(
+  miniMap: L.Map,
+  gap: TimestampGap,
+  index: number
+): void {
+  if (!gap.startGpsPoint || !gap.endGpsPoint) {
+    return;
+  }
+
   // Add start marker
   L.marker(gap.startGpsPoint, {
     icon: L.divIcon({
@@ -313,12 +357,11 @@ function setupDualPointGapMap(miniMap: L.Map, gap: TimestampGap, index: number):
   // Add dashed line
   L.polyline([gap.startGpsPoint, gap.endGpsPoint], {
     color: '#dc3545',
-    weight: 3,
+    weight: 4,
     opacity: 0.7,
     dashArray: '10, 10'
   }).addTo(miniMap);
 
-  // Fit to bounds
   const bounds = L.latLngBounds([gap.startGpsPoint, gap.endGpsPoint]);
   miniMap.fitBounds(bounds, { padding: [20, 20] });
 }
@@ -326,18 +369,27 @@ function setupDualPointGapMap(miniMap: L.Map, gap: TimestampGap, index: number):
 /**
  * Sets up a slow period mini-map with a single GPS point
  */
-function setupSinglePointSlowPeriodMap(miniMap: L.Map, period: SlowPeriod, index: number): void {
+function setupSinglePointSlowPeriodMap(
+  miniMap: L.Map,
+  period: SlowPeriod,
+  index: number
+): void {
   const point = period.gpsPoints[0];
-  miniMap.setView(point, 16);
   L.marker(point)
     .addTo(miniMap)
     .bindPopup(`Slow period ${index + 1}`);
+
+  miniMap.setView(point, 16);
 }
 
 /**
  * Sets up a slow period mini-map with multiple GPS points
  */
-function setupMultiPointSlowPeriodMap(miniMap: L.Map, period: SlowPeriod, index: number): void {
+function setupMultiPointSlowPeriodMap(
+  miniMap: L.Map,
+  period: SlowPeriod,
+  index: number
+): void {
   const polyline = L.polyline(period.gpsPoints, {
     color: '#ffc107',
     weight: 4,
