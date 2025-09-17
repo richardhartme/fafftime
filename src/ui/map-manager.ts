@@ -11,6 +11,17 @@ import { createElementFromTemplate } from './dom-manager';
 let activityMap: L.Map | null = null;
 let currentSlowPeriods: SlowPeriod[] | null = null;
 
+interface FullRouteOverlay {
+  polyline: L.Polyline;
+  decorator: L.Layer | null;
+}
+
+type ToggleInputWithHandler = HTMLInputElement & {
+  __fullRouteToggleHandler?: (event: Event) => void;
+};
+
+const fullRouteOverlaysByMapId = new Map<string, FullRouteOverlay>();
+
 /**
  * Initializes the main activity map with GPS route and markers
  */
@@ -199,12 +210,13 @@ function initializeGapMiniMap(
   const gap = period.gapData;
 
   if (!gap.startGpsPoint && !gap.endGpsPoint) {
+    disableFullRouteToggle(mapId);
     showNoGpsMessage(mapElement, 'No GPS data available for this gap');
     return;
   }
 
   const miniMap = createBasicMiniMap(mapId);
-  plotFullRouteOnMiniMap(miniMap, fullRoute);
+  setupFullRouteToggle(mapId, miniMap, fullRoute);
   const availablePoints = collectAvailableGpsPoints(gap);
 
   if (availablePoints.length === 1) {
@@ -225,12 +237,13 @@ function initializeSlowPeriodMiniMap(
   fullRoute: [number, number][]
 ): void {
   if (period.gpsPoints.length === 0) {
+    disableFullRouteToggle(mapId);
     showNoGpsMessage(mapElement, 'No GPS data for this period');
     return;
   }
 
   const miniMap = createBasicMiniMap(mapId);
-  plotFullRouteOnMiniMap(miniMap, fullRoute);
+  setupFullRouteToggle(mapId, miniMap, fullRoute);
 
   if (period.gpsPoints.length === 1) {
     setupSinglePointSlowPeriodMap(miniMap, period, index);
@@ -259,12 +272,84 @@ function createBasicMiniMap(mapId: string): L.Map {
   return miniMap;
 }
 
+function setupFullRouteToggle(mapId: string, miniMap: L.Map, fullRoute: [number, number][]): void {
+  const toggleInput = document.querySelector(`input[data-mini-map-id="${mapId}"]`) as ToggleInputWithHandler | null;
+
+  if (!toggleInput) {
+    return;
+  }
+
+  if (!fullRoute || fullRoute.length < 2) {
+    disableFullRouteToggle(mapId);
+    return;
+  }
+
+  if (toggleInput.__fullRouteToggleHandler) {
+    toggleInput.removeEventListener('change', toggleInput.__fullRouteToggleHandler);
+  }
+
+  toggleInput.disabled = false;
+  toggleInput.checked = false;
+  removeFullRouteOverlay(mapId);
+
+  const handleChange = () => {
+    if (toggleInput.checked) {
+      addFullRouteOverlay(mapId, miniMap, fullRoute);
+    } else {
+      removeFullRouteOverlay(mapId);
+    }
+  };
+
+  toggleInput.__fullRouteToggleHandler = handleChange;
+  toggleInput.addEventListener('change', handleChange);
+}
+
+function disableFullRouteToggle(mapId: string): void {
+  const toggleInput = document.querySelector(`input[data-mini-map-id="${mapId}"]`) as ToggleInputWithHandler | null;
+
+  if (!toggleInput) {
+    return;
+  }
+
+  if (toggleInput.__fullRouteToggleHandler) {
+    toggleInput.removeEventListener('change', toggleInput.__fullRouteToggleHandler);
+    delete toggleInput.__fullRouteToggleHandler;
+  }
+
+  toggleInput.checked = false;
+  toggleInput.disabled = true;
+  removeFullRouteOverlay(mapId);
+}
+
+function addFullRouteOverlay(mapId: string, miniMap: L.Map, fullRoute: [number, number][]): void {
+  removeFullRouteOverlay(mapId);
+
+  const overlay = plotFullRouteOnMiniMap(miniMap, fullRoute);
+  if (overlay) {
+    fullRouteOverlaysByMapId.set(mapId, overlay);
+  }
+}
+
+function removeFullRouteOverlay(mapId: string): void {
+  const overlay = fullRouteOverlaysByMapId.get(mapId);
+  if (!overlay) {
+    return;
+  }
+
+  overlay.polyline.remove();
+  if (overlay.decorator) {
+    overlay.decorator.remove();
+  }
+
+  fullRouteOverlaysByMapId.delete(mapId);
+}
+
 /**
  * Plots the full activity route on a mini-map when GPS data is available
  */
-function plotFullRouteOnMiniMap(miniMap: L.Map, fullRoute: [number, number][]): void {
+function plotFullRouteOnMiniMap(miniMap: L.Map, fullRoute: [number, number][]): FullRouteOverlay | null {
   if (!fullRoute || fullRoute.length < 2) {
-    return;
+    return null;
   }
 
   const fullRouteLine = L.polyline(fullRoute, {
@@ -275,7 +360,12 @@ function plotFullRouteOnMiniMap(miniMap: L.Map, fullRoute: [number, number][]): 
     className: 'full-route-overlay'
   }).addTo(miniMap);
 
-  addDirectionalChevrons(miniMap, fullRouteLine);
+  const decorator = addDirectionalChevrons(miniMap, fullRouteLine);
+
+  return {
+    polyline: fullRouteLine,
+    decorator
+  };
 }
 
 /**
@@ -364,8 +454,6 @@ function setupDualPointGapMap(
     dashArray: '10, 10'
   }).addTo(miniMap);
 
-  addDirectionalChevrons(miniMap, gapLine);
-
   const bounds = L.latLngBounds([gap.startGpsPoint, gap.endGpsPoint]);
   miniMap.fitBounds(bounds, { padding: [20, 20] });
 }
@@ -400,8 +488,6 @@ function setupMultiPointSlowPeriodMap(
     opacity: 0.8
   }).addTo(miniMap);
 
-  addDirectionalChevrons(miniMap, polyline);
-
   // Add start marker
   L.marker(period.gpsPoints[0], {
     icon: L.divIcon({
@@ -426,9 +512,9 @@ function setupMultiPointSlowPeriodMap(
 /**
  * Adds chevron markers along a polyline to show travel direction
  */
-function addDirectionalChevrons(miniMap: L.Map, polyline: L.Polyline): void {
+function addDirectionalChevrons(miniMap: L.Map, polyline: L.Polyline): L.Layer | null {
   if (typeof L.polylineDecorator !== 'function' || !L.Symbol || typeof L.Symbol.arrowHead !== 'function') {
-    return;
+    return null;
   }
 
   const polylineOptions = polyline.options as L.PolylineOptions;
@@ -455,6 +541,7 @@ function addDirectionalChevrons(miniMap: L.Map, polyline: L.Polyline): void {
   });
 
   decorator.addTo(miniMap);
+  return decorator;
 }
 
 /**

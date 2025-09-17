@@ -301,8 +301,17 @@ function createSlowPeriodLocationLink(period: SlowPeriod): HTMLSpanElement | str
  * Sets up the mini-map element for a period
  */
 function setupMiniMapElement(element: DocumentFragment, index: number): void {
-  const miniMapElement = element.querySelector('[data-field="mini-map"]');
-  miniMapElement.id = `miniMap${index}`;
+  const mapId = `miniMap${index}`;
+  const miniMapElement = element.querySelector('[data-field="mini-map"]') as HTMLElement | null;
+  if (miniMapElement) {
+    miniMapElement.id = mapId;
+  }
+
+  const fullRouteToggle = element.querySelector('input[data-role="full-route-toggle"]') as HTMLInputElement | null;
+  if (fullRouteToggle) {
+    fullRouteToggle.checked = false;
+    fullRouteToggle.setAttribute('data-mini-map-id', mapId);
+  }
 }
 
 /**
