@@ -45,7 +45,6 @@ import {
 import {
   initializeEventHandlers,
   setCurrentFitData,
-  getCurrentFitData,
   updateUIForExampleFile
 } from './ui/event-handlers';
 

@@ -144,10 +144,3 @@ export function setCurrentFitData(fitData: FitData, fileName: string): void {
   currentFitData = fitData;
   currentFileName = fileName;
 }
-
-/**
- * Gets the current FIT data
- */
-export function getCurrentFitData(): { fitData: FitData | null; fileName: string | null } {
-  return { fitData: currentFitData, fileName: currentFileName };
-}
