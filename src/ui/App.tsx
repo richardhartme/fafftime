@@ -122,9 +122,9 @@ function buildAnalysisResult(
 ): AnalysisResult {
   const sessions = fitData.sessionMesgs || [];
   const records = fitData.recordMesgs || [];
-  const timestampGaps = findTimestampGaps(records, gapThreshold);
   const {startTime, endTime, movingTime, totalDistance} = extractActivityTimes(sessions, records);
   const slowPeriods = findSlowPeriodsWithRanges(records, selectedRanges, gapThreshold);
+  const timestampGaps = findTimestampGaps(records, gapThreshold);
   const activityRoute = convertGpsCoordinates(records);
   const stats = calculateSlowPeriodStatistics(slowPeriods, selectedRanges);
   const selectedRangeText = selectedRanges.length > 0 ? getSelectedRangeText(selectedRanges) : 'None selected';
