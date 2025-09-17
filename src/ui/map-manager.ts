@@ -267,13 +267,15 @@ function plotFullRouteOnMiniMap(miniMap: L.Map, fullRoute: [number, number][]): 
     return;
   }
 
-  L.polyline(fullRoute, {
+  const fullRouteLine = L.polyline(fullRoute, {
     color: 'red',
     weight: 3,
     opacity: 0.6,
     interactive: false,
     className: 'full-route-overlay'
   }).addTo(miniMap);
+
+  addDirectionalChevrons(miniMap, fullRouteLine);
 }
 
 /**
@@ -355,12 +357,14 @@ function setupDualPointGapMap(
   }).addTo(miniMap).bindPopup(`Recording Gap ${index + 1} - Recording resumed`);
 
   // Add dashed line
-  L.polyline([gap.startGpsPoint, gap.endGpsPoint], {
+  const gapLine = L.polyline([gap.startGpsPoint, gap.endGpsPoint], {
     color: '#dc3545',
     weight: 4,
     opacity: 0.7,
     dashArray: '10, 10'
   }).addTo(miniMap);
+
+  addDirectionalChevrons(miniMap, gapLine);
 
   const bounds = L.latLngBounds([gap.startGpsPoint, gap.endGpsPoint]);
   miniMap.fitBounds(bounds, { padding: [20, 20] });
@@ -396,6 +400,8 @@ function setupMultiPointSlowPeriodMap(
     opacity: 0.8
   }).addTo(miniMap);
 
+  addDirectionalChevrons(miniMap, polyline);
+
   // Add start marker
   L.marker(period.gpsPoints[0], {
     icon: L.divIcon({
@@ -415,6 +421,40 @@ function setupMultiPointSlowPeriodMap(
   }).addTo(miniMap);
 
   miniMap.fitBounds(polyline.getBounds(), { padding: [10, 10] });
+}
+
+/**
+ * Adds chevron markers along a polyline to show travel direction
+ */
+function addDirectionalChevrons(miniMap: L.Map, polyline: L.Polyline): void {
+  if (typeof L.polylineDecorator !== 'function' || !L.Symbol || typeof L.Symbol.arrowHead !== 'function') {
+    return;
+  }
+
+  const polylineOptions = polyline.options as L.PolylineOptions;
+  const arrowColor = polylineOptions.color ?? '#3388ff';
+  const arrowWeight = polylineOptions.weight ?? 3;
+  const arrowOpacity = polylineOptions.opacity ?? 0.9;
+
+  const decorator = L.polylineDecorator(polyline, {
+    patterns: [
+      {
+        offset: 25,
+        repeat: 240,
+        symbol: L.Symbol.arrowHead({
+          pixelSize: Math.max(10, arrowWeight * 3),
+          polygon: false,
+          pathOptions: {
+            color: arrowColor,
+            weight: arrowWeight,
+            opacity: arrowOpacity
+          }
+        })
+      }
+    ]
+  });
+
+  decorator.addTo(miniMap);
 }
 
 /**
