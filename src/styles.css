@@ -367,8 +367,8 @@ h4 {
 }
 
 #analysisControls label {
-  display: inline-block;
-  margin-right: 5px;
+  display: block;
+  margin-bottom: 4px;
 }
 
 .map-overlay-control {

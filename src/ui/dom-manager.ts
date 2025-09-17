@@ -288,10 +288,6 @@ function createSlowPeriodLocationLink(period: SlowPeriod): HTMLSpanElement | str
   const locationSpan = document.createElement('span');
 
   locationSpan.appendChild(document.createTextNode('\n'));
-  const strongElement = document.createElement('strong');
-  strongElement.textContent = 'Location:';
-  locationSpan.appendChild(strongElement);
-  locationSpan.appendChild(document.createTextNode(' '));
   locationSpan.appendChild(linkElement);
 
   return locationSpan;
