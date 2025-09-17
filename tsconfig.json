@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "allowJs": true,
     "checkJs": false,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

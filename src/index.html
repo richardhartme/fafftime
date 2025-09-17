@@ -8,231 +8,23 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
-
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossorigin=""/>
+        crossorigin="" />
 </head>
 <body>
-<div class="page-header">
-  <div class="container">
-    <header>
-      <h1>Ultra Cycling Faff Time</h1>
-      <h4>Find where you spent time stopped (faffing) instead of riding.</h4>
-      <span class="description">After realising there was a 20-hour difference between my elapsed time and moving time during my last ultra event. I wanted a tool to be able to see where all that time went!</span>
-    </header>
-  </div>
-</div>
+<div id="root"></div>
 
-<div class="app-layout">
-  <aside class="app-sidebar">
-    <div class="app-sidebar-content">
-      <div class="sidebar-section">
-        <div class="file-selection-box">
-          <div class="file-drop-area" id="fileDropArea">
-          <div class="drop-zone-content">
-            <h3>Drop your FIT file here</h3>
-            <p>or <button type="button" class="file-select-button" id="fileSelectButton">choose a file</button></p>
-            <p class="file-types">Accepts .fit files</p>
-          </div>
-          <input type="file" id="fitFile" accept=".fit" style="display: none;" />
-        </div>
-
-          <div class="example-file-link">
-            <a href="#" id="loadExampleFile">🚴 Load example FIT file</a>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="sidebar-section" id="sidebarActivitySummary">
-        <div id="activitySummary"></div>
-      </div>
-
-      <div class="sidebar-section">
-        <div id="analysisControls">
-          <label>Faff Period Thresholds:</label>
-          <div>
-            <label>
-              <input type="checkbox" id="threshold_2to5" value="2to5" checked> 2-5 minutes
-            </label>
-            <label>
-              <input type="checkbox" id="threshold_5to10" value="5to10" checked> 5-10 minutes
-            </label>
-            <label>
-              <input type="checkbox" id="threshold_10to30" value="10to30" checked> 10-30 minutes
-            </label>
-            <label>
-              <input type="checkbox" id="threshold_30to60" value="30to60" checked> 30-60 minutes
-            </label>
-            <label>
-              <input type="checkbox" id="threshold_1to2hours" value="1to2hours" checked> 1-2 hours
-            </label>
-            <label>
-              <input type="checkbox" id="threshold_over2hours" value="over2hours" checked> Over 2 hours
-            </label>
-          </div>
-          <div class="timestamp-gap-control">
-            <label for="timestampGapThreshold">Gap Threshold:</label>
-            <select id="timestampGapThreshold" title="Increase if you have excessive recording gaps">
-              <option value="60000">1 minute</option>
-              <option value="120000" selected>2 minutes</option>
-              <option value="240000">3 minutes</option>
-              <option value="300000">5 minutes</option>
-              <option value="600000">10 minutes</option>
-            </select>
-          </div>
-          <div class="map-overlay-control">
-            <label>
-              <input type="checkbox" id="showPeriodsOnMap" checked> Show slow periods and gaps on main activity map
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <span class="disclaimer">
-              <strong>Use the feedback link below to share any files that aren’t behaving so I can fix them.</strong>
-              <br>
-              <br>
-              FIT files are processed in your browser.<br>
-              <a href="https://github.com/Hates/fafftime" target="_blank">🐙 github.com/Hates/fafftime</a> | <a
-              href="mailto:info@fafftime.com?subject=Faff%20Time%20Feedback">✉️ send feedback</a>
-          </span>
-    </div>
-  </aside>
-
-  <div class="app-content">
-    <div class="container">
-      <div id="screenshot">
-        <div class="screenshotContents">
-          <h3>Example Output</h3>
-          <img src="screenshot.png">
-        </div>
-      </div>
-
-      <div id="mapContainer">
-        <h3>📍 Activity Map</h3>
-        <div id="map"></div>
-      </div>
-
-      <div id="slowPeriodData"></div>
-      <div id="timestampGapData"></div>
-      <div id="activityData"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Templates -->
-<template id="loading-template">
-  <p data-field="message"></p>
-</template>
-
-<template id="error-template">
-  <p class="error-message" data-field="message"></p>
-</template>
-
-<template id="activity-summary-template">
-  <h4 data-field="title"></h4>
-</template>
-
-<template id="slow-periods-container-template">
-  <div class="slow-periods">
-    <h3>🐌 Faff Periods & Recording Gaps</h3>
-    <p>Found <span data-field="total-periods"></span> period(s) in selected ranges (<span data-field="range-text"></span>)</p>
-    <p><strong>Faff periods:</strong> <span data-field="slow-count"></span> (speed &lt; 1 m/s)</p>
-    <div class="threshold-breakdown">
-      <strong>Faff periods by threshold:</strong>
-      <ul data-field="range-breakdown"></ul>
-    </div>
-    <p><strong>Recording gaps:</strong> <span data-field="gap-count"></span></p>
-    <p><strong>Total duration:</strong> <span data-field="total-duration"></span></p>
-    <div data-field="periods-list"></div>
-  </div>
-</template>
-
-<template id="recording-gap-item-template">
-  <div class="timestamp-gap-item">
-    <strong data-field="title"></strong> <span data-field="time-range"></span><br>
-    <strong>Duration:</strong> <span data-field="duration"></span> (no data recorded)<br>
-    <strong>Distance:</strong> <span data-field="distance-range"></span><br>
-    <label class="full-route-toggle">
-      <input type="checkbox" data-role="full-route-toggle">
-      Show activity route
-    </label></br>
-    <span data-field="location-links"></span><br>
-    <div data-field="mini-map" class="mini-map"></div>
-  </div>
-</template>
-
-<template id="slow-period-item-template">
-  <div class="slow-period-item">
-    <strong data-field="title"></strong> <span data-field="time-range"></span><br>
-    <strong>Duration:</strong> <span data-field="duration"></span> (<span data-field="record-count"></span> records)<br>
-    <strong>Distance:</strong> <span data-field="distance"></span> km<br>
-    <label class="full-route-toggle">
-      <input type="checkbox" data-role="full-route-toggle">
-      Show activity route
-    </label><br>
-    <span data-field="location-link"></span><br>
-    <div data-field="mini-map" class="mini-map"></div>
-  </div>
-</template>
-
-<template id="no-slow-periods-template">
-  <div class="no-slow-periods">
-    <h3>✅ No Faff Periods or Recording Gaps Detected</h3>
-    <p>No periods found in selected ranges (<span data-field="range-text"></span>) where speed was &lt; 1 m/s or where recording gaps occurred.</p>
-    <p>Great job maintaining your pace and consistent recording! 🚴‍♀️💨</p>
-  </div>
-</template>
-
-<template id="google-maps-link-template">
-  <a data-field="href" target="_blank" class="google-maps-link" data-field="text">📍 View on Google Maps</a>
-</template>
-
-<template id="no-gps-message-template">
-  <div class="no-gps-message" data-field="message"></div>
-</template>
-
-<template id="activity-times-template">
-  <div class="activity-times">
-    <h3>⏰ Activity Times</h3>
-    <p><strong>Start Time:</strong> <span data-field="start-time"></span></p>
-    <p><strong>End Time:</strong> <span data-field="end-time"></span></p>
-    <p><strong>Duration:</strong> <span data-field="duration"></span></p>
-    <p><strong>Est. Stopped Time:</strong> <span data-field="stopped-time"></span></p>
-    <p><strong>Est. Moving Time:</strong> <span data-field="moving-time"></span></p>
-    <p data-field="distance-info" style="display:none;"><strong>Total Distance:</strong> <span data-field="distance"></span></p>
-  </div>
-</template>
-
-<template id="warning-message-template">
-  <p class="warning-message" data-field="message"></p>
-</template>
-
-<template id="file-summary-template">
-  <div class="file-summary">
-    <h3>📊 File Summary</h3>
-    <p><strong>Total Records:</strong> <span data-field="total-records"></span></p>
-    <p><strong>Sessions Found:</strong> <span data-field="sessions-found"></span></p>
-    <p><strong>Timestamp Gaps:</strong> <span data-field="timestamp-gaps"></span></p>
-  </div>
-</template>
-
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         crossorigin=""></script>
 <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.js"
         crossorigin=""></script>
 
-<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CEQ4W86TKD"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-CEQ4W86TKD');
 </script>
 </body>

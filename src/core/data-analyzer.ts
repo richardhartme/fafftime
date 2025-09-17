@@ -3,9 +3,9 @@
 // =============================================================================
 
 import { FitRecord, TimestampGap, SlowPeriod, TimeRange } from '../types/app-types';
-import { SPEED_THRESHOLD } from '../utils/constants';
+import { SPEED_THRESHOLD, DEFAULT_GAP_THRESHOLD_MS } from '../utils/constants';
 import { convertGpsCoordinates } from '../utils/gps-utils';
-import { matchesTimeRange, getCurrentTimestampGapThreshold } from './time-utils';
+import { matchesTimeRange } from './time-utils';
 
 /**
  * Finds slow periods and recording gaps from FIT file records that match the selected time ranges.
@@ -17,11 +17,15 @@ import { matchesTimeRange, getCurrentTimestampGapThreshold } from './time-utils'
  * @param {Array} selectedRanges - Array of selected time range strings (e.g., ['5to10', '30to60'])
  * @returns {Array} Array of period objects containing both slow periods and recording gaps, sorted chronologically
  */
-export function findSlowPeriodsWithRanges(records: FitRecord[], selectedRanges: TimeRange[]): SlowPeriod[] {
+export function findSlowPeriodsWithRanges(
+  records: FitRecord[],
+  selectedRanges: TimeRange[],
+  gapThreshold: number = DEFAULT_GAP_THRESHOLD_MS
+): SlowPeriod[] {
   if (selectedRanges.length === 0) return [];
 
-  const slowPeriods = findSpeedBasedSlowPeriods(records, selectedRanges);
-  const gapPeriods = findMatchingRecordingGaps(records, selectedRanges);
+  const slowPeriods = findSpeedBasedSlowPeriods(records, selectedRanges, gapThreshold);
+  const gapPeriods = findMatchingRecordingGaps(records, selectedRanges, gapThreshold);
 
   return [...slowPeriods, ...gapPeriods].sort((a, b) => a.startTime - b.startTime);
 }
@@ -29,7 +33,11 @@ export function findSlowPeriodsWithRanges(records: FitRecord[], selectedRanges: 
 /**
  * Finds slow periods based on speed analysis
  */
-export function findSpeedBasedSlowPeriods(records: FitRecord[], selectedRanges: TimeRange[]): SlowPeriod[] {
+export function findSpeedBasedSlowPeriods(
+  records: FitRecord[],
+  selectedRanges: TimeRange[],
+  gapThreshold: number = DEFAULT_GAP_THRESHOLD_MS
+): SlowPeriod[] {
   const slowPeriods = [];
   let currentSlowSequence = [];
 
@@ -38,7 +46,7 @@ export function findSpeedBasedSlowPeriods(records: FitRecord[], selectedRanges: 
     const speed = record.enhancedSpeed || record.speed || 0;
 
     if (speed < SPEED_THRESHOLD) {
-      if (shouldBreakSequenceForTimestampGap(currentSlowSequence, record)) {
+      if (shouldBreakSequenceForTimestampGap(currentSlowSequence, record, gapThreshold)) {
         const slowPeriod = processSlowSequence(currentSlowSequence, selectedRanges);
         if (slowPeriod) {
           slowPeriods.push(slowPeriod);
@@ -69,23 +77,30 @@ export function findSpeedBasedSlowPeriods(records: FitRecord[], selectedRanges: 
 /**
  * Determines if a slow sequence should be broken due to a timestamp gap
  */
-export function shouldBreakSequenceForTimestampGap(currentSlowSequence: FitRecord[], record: FitRecord): boolean {
+export function shouldBreakSequenceForTimestampGap(
+  currentSlowSequence: FitRecord[],
+  record: FitRecord,
+  gapThreshold: number
+): boolean {
   if (currentSlowSequence.length === 0) {
     return false;
   }
 
   const previousRecord = currentSlowSequence[currentSlowSequence.length - 1];
   const timeDifference = record.timestamp - previousRecord.timestamp;
-  const currentThreshold = getCurrentTimestampGapThreshold();
 
-  return timeDifference > currentThreshold;
+  return timeDifference > gapThreshold;
 }
 
 /**
  * Finds recording gaps that match the selected time ranges
  */
-export function findMatchingRecordingGaps(records: FitRecord[], selectedRanges: TimeRange[]): SlowPeriod[] {
-  const timestampGaps = findTimestampGaps(records);
+export function findMatchingRecordingGaps(
+  records: FitRecord[],
+  selectedRanges: TimeRange[],
+  gapThreshold: number = DEFAULT_GAP_THRESHOLD_MS
+): SlowPeriod[] {
+  const timestampGaps = findTimestampGaps(records, gapThreshold);
   const matchingGaps = [];
 
   timestampGaps.forEach(gap => {
@@ -140,11 +155,10 @@ export function buildGpsPointsFromGap(gap: TimestampGap): [number, number][] {
  * @param {Number} threshold - Optional threshold in milliseconds. Defaults to current UI setting or 5 minutes
  * @returns {Array} Array of gap objects with timing, location, and distance information
  */
-export function findTimestampGaps(records: FitRecord[], threshold: number | null = null): TimestampGap[] {
+export function findTimestampGaps(records: FitRecord[], threshold?: number | null): TimestampGap[] {
   const gaps = [];
 
-  // Use provided threshold or fall back to UI setting or default
-  const gapThreshold = threshold || getCurrentTimestampGapThreshold();
+  const gapThreshold = typeof threshold === 'number' ? threshold : DEFAULT_GAP_THRESHOLD_MS;
 
   // Iterate through consecutive record pairs to find timestamp jumps
   for (let i = 1; i < records.length; i++) {
