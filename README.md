@@ -1,132 +1,89 @@
 # Ultra Cycling Faff Time Analyser
 
-Ultra Cycling faff time Analyser - Find where you spent time stopped instead of riding. A web-based tool for analyzing Garmin FIT files, built with the official Garmin FIT SDK. This application allows you to upload FIT files and analyze activity data including route visualization, slow/stopped periods detection, and detailed activity metrics.
+Ultra Cycling Faff Time Analyser helps riders understand where their time went during long events. Drop in a Garmin FIT file to get a React-powered dashboard with route visualisation, faff/stop detection, and detailed ride metrics – all handled locally in the browser using the official Garmin FIT SDK.
 
-Use the tool live [https://fafftime.com](https://fafftime.com)
+Use the tool live at [https://fafftime.com](https://fafftime.com)
 
-> 🤖 This project was generated with the help of [Claude Code](https://claude.ai/code) and [OpenAI Codex](https://openai.com/codex/)
+> 🤖 Built with a good mix of elbow grease, [Claude Code](https://claude.ai/code), and [OpenAI Codex](https://openai.com/codex/).
 
 ## Screenshot
 
-![Fafftime Analyser Screenshot](src/screenshot.png)
+![Fafftime Analyser Screenshot](src/assets/images/screenshot.png)
 
 ## Features
 
-- **FIT File Parsing**: Upload and parse Garmin FIT files using the official SDK
-- **Activity Analysis**: View start/end times, duration, distance, and moving time
-- **Slow Period Detection**: Identify periods where speed drops below 1 m/s for configurable durations
-- **Interactive Maps**: Visualize activity routes using Leaflet.js
-- **Mini Maps**: View specific locations of slow periods with detailed maps
-- **Customizable Thresholds**: Adjust slow period detection from 5 minutes to over 1 hour
+- **React UI** with drag‑and‑drop FIT upload and instant feedback
+- **Garmin FIT decoding** via `@garmin/fitsdk`, running entirely client-side
+- **Activity summary** covering elapsed vs moving time and total distance (km + miles)
+- **Faff period detection** for configurable time thresholds (2 minutes through 2+ hours)
+- **Recording gap analysis** so paused/logging gaps are highlighted alongside slow periods
+- **Leaflet maps** showing the full route plus mini-maps for every faff/gap segment
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (for npm package management)
-- Modern web browser with ES6 module support
+- Node.js 18+ (needed for the toolchain and Vitest)
+- A modern browser (Chrome, Firefox, Edge, Safari) for running the UI
 
-### Installation
+### Local Setup
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Start the development server:
-   ```bash
-   npm start
-   ```
-   
-   Or for development with file watching:
-   ```bash
-   npm run dev
-   ```
-
-3. The application will automatically open in your browser at `http://localhost:3000`
-
-### Building for Production
-
-To create a production build:
 ```bash
-npm run build
+npm install
+npm start        # launches the webpack dev server on http://localhost:3000
+
+# optional helpers
+npm run dev      # rebuild on change without serving
+npm run build    # production bundle in dist/
+npm test         # Vitest suite against the exported analysis API
 ```
 
-The built files will be in the `dist` directory.
+## Using the App
 
-## Usage
+1. Launch the dev server (or open [fafftime.com](https://fafftime.com)).
+2. Drag a `.fit` file onto the drop zone or use the picker button.
+3. The dashboard analyses the file locally and shows:
+   - Summary cards for start/end, duration, stopped vs moving time, and total distance.
+   - The main Leaflet map with the full activity trace (toggled overlays keep faff periods visible).
+   - A breakdown of faff periods and recording gaps, each with mini-maps and Google Maps links.
+4. Use the sidebar controls to tweak faff thresholds and the timestamp gap tolerance; the UI re-runs the analysis instantly.
+5. Explore mini-maps with the “Show activity route” toggle to overlay the entire ride for context.
 
-1. **Upload FIT File**: Click "Select FIT File" and choose a .fit file from your device
-2. **Parse Data**: Click "Parse FIT File" to analyze the activity
-3. **View Results**: The application will display:
-   - Activity start/end times and duration
-   - Total distance (in km and miles)
-   - Interactive map showing the complete route
-   - Slow/stopped periods with customizable duration thresholds
-4. **Adjust Analysis**: Use the dropdown to change slow period detection thresholds
-5. **Explore Maps**: 
-   - Main map shows the complete activity route
-   - Mini maps show specific locations where slow periods occurred
-   - All maps support zooming, panning, and interaction
+## Project Structure
 
-## Technical Details
+```
+src/
+├─ core/          # FIT decoding + data analysis (framework agnostic)
+├─ types/         # Shared TypeScript definitions
+├─ ui/
+│  ├─ App.tsx     # React application shell and UI composition
+│  └─ map-manager.ts  # Leaflet helpers shared by React components
+├─ utils/         # Misc helpers (GPS conversion, analytics tracking, constants)
+├─ assets/        # Icons, screenshots, example FIT payloads
+├─ main.tsx       # React entry point (render <App />)
+├─ main.ts        # Re-exports analysis helpers for Vitest
+├─ index.html     # HtmlWebpackPlugin template with Leaflet + GA bootstrapping
+└─ styles.css     # Shared styling imported into the React bundle
 
-### Architecture
+tests/
+└─ main.test.ts   # Vitest suite hitting the exported core analysis API
+```
 
-- **Frontend**: TypeScript with ES6 modules and type safety
-- **Build System**: Webpack 5 with TypeScript support and development server
-- **FIT Parsing**: Garmin FIT SDK (@garmin/fitsdk)
-- **Mapping**: Leaflet.js with OpenStreetMap tiles and TypeScript types
-- **File Processing**: HTML5 File API with ArrayBuffer handling
-- **Testing**: Vitest with TypeScript integration
+## Tech Stack
 
-### Key Components
+- **UI**: React 18 + TypeScript
+- **Bundler**: Webpack 5, `ts-loader`, `html-webpack-plugin`, `copy-webpack-plugin`
+- **Mapping**: Leaflet + OpenStreetMap tiles (loaded from CDN)
+- **Analysis**: Pure TypeScript modules in `src/core/` using `@garmin/fitsdk`
+- **Testing**: Vitest with JSDOM for exercising the non-React logic
 
-- `src/main.ts`: Core application logic and FIT data processing (TypeScript)
-- `src/analysis.ts`: Data analysis functions with strong typing
-- `src/utils.ts`: Utility functions and DOM helpers
-- `src/types.ts`: TypeScript type definitions for FIT data and application state
-- `src/index.html`: User interface and module configuration
-- `src/styles.css`: Application styling
-- `webpack.config.js`: Webpack build configuration with TypeScript support
-- `tsconfig.json`: TypeScript configuration
-- `package.json`: NPM dependencies and project configuration
+## Contributing & Testing
 
-### Data Processing
-
-The application processes FIT files to extract:
-- Session messages (`sessionMesgs`) for activity metadata
-- Record messages (`recordMesgs`) for GPS and speed data
-- GPS coordinates converted from semicircles to decimal degrees
-- Speed analysis for detecting slow/stopped periods
-
-## Browser Compatibility
-
-This application uses TypeScript compiled to ES6 modules and modern JavaScript features. Webpack handles module bundling and TypeScript compilation for broad compatibility with modern browsers:
-- Chrome 88+
-- Firefox 78+
-- Safari 14+
-- Edge 88+
-
-## Dependencies
-
-### Runtime Dependencies
-- `@garmin/fitsdk`: Official Garmin FIT SDK for parsing FIT files
-
-### Development Dependencies
-- `typescript`: TypeScript compiler and language support
-- `ts-loader`: Webpack TypeScript loader
-- `@types/leaflet`: TypeScript type definitions for Leaflet
-- `webpack`: Module bundler and development server
-- `html-webpack-plugin`: HTML template processing
-- `copy-webpack-plugin`: Asset copying
-- `css-loader` & `style-loader`: CSS processing
-- `vitest`: Modern testing framework with TypeScript support
-- `jsdom`: DOM environment for testing
-- `leaflet`: Interactive mapping library (loaded via CDN)
+1. Create a branch, run `npm install`, and make your changes.
+2. Keep TypeScript happy (`npm run dev` is handy while editing).
+3. Run `npm test` before opening a PR – the suite focuses on the exported analysis helpers.
+4. Attach screenshots or explain UI-visible changes in your PR description.
 
 ## License
 
-MIT License
-
-This project uses the Garmin FIT SDK, which is licensed under the Flexible and Interoperable Data Transfer (FIT) Protocol License.
+MIT License. Garmin FIT SDK usage is governed by the Flexible and Interoperable Data Transfer (FIT) Protocol License.
