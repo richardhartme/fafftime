@@ -94,15 +94,13 @@ export default function App(): JSX.Element {
   return (
     <div className="app">
       <div className="page-header">
-        <div className="container">
-          <header>
-            <h1>Ultra Cycling Faff Time</h1>
-            <h4>Find where you spent time stopped (faffing) instead of riding.</h4>
-            <span className="description">
-              After realising there was a 20-hour difference between my elapsed time and moving time during my last ultra event. I wanted a tool to be able to see where all that time went!
-            </span>
-          </header>
-        </div>
+        <header>
+          <h1>Ultra Cycling Faff Time</h1>
+          <h4>Find where you spent time stopped (faffing) instead of riding.</h4>
+          <span className="description">
+            After realising there was a 20-hour difference between my elapsed time and moving time during my last ultra event. I wanted a tool to be able to see where all that time went. Faff Time shows where you spent time stopped and for how long.
+          </span>
+        </header>
       </div>
 
       <div className="app-layout">
@@ -110,7 +108,7 @@ export default function App(): JSX.Element {
           <div className="app-sidebar-content">
             <FileDropzone onFileSelected={handleFileSelection} onExampleLoad={handleExampleLoad} isLoading={status === 'loading'} />
 
-            <div className="sidebar-section" id="sidebarActivitySummary">
+            <div className="sidebar-section">
               <div id="activitySummary">
                 {analysisResult && analysisResult.startTime && analysisResult.endTime && (
                   <ActivitySummary analysisResult={analysisResult} />
@@ -147,39 +145,37 @@ export default function App(): JSX.Element {
         </aside>
 
         <div className="app-content">
-          <div className="container">
-            {!parsedFile && status !== 'loading' && (
-              <div id="screenshot">
-                <div className="screenshotContents">
-                  <h3>Example Output</h3>
-                  <img src="screenshot.png" alt="Example analysis output" />
-                </div>
+          {!parsedFile && status !== 'loading' && (
+            <div id="screenshot">
+              <div className="screenshotContents">
+                <h3>Example Output</h3>
+                <img src="screenshot.png" alt="Example analysis output" />
               </div>
-            )}
-
-            {status === 'loading' && (
-              <div className="loading-message">📊 Parsing FIT file...</div>
-            )}
-
-            {combinedError && (
-              <div className="error-message">❌ {combinedError}</div>
-            )}
-
-            {analysisAvailable && (
-              <div id="mapContainer" style={{ display: analysisAvailable ? 'block' : 'none' }}>
-                <h3>📍 Activity Map</h3>
-                <div id="map"></div>
-              </div>
-            )}
-
-            <div id="slowPeriodData">
-              {analysisAvailable && analysisResult && <SlowPeriodList analysisResult={analysisResult} />}
             </div>
+          )}
 
-            {analysisResult && (
-              <FileSummary analysisResult={analysisResult} />
-            )}
+          {status === 'loading' && (
+            <div className="loading-message">📊 Parsing FIT file...</div>
+          )}
+
+          {combinedError && (
+            <div className="error-message">❌ {combinedError}</div>
+          )}
+
+          {analysisAvailable && (
+            <div id="mapContainer" style={{ display: analysisAvailable ? 'block' : 'none' }}>
+              <h3>📍 Activity Map</h3>
+              <div id="map"></div>
+            </div>
+          )}
+
+          <div id="slowPeriodData">
+            {analysisAvailable && analysisResult && <SlowPeriodList analysisResult={analysisResult} />}
           </div>
+
+          {analysisResult && (
+            <FileSummary analysisResult={analysisResult} />
+          )}
         </div>
       </div>
     </div>
