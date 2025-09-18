@@ -442,7 +442,7 @@ h4 {
   border: 1px solid #ddd;
 }
 
-.google-maps-link {
+.google-maps-link, .google-street-view-link {
   color: #1a73e8;
   text-decoration: none;
 }

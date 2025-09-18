@@ -27,6 +27,26 @@ function createGoogleMapsLink([lat, lng]: [number, number], text = 'View on Goog
   );
 }
 
+function createStreetViewLink([lat, lng]: [number, number], text = 'View on Street View'): JSX.Element {
+  const href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="google-street-view-link">
+      <Icon name="street-view"/>
+      {text}
+    </a>
+  );
+}
+
+function createLocationLinkGroup(point: [number, number], labelPrefix = 'View'): JSX.Element {
+  return (
+    <>
+      {createGoogleMapsLink(point, `${labelPrefix} on Google Maps`)}
+      <span> | </span>
+      {createStreetViewLink(point, `${labelPrefix} on Street View`)}
+    </>
+  );
+}
+
 interface SlowPeriodListProps {
   analysisResult: AnalysisResult;
 }
@@ -105,9 +125,9 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
                   Show activity route on map
                 </label><br/>
                 <span className="location-links">
-                  {period.gapData.startGpsPoint && createGoogleMapsLink(period.gapData.startGpsPoint, 'View start on Google Maps')}
+                  {period.gapData.startGpsPoint && createLocationLinkGroup(period.gapData.startGpsPoint, 'View start')}
                   {period.gapData.startGpsPoint && period.gapData.endGpsPoint && <span> | </span>}
-                  {period.gapData.endGpsPoint && createGoogleMapsLink(period.gapData.endGpsPoint, 'View end  on Google Maps')}
+                  {period.gapData.endGpsPoint && createLocationLinkGroup(period.gapData.endGpsPoint, 'View end')}
                   {!period.gapData.startGpsPoint && !period.gapData.endGpsPoint && 'No GPS data'}
                 </span><br/>
                 <div className="mini-map" id={miniMapId}></div>
@@ -116,7 +136,7 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
           }
 
           const locationLink = period.gpsPoints[0]
-            ? createGoogleMapsLink(period.gpsPoints[0])
+            ? createLocationLinkGroup(period.gpsPoints[0])
             : null;
 
           return (
@@ -133,7 +153,7 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
                 Show activity route on map
               </label><br/>
               <span className="location-link">
-                {locationLink}
+                {locationLink ?? 'No GPS data'}
               </span><br/>
               <div className="mini-map" id={miniMapId}></div>
             </div>
