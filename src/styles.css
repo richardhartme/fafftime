@@ -32,12 +32,12 @@ h4 {
   flex-direction: column;
   gap: 30px;
   width: 100%;
-  max-width: 1200px;
+  /*max-width: 1200px;*/
 }
 
 .page-header {
   width: 100%;
-  max-width: 1200px;
+  /*max-width: 1200px;*/
   margin: 0 auto 30px auto;
 }
 
@@ -363,15 +363,13 @@ h4 {
 .screenshotContents {
   padding: 20px;
   text-align: center;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 12px 40px rgba(0, 38, 92, 0.08);
 }
 
 .screenshotContents img {
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 10px;
+  max-width: 800px;
   width: 90%;
   height: auto;
   box-sizing: border-box;
