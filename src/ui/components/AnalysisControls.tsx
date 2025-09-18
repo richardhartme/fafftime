@@ -38,7 +38,7 @@ export function AnalysisControls({
     onGapThresholdChange(parseInt(event.target.value, 10));
   };
 
-  const analysisControlsStyle = isVisible ? undefined : { display: 'none' };
+  const analysisControlsStyle = { display: isVisible ? 'block' : 'none' };
 
   return (
     <div className="sidebar-section">
