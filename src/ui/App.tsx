@@ -12,6 +12,7 @@ import { ActivitySummary } from './components/ActivitySummary';
 import { SlowPeriodList } from './components/SlowPeriodList';
 import { FileSummary } from './components/FileSummary';
 import { Icon } from './components/Icon';
+import logoImage from '../assets/images/logo.png';
 
 const GAP_THRESHOLD_OPTIONS: GapThresholdOption[] = [
   { value: 60000, label: '1 minute' },
@@ -95,13 +96,18 @@ export default function App(): JSX.Element {
   return (
     <div className="app">
       <div className="page-header">
-        <header>
-          <h1>Ultra Cycling Faff Time</h1>
-          <strong>faff about/around</strong> - phrasal verb - to spend your time doing things that are not important instead of the thing that you should be doing.
-          <h4>Find where you spent time stopped (faffing) instead of riding.</h4>
-          <span className="description">
-            After realising there was a 20-hour difference between my elapsed time and moving time during my last ultra event. I wanted a tool to be able to see where all that time went. Faff Time shows where you spent time stopped and for how long.
-          </span>
+        <header className="app-header">
+          <div className="header-brand">
+            <img src={logoImage} alt="Faff Time logo" className="header-logo" />
+            <div className="header-copy">
+              <h1>Ultra Cycling Faff Time</h1>
+              <strong>faff about/around</strong> - phrasal verb - to spend your time doing things that are not important instead of the thing that you should be doing.
+              <h4>Find where you spent time stopped (faffing) instead of riding.</h4>
+              <span className="description">
+                After realising there was a 20-hour difference between my elapsed time and moving time during my last ultra event. I wanted a tool to be able to see where all that time went. Faff Time shows where you spent time stopped and for how long.
+              </span>
+            </div>
+          </div>
         </header>
       </div>
 
