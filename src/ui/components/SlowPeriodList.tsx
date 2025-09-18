@@ -1,6 +1,7 @@
 import { AnalysisResult } from '../../types/analysis';
 import { SlowPeriod } from '../../types/app-types';
 import { formatDuration } from '../../core/time-utils';
+import { Icon } from './Icon';
 
 function formatPeriodTimes(period: SlowPeriod): { startText: string; endText: string } {
   const startText = period.startTime.toLocaleString('en-GB', {
@@ -16,10 +17,11 @@ function formatPeriodTimes(period: SlowPeriod): { startText: string; endText: st
   return { startText, endText };
 }
 
-function createGoogleMapsLink([lat, lng]: [number, number], text = '📍 View on Google Maps'): JSX.Element {
+function createGoogleMapsLink([lat, lng]: [number, number], text = 'View on Google Maps'): JSX.Element {
   const href = `https://www.google.com/maps?q=${lat},${lng}`;
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="google-maps-link">
+      <Icon name="location-dot" />
       {text}
     </a>
   );
@@ -33,19 +35,30 @@ export function SlowPeriodList({ analysisResult }: SlowPeriodListProps): JSX.Ele
   if (analysisResult.slowPeriods.length === 0) {
     return (
       <div className="no-slow-periods">
-        <h3>✅ No Faff Periods or Recording Gaps Detected</h3>
+        <h3>
+          <Icon name="circle-check" />
+          No Faff Periods or Recording Gaps Detected
+        </h3>
         <p>
           No periods found in selected ranges ({analysisResult.selectedRangeText}) where speed was {'<'} 1 m/s or where
           recording gaps occurred.
         </p>
-        <p>Great job maintaining your pace and consistent recording! 🚴‍♀️💨</p>
+        <p>
+          Great job maintaining your pace and consistent recording!
+          {' '}
+          <Icon name="person-biking" />
+          <Icon name="wind" />
+        </p>
       </div>
     );
   }
 
   return (
     <div className="slow-periods">
-      <h3>🐌 Faff Periods &amp; Recording Gaps</h3>
+      <h3>
+        <Icon name="stopwatch" />
+        Faff Periods &amp; Recording Gaps
+      </h3>
       <p>
         Found <span>{analysisResult.slowPeriods.length}</span> period(s) in selected ranges ({analysisResult.selectedRangeText})
       </p>
@@ -77,17 +90,21 @@ export function SlowPeriodList({ analysisResult }: SlowPeriodListProps): JSX.Ele
 
             return (
               <div className="timestamp-gap-item" key={miniMapId}>
-                <strong>⏸️ Recording Gap {index + 1}:</strong> <span>{startText} - {endText}</span><br />
+                <strong>
+                  <Icon name="circle-pause" />
+                  Recording Gap {index + 1}
+                </strong><br />
+                <strong>Time:</strong> <span>{startText} - {endText}</span><br />
                 <strong>Duration:</strong> <span>{durationText}</span> (no data recorded)<br />
                 <strong>Distance:</strong> <span>{startDistanceKm} km → {endDistanceKm} km</span><br />
                 <label className="full-route-toggle">
                   <input type="checkbox" data-role="full-route-toggle" data-mini-map-id={miniMapId} />
-                  Show activity route
+                  Show activity route on map
                 </label><br />
                 <span className="location-links">
-                  {period.gapData.startGpsPoint && createGoogleMapsLink(period.gapData.startGpsPoint, '📍 Start location')}
+                  {period.gapData.startGpsPoint && createGoogleMapsLink(period.gapData.startGpsPoint, 'View start on Google Maps')}
                   {period.gapData.startGpsPoint && period.gapData.endGpsPoint && <span> | </span>}
-                  {period.gapData.endGpsPoint && createGoogleMapsLink(period.gapData.endGpsPoint, '📍 End location')}
+                  {period.gapData.endGpsPoint && createGoogleMapsLink(period.gapData.endGpsPoint, 'View end  on Google Maps')}
                   {!period.gapData.startGpsPoint && !period.gapData.endGpsPoint && 'No GPS data'}
                 </span><br />
                 <div className="mini-map" id={miniMapId}></div>
@@ -101,12 +118,16 @@ export function SlowPeriodList({ analysisResult }: SlowPeriodListProps): JSX.Ele
 
           return (
             <div className="slow-period-item" key={miniMapId}>
-              <strong>🐌 Faff Period {index + 1}:</strong> <span>{startText} - {endText}</span><br />
+              <strong>
+                <Icon name="stopwatch" />
+                Faff Period {index + 1}
+              </strong><br />
+              <strong>Time:</strong> <span>{startText} - {endText}</span><br />
               <strong>Duration:</strong> <span>{durationText}</span> (<span>{period.recordCount}</span> records)<br />
               <strong>Distance:</strong> <span>{startDistanceKm}</span> km<br />
               <label className="full-route-toggle">
                 <input type="checkbox" data-role="full-route-toggle" data-mini-map-id={miniMapId} />
-                Show activity route
+                Show activity route on map
               </label><br />
               <span className="location-link">
                 {locationLink}

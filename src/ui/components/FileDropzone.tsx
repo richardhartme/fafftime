@@ -1,4 +1,5 @@
 import { ChangeEvent, DragEvent, MouseEvent, useRef, useState } from 'react';
+import { Icon } from './Icon';
 
 interface FileDropzoneProps {
   onFileSelected: (file: File) => Promise<void> | void;
@@ -109,7 +110,8 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
 
         <div className="example-file-link">
           <a href="#" id="loadExampleFile" onClick={handleExampleLoadClick} aria-disabled={isLoading}>
-            🚴 Load example FIT file
+            <Icon name="file-lines" />
+            Load example FIT file
           </a>
         </div>
       </div>

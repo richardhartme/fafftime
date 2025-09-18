@@ -215,6 +215,11 @@ h4 {
   color: orange;
 }
 
+.icon {
+  display: inline-block;
+  margin-right: 0.35rem;
+}
+
 /* =============================================================================
    FILE SELECTION & UPLOAD
    ============================================================================= */
@@ -539,6 +544,7 @@ h4 {
   padding: 10px;
   background: rgba(255, 255, 255, 0.7);
   border-radius: 3px;
+  line-height: 1.6em;
 }
 
 .timestamp-gap-item {
@@ -546,4 +552,5 @@ h4 {
   padding: 10px;
   background: rgba(238, 238, 238, 0.9);
   border-radius: 3px;
+  line-height: 1.6em;
 }

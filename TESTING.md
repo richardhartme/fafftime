@@ -25,9 +25,9 @@ npm run test:ui         # Open Vitest UI (if installed)
 ## Coverage
 
 The current test coverage focuses on:
-- ✅ **Utility & DOM Functions** (~99% coverage) - Pure functions like formatDuration, GPS conversion, DOM helpers
-- ✅ **Data Analysis** (~98% coverage) - Core business logic for FIT file processing  
-- ❌ **Main Application** (0% coverage) - Event handlers and UI coordination (harder to test)
+- **Utility & DOM Functions** (~99% coverage) - Pure functions like formatDuration, GPS conversion, DOM helpers
+- **Data Analysis** (~98% coverage) - Core business logic for FIT file processing  
+- **Main Application** (0% coverage) - Event handlers and UI coordination (harder to test)
 
 ## Writing Tests
 
@@ -103,12 +103,12 @@ expect(mockFunction).toHaveBeenCalledWith(expectedArg);
 ### 1. Test Pure Functions First
 Start with utility functions and data processing functions as they're easiest to test:
 ```typescript
-// ✅ Easy to test
+// Easy to test
 function formatDuration(seconds: number): string {
   return `${seconds}s`;
 }
 
-// ❌ Harder to test (has side effects)
+// Harder to test (has side effects)
 function updateUI(data: string): void {
   document.getElementById('result')!.innerHTML = data;
 }
@@ -116,10 +116,10 @@ function updateUI(data: string): void {
 
 ### 2. Use Descriptive Test Names
 ```typescript
-// ✅ Good
+// Good
 it('returns null when no GPS coordinates are provided')
 
-// ❌ Bad  
+// Avoid doing this
 it('handles edge case')
 ```
 

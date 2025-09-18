@@ -153,7 +153,7 @@ function addGapOverlayToMap(period: SlowPeriod, index: number): void {
     const marker = L.marker(gap.startGpsPoint, {
       icon: L.divIcon({
         className: 'gap-overlay-marker',
-        html: '<div class="gap-overlay-marker">⏸️</div>',
+        html: '<div class="gap-overlay-marker"><i class="fa-solid fa-circle-pause" aria-hidden="true"></i></div>',
         iconSize: [20, 20],
       }),
     }).addTo(map).bindPopup(`Recording Gap ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000))}`);
@@ -195,7 +195,7 @@ function addSlowPeriodOverlayToMap(period: SlowPeriod, index: number): void {
     const marker = L.marker(centerPoint, {
       icon: L.divIcon({
         className: 'slow-overlay-marker',
-        html: '<div class="slow-overlay-marker">🐌</div>',
+        html: '<div class="slow-overlay-marker"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></div>',
         iconSize: [20, 20]
       })
     }).addTo(map).bindPopup(`Slow Period ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000))}<br>Records: ${period.recordCount}`);

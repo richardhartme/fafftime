@@ -27,7 +27,7 @@ export function ActivitySummary({ analysisResult }: ActivitySummaryProps): JSX.E
 
   return (
     <div className="activity-times">
-      <h3>⏰ Activity Times</h3>
+      <h3>Activity Summary</h3>
       <p><strong>Start Time:</strong> <span>{analysisResult.startTime?.toLocaleString() ?? 'Unknown'}</span></p>
       <p><strong>End Time:</strong> <span>{analysisResult.endTime?.toLocaleString() ?? 'Unknown'}</span></p>
       <p><strong>Duration:</strong> <span>{formatDuration(totalDurationSeconds)}</span></p>

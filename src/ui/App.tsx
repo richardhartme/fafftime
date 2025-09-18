@@ -11,6 +11,7 @@ import { AnalysisControls, GapThresholdOption, RangeOption } from './components/
 import { ActivitySummary } from './components/ActivitySummary';
 import { SlowPeriodList } from './components/SlowPeriodList';
 import { FileSummary } from './components/FileSummary';
+import { Icon } from './components/Icon';
 
 const GAP_THRESHOLD_OPTIONS: GapThresholdOption[] = [
   { value: 60000, label: '1 minute' },
@@ -115,7 +116,8 @@ export default function App(): JSX.Element {
                 )}
                 {analysisResult && (!analysisResult.startTime || !analysisResult.endTime) && (
                   <div className="warning-message">
-                    ⚠️ Could not determine start/end times from this FIT file.
+                    <Icon name="triangle-exclamation" />
+                    Could not determine start/end times from this FIT file.
                   </div>
                 )}
               </div>
@@ -138,8 +140,13 @@ export default function App(): JSX.Element {
               <br />
               <br />
               FIT files are processed in your browser.<br />
-              <a href="https://github.com/Hates/fafftime" target="_blank" rel="noopener noreferrer">🐙 github.com/Hates/fafftime</a> |{' '}
-              <a href="mailto:info@fafftime.com?subject=Faff%20Time%20Feedback">✉️ send feedback</a>
+              <a href="https://github.com/Hates/fafftime" target="_blank" rel="noopener noreferrer">
+                <Icon name="github" prefix="brands" />github.com/Hates/fafftime
+              </a>
+              {' | '}
+              <a href="mailto:info@fafftime.com?subject=Faff%20Time%20Feedback">
+                <Icon name="envelope" />send feedback
+              </a>
             </span>
           </div>
         </aside>
@@ -155,16 +162,25 @@ export default function App(): JSX.Element {
           )}
 
           {status === 'loading' && (
-            <div className="loading-message">📊 Parsing FIT file...</div>
+            <div className="loading-message">
+              <Icon name="spinner fa-spin-pulse" />
+              Parsing FIT file...
+            </div>
           )}
 
           {combinedError && (
-            <div className="error-message">❌ {combinedError}</div>
+            <div className="error-message">
+              <Icon name="circle-xmark" />
+              {combinedError}
+            </div>
           )}
 
           {analysisAvailable && (
             <div id="mapContainer" style={{ display: analysisAvailable ? 'block' : 'none' }}>
-              <h3>📍 Activity Map</h3>
+              <h3>
+                <Icon name="location-dot" />
+                Activity Map
+              </h3>
               <div id="map"></div>
             </div>
           )}

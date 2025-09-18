@@ -4,7 +4,7 @@ Ultra Cycling Faff Time Analyser helps ultra-distance riders understand where th
 
 Use the tool live at [https://fafftime.com](https://fafftime.com)
 
-> 🤖 Built with a good mix of elbow grease, [Claude Code](https://claude.ai/code), and [OpenAI Codex](https://openai.com/codex/).
+> Built with a good mix of elbow grease, [Claude Code](https://claude.ai/code), and [OpenAI Codex](https://openai.com/codex/).
 
 ## Screenshot
 
@@ -90,6 +90,7 @@ Run `npm run build` first if you need to validate the production bundle before p
 - **Analysis**: Pure TypeScript modules in `src/core/` using Garmin's FIT SDK
 - **Mapping**: Leaflet with OpenStreetMap tiles
 - **Tooling**: Webpack 5, Vitest, HtmlWebpackPlugin, CopyWebpackPlugin
+- **Icons**: Font Awesome 7 (imported via `@fortawesome/fontawesome-free`)
 
 ## Contributing
 

@@ -1,0 +1,13 @@
+interface IconProps {
+  name: string;
+  prefix?: 'solid' | 'regular' | 'brands';
+  className?: string;
+  title?: string;
+}
+
+export function Icon({ name, prefix = 'solid', className = '', title }: IconProps): JSX.Element {
+  const prefixClass = prefix === 'brands' ? 'fa-brands' : prefix === 'regular' ? 'fa-regular' : 'fa-solid';
+  const classes = ['icon', prefixClass, `fa-${name}`, className].filter(Boolean).join(' ');
+
+  return <i className={classes} aria-hidden={true} title={title}></i>;
+}
