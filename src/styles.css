@@ -362,6 +362,13 @@ h4 {
 #mapContainer {
   display: none;
   margin: 15px 0;
+  padding: 10px;
+  background: var(--gray-background);
+  border-radius: 5px;
+}
+
+#mapContainer h3 {
+  margin-bottom: 10px;
 }
 
 #map {
