@@ -8,6 +8,7 @@ export interface RangeBreakdownEntry {
   range: TimeRange;
   label: string;
   count: number;
+  totalDurationSeconds: number;
 }
 
 export interface SlowPeriodStats {

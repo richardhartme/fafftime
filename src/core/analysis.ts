@@ -30,10 +30,17 @@ export function calculateSlowPeriodStatistics(
       return matchesTimeRange(range, durationMinutes, durationHours);
     });
 
+    const totalDurationSeconds = matchingPeriods.reduce((total, period) => {
+      const durationMs = period.endTime.getTime() - period.startTime.getTime();
+      const durationSeconds = Math.max(0, Math.round(durationMs / 1000));
+      return total + durationSeconds;
+    }, 0);
+
     return {
       range,
       label: RANGE_LABELS[range],
       count: matchingPeriods.length,
+      totalDurationSeconds,
     };
   });
 

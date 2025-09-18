@@ -68,9 +68,14 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
             {analysisResult.stats.rangeBreakdown.length === 0 && (
               <li>No thresholds selected</li>
             )}
-            {analysisResult.stats.rangeBreakdown.map(entry => (
-              <li key={entry.range}>{entry.label}: {entry.count}</li>
-            ))}
+            {analysisResult.stats.rangeBreakdown.map(entry => {
+              const totalDuration = formatDuration(entry.totalDurationSeconds);
+              return (
+                <li key={entry.range}>
+                  <strong>{entry.label}:</strong> {entry.count} <span>({totalDuration})</span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>

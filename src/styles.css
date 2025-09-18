@@ -567,6 +567,14 @@ h4 {
   margin: 5px 0;
 }
 
+.threshold-breakdown ul {
+  padding-left: 20px;
+}
+
+.threshold-breakdown ul li {
+  padding-bottom: 5px;
+}
+
 .file-summary {
   background: #e8f4f8;
   padding: 15px;

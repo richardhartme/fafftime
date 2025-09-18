@@ -101,8 +101,8 @@ export default function App(): JSX.Element {
             <img src={logoImage} alt="Ultra Cycling Faff Time" className="header-logo" />
             <div className="header-copy">
               <h1>Ultra Cycling Faff Time</h1>
-              <strong>faff about / around</strong> - phrasal verb - to spend your time doing things that are not important instead of the thing that you should be doing.
               <h4>Find where you spent time stopped (faffing) instead of riding.</h4>
+              <strong>faff about / around</strong> phrasal verb - to spend your time doing things that are not important instead of the thing that you should be doing.
               <span className="description">
                 After realising there was a 20-hour difference between my elapsed time and moving time during my last ultra event. I wanted a tool to be able to see where all that time went. Faff Time shows where you spent time stopped and for how long.
               </span>
