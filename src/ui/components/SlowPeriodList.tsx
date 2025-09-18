@@ -45,9 +45,6 @@ export function SlowPeriodList({ analysisResult }: SlowPeriodListProps): JSX.Ele
         </p>
         <p>
           Great job maintaining your pace and consistent recording!
-          {' '}
-          <Icon name="person-biking" />
-          <Icon name="wind" />
         </p>
       </div>
     );
@@ -60,11 +57,11 @@ export function SlowPeriodList({ analysisResult }: SlowPeriodListProps): JSX.Ele
         Faff Periods &amp; Recording Gaps
       </h3>
       <p>
-        Found <span>{analysisResult.slowPeriods.length}</span> period(s) in selected ranges ({analysisResult.selectedRangeText})
+        Found <strong>{analysisResult.slowPeriods.length}</strong> period(s) totalling <strong>{formatDuration(analysisResult.stats.totalDurationSeconds)}</strong>.
       </p>
+      <p><strong>Recording gaps:</strong> <span>{analysisResult.stats.gapCount}</span></p>
       <p><strong>Faff periods:</strong> <span>{analysisResult.stats.slowCount}</span> (speed {'<'} 1 m/s)</p>
       <div className="threshold-breakdown">
-        <strong>Faff periods by threshold:</strong>
         <ul>
           {analysisResult.stats.rangeBreakdown.length === 0 && (
             <li>No thresholds selected</li>
@@ -74,8 +71,6 @@ export function SlowPeriodList({ analysisResult }: SlowPeriodListProps): JSX.Ele
           ))}
         </ul>
       </div>
-      <p><strong>Recording gaps:</strong> <span>{analysisResult.stats.gapCount}</span></p>
-      <p><strong>Total duration:</strong> <span>{formatDuration(analysisResult.stats.totalDurationSeconds)}</span></p>
 
       <div className="slow-periods-list">
         {analysisResult.slowPeriods.map((period, index) => {
