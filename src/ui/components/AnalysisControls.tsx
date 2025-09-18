@@ -33,18 +33,16 @@ export function AnalysisControls({
   onGapThresholdChange,
   showOverlays,
   onShowOverlaysChange,
-}: AnalysisControlsProps): JSX.Element | null {
-  if (!isVisible) {
-    return null;
-  }
-
+}: AnalysisControlsProps): JSX.Element {
   const handleGapThresholdChange = (event: ChangeEvent<HTMLSelectElement>) => {
     onGapThresholdChange(parseInt(event.target.value, 10));
   };
 
+  const analysisControlsStyle = isVisible ? undefined : { display: 'none' };
+
   return (
     <div className="sidebar-section">
-      <div id="analysisControls">
+      <div id="analysisControls" style={analysisControlsStyle}>
         <label>Faff Period Thresholds:</label>
         <div>
           {rangeOptions.map(option => (
