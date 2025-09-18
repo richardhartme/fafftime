@@ -2,19 +2,29 @@
 // MAP MANAGER - LEAFLET MAPPING FUNCTIONALITY
 // =============================================================================
 
+import type { Layer, Map as LeafletMap, Polyline as LeafletPolyline, PolylineOptions } from 'leaflet';
 import { FitData, SlowPeriod, TimestampGap } from '../types/app-types';
 import { convertGpsCoordinates } from '../utils/gps-utils';
 import { formatDuration } from '../core/time-utils';
 
+declare const L: typeof import('leaflet');
+
 // Global State
-let activityMap: L.Map | null = null;
+let activityMap: LeafletMap | null = null;
 let currentSlowPeriods: SlowPeriod[] | null = null;
-const miniMapsById = new Map<string, L.Map>();
+const miniMapsById = new Map<string, LeafletMap>();
 
 interface FullRouteOverlay {
-  polyline: L.Polyline;
-  decorator: L.Layer | null;
+  polyline: LeafletPolyline;
+  decorator: Layer | null;
 }
+
+type OverlayLayer = Layer & {
+  options?: {
+    isSlowPeriodOverlay?: boolean;
+    isGapOverlay?: boolean;
+  };
+};
 
 type ToggleInputWithHandler = HTMLInputElement & {
   __fullRouteToggleHandler?: (event: Event) => void;
@@ -54,20 +64,28 @@ export function initializeMap(fitData: FitData): void {
     }).addTo(activityMap);
   } else {
     // Clear existing layers
-    activityMap.eachLayer(layer => {
+    activityMap.eachLayer((layer: Layer) => {
+      if (!activityMap) {
+        return;
+      }
       if (layer instanceof L.Polyline || layer instanceof L.Marker) {
         activityMap.removeLayer(layer);
       }
     });
   }
 
+  const mapInstance = activityMap;
+  if (!mapInstance) {
+    return;
+  }
+
   // Add activity route as polyline
-  const polyline = L.polyline(gpsPoints, { color: 'red', weight: 3 }).addTo(activityMap);
+  const polyline = L.polyline(gpsPoints, { color: 'red', weight: 3 }).addTo(mapInstance);
 
   // Add start marker
   if (gpsPoints.length > 0) {
     L.marker(gpsPoints[0])
-      .addTo(activityMap)
+      .addTo(mapInstance)
       .bindPopup('Start');
   }
 
@@ -75,12 +93,12 @@ export function initializeMap(fitData: FitData): void {
   if (gpsPoints.length > 1) {
     const endPoint = gpsPoints[gpsPoints.length - 1];
     L.marker(endPoint)
-      .addTo(activityMap)
+      .addTo(mapInstance)
       .bindPopup('End');
   }
 
   // Fit map to show entire route
-  activityMap.fitBounds(polyline.getBounds(), { padding: [10, 10] });
+  mapInstance.fitBounds(polyline.getBounds(), { padding: [10, 10] });
 }
 
 /**
@@ -91,10 +109,13 @@ export function updateMapOverlays(showOverlays: boolean = true): void {
     return;
   }
 
+  const mapInstance = activityMap;
+
   // Remove existing overlay markers and lines
-  activityMap.eachLayer(layer => {
-    if (layer.options && (layer.options.isSlowPeriodOverlay || layer.options.isGapOverlay)) {
-      activityMap.removeLayer(layer);
+  mapInstance.eachLayer((layer: Layer) => {
+    const overlayLayer = layer as OverlayLayer;
+    if (overlayLayer.options?.isSlowPeriodOverlay || overlayLayer.options?.isGapOverlay) {
+      mapInstance.removeLayer(layer);
     }
   });
 
@@ -117,28 +138,45 @@ export function updateMapOverlays(showOverlays: boolean = true): void {
  * Adds gap overlay markers and lines to the map
  */
 function addGapOverlayToMap(period: SlowPeriod, index: number): void {
+  const map = activityMap;
+  if (!map) {
+    return;
+  }
+
   const gap = period.gapData;
 
+  if (!gap) {
+    return;
+  }
+
   if (gap.startGpsPoint) {
-    L.marker(gap.startGpsPoint, {
+    const marker = L.marker(gap.startGpsPoint, {
       icon: L.divIcon({
         className: 'gap-overlay-marker',
         html: '<div class="gap-overlay-marker">⏸️</div>',
-        iconSize: [20, 20]
+        iconSize: [20, 20],
       }),
-      isGapOverlay: true
-    }).addTo(activityMap).bindPopup(`Recording Gap ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime - period.startTime) / 1000))}`);
+    }).addTo(map).bindPopup(`Recording Gap ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000))}`);
+    const markerOverlay = marker as OverlayLayer;
+    markerOverlay.options = {
+      ...(markerOverlay.options ?? {}),
+      isGapOverlay: true,
+    };
   }
 
   if (gap.endGpsPoint && gap.startGpsPoint) {
     // Add dashed line for gap if both points exist
-    L.polyline([gap.startGpsPoint, gap.endGpsPoint], {
+    const line = L.polyline([gap.startGpsPoint, gap.endGpsPoint], {
       color: '#dc3545',
       weight: 3,
       opacity: 0.8,
       dashArray: '15, 10',
-      isGapOverlay: true
-    }).addTo(activityMap);
+    }).addTo(map);
+    const lineOverlay = line as OverlayLayer;
+    lineOverlay.options = {
+      ...(lineOverlay.options ?? {}),
+      isGapOverlay: true,
+    };
   }
 }
 
@@ -146,26 +184,39 @@ function addGapOverlayToMap(period: SlowPeriod, index: number): void {
  * Adds slow period overlay markers and lines to the map
  */
 function addSlowPeriodOverlayToMap(period: SlowPeriod, index: number): void {
+  const map = activityMap;
+  if (!map) {
+    return;
+  }
+
   if (period.gpsPoints.length > 0) {
     const centerPoint = period.gpsPoints[Math.floor(period.gpsPoints.length / 2)];
 
-    L.marker(centerPoint, {
+    const marker = L.marker(centerPoint, {
       icon: L.divIcon({
         className: 'slow-overlay-marker',
         html: '<div class="slow-overlay-marker">🐌</div>',
         iconSize: [20, 20]
-      }),
-      isSlowPeriodOverlay: true
-    }).addTo(activityMap).bindPopup(`Slow Period ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime - period.startTime) / 1000))}<br>Records: ${period.recordCount}`);
+      })
+    }).addTo(map).bindPopup(`Slow Period ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000))}<br>Records: ${period.recordCount}`);
+    const markerOverlay = marker as OverlayLayer;
+    markerOverlay.options = {
+      ...(markerOverlay.options ?? {}),
+      isSlowPeriodOverlay: true,
+    };
 
     // Add highlighted route for slow period if multiple points
     if (period.gpsPoints.length > 1) {
-      L.polyline(period.gpsPoints, {
+      const line = L.polyline(period.gpsPoints, {
         color: '#ffc107',
         weight: 3,
         opacity: 0.9,
-        isSlowPeriodOverlay: true
-      }).addTo(activityMap);
+      }).addTo(map);
+      const lineOverlay = line as OverlayLayer;
+      lineOverlay.options = {
+        ...(lineOverlay.options ?? {}),
+        isSlowPeriodOverlay: true,
+      };
     }
   }
 }
@@ -221,6 +272,12 @@ function initializeGapMiniMap(
 ): void {
   const gap = period.gapData;
 
+  if (!gap) {
+    disableFullRouteToggle(mapId);
+    showNoGpsMessage(mapElement, 'No GPS data available for this gap');
+    return;
+  }
+
   if (!gap.startGpsPoint && !gap.endGpsPoint) {
     disableFullRouteToggle(mapId);
     showNoGpsMessage(mapElement, 'No GPS data available for this gap');
@@ -260,14 +317,14 @@ function initializeSlowPeriodMiniMap(
   if (period.gpsPoints.length === 1) {
     setupSinglePointSlowPeriodMap(miniMap, period, index);
   } else {
-    setupMultiPointSlowPeriodMap(miniMap, period, index);
+    setupMultiPointSlowPeriodMap(miniMap, period);
   }
 }
 
 /**
  * Creates a basic mini-map with common settings
  */
-function createBasicMiniMap(mapId: string): L.Map {
+function createBasicMiniMap(mapId: string): LeafletMap {
   const miniMap = L.map(mapId, {
     zoomControl: true,
     attributionControl: false,
@@ -286,7 +343,7 @@ function createBasicMiniMap(mapId: string): L.Map {
   return miniMap;
 }
 
-function setupFullRouteToggle(mapId: string, miniMap: L.Map, fullRoute: [number, number][]): void {
+function setupFullRouteToggle(mapId: string, miniMap: LeafletMap, fullRoute: [number, number][]): void {
   const toggleInput = document.querySelector(`input[data-mini-map-id="${mapId}"]`) as ToggleInputWithHandler | null;
 
   if (!toggleInput) {
@@ -335,7 +392,7 @@ function disableFullRouteToggle(mapId: string): void {
   removeFullRouteOverlay(mapId);
 }
 
-function addFullRouteOverlay(mapId: string, miniMap: L.Map, fullRoute: [number, number][]): void {
+function addFullRouteOverlay(mapId: string, miniMap: LeafletMap, fullRoute: [number, number][]): void {
   removeFullRouteOverlay(mapId);
 
   const overlay = plotFullRouteOnMiniMap(miniMap, fullRoute);
@@ -361,7 +418,7 @@ function removeFullRouteOverlay(mapId: string): void {
 /**
  * Plots the full activity route on a mini-map when GPS data is available
  */
-function plotFullRouteOnMiniMap(miniMap: L.Map, fullRoute: [number, number][]): FullRouteOverlay | null {
+function plotFullRouteOnMiniMap(miniMap: LeafletMap, fullRoute: [number, number][]): FullRouteOverlay | null {
   if (!fullRoute || fullRoute.length < 2) {
     return null;
   }
@@ -400,7 +457,7 @@ function showNoGpsMessage(mapElement: HTMLElement, message: string): void {
  * Collects available GPS points from a gap
  */
 function collectAvailableGpsPoints(gap: TimestampGap): [number, number][] {
-  const availablePoints = [];
+  const availablePoints: [number, number][] = [];
   if (gap.startGpsPoint) availablePoints.push(gap.startGpsPoint);
   if (gap.endGpsPoint) availablePoints.push(gap.endGpsPoint);
   return availablePoints;
@@ -410,15 +467,25 @@ function collectAvailableGpsPoints(gap: TimestampGap): [number, number][] {
  * Sets up a gap mini-map with a single GPS point
  */
 function setupSinglePointGapMap(
-  miniMap: L.Map,
+  miniMap: LeafletMap,
   gap: TimestampGap,
   index: number,
   point: [number, number]
 ): void {
   const isStartPoint = gap.startGpsPoint && !gap.endGpsPoint;
   const markerConfig = isStartPoint
-    ? { className: 'gap-start-marker', html: '<div class="gap-start-marker">Gap Start</div>', size: [70, 25], popup: `Recording Gap ${index + 1} - Recording stopped here` }
-    : { className: 'gap-end-marker', html: '<div class="gap-end-marker">Gap End</div>', size: [70, 25], popup: `Recording Gap ${index + 1} - Recording resumed here` };
+    ? {
+        className: 'gap-start-marker',
+        html: '<div class="gap-start-marker">Gap Start</div>',
+        size: [70, 25] as [number, number],
+        popup: `Recording Gap ${index + 1} - Recording stopped here`,
+      }
+    : {
+        className: 'gap-end-marker',
+        html: '<div class="gap-end-marker">Gap End</div>',
+        size: [70, 25] as [number, number],
+        popup: `Recording Gap ${index + 1} - Recording resumed here`,
+      };
 
   L.marker(point, {
     icon: L.divIcon({
@@ -435,7 +502,7 @@ function setupSinglePointGapMap(
  * Sets up a gap mini-map with both start and end GPS points
  */
 function setupDualPointGapMap(
-  miniMap: L.Map,
+  miniMap: LeafletMap,
   gap: TimestampGap,
   index: number
 ): void {
@@ -462,7 +529,7 @@ function setupDualPointGapMap(
   }).addTo(miniMap).bindPopup(`Recording Gap ${index + 1} - Recording resumed`);
 
   // Add dashed line
-  const gapLine = L.polyline([gap.startGpsPoint, gap.endGpsPoint], {
+  L.polyline([gap.startGpsPoint, gap.endGpsPoint], {
     color: '#dc3545',
     weight: 4,
     opacity: 0.7,
@@ -477,7 +544,7 @@ function setupDualPointGapMap(
  * Sets up a slow period mini-map with a single GPS point
  */
 function setupSinglePointSlowPeriodMap(
-  miniMap: L.Map,
+  miniMap: LeafletMap,
   period: SlowPeriod,
   index: number
 ): void {
@@ -493,9 +560,8 @@ function setupSinglePointSlowPeriodMap(
  * Sets up a slow period mini-map with multiple GPS points
  */
 function setupMultiPointSlowPeriodMap(
-  miniMap: L.Map,
-  period: SlowPeriod,
-  index: number
+  miniMap: LeafletMap,
+  period: SlowPeriod
 ): void {
   const polyline = L.polyline(period.gpsPoints, {
     color: '#ffc107',
@@ -527,12 +593,12 @@ function setupMultiPointSlowPeriodMap(
 /**
  * Adds chevron markers along a polyline to show travel direction
  */
-function addDirectionalChevrons(miniMap: L.Map, polyline: L.Polyline): L.Layer | null {
+function addDirectionalChevrons(miniMap: LeafletMap, polyline: LeafletPolyline): Layer | null {
   if (typeof L.polylineDecorator !== 'function' || !L.Symbol || typeof L.Symbol.arrowHead !== 'function') {
     return null;
   }
 
-  const polylineOptions = polyline.options as L.PolylineOptions;
+  const polylineOptions = polyline.options as PolylineOptions;
   const arrowColor = polylineOptions.color ?? '#3388ff';
   const arrowWeight = polylineOptions.weight ?? 3;
   const arrowOpacity = polylineOptions.opacity ?? 0.9;
@@ -562,7 +628,7 @@ function addDirectionalChevrons(miniMap: L.Map, polyline: L.Polyline): L.Layer |
 /**
  * Gets the current activity map instance
  */
-export function getActivityMap(): L.Map | null {
+export function getActivityMap(): LeafletMap | null {
   return activityMap;
 }
 

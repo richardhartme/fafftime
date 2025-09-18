@@ -1,42 +1,45 @@
 // TypeScript declarations for leaflet-polylinedecorator
 // Provides minimal typings so we can safely call the plugin from our codebase
 
-declare namespace L {
-  // Minimal symbol support from leaflet-polylinedecorator
-  type Symbol = any;
+import 'leaflet';
+
+declare module 'leaflet' {
+  namespace Symbol {
+    interface ArrowHeadOptions {
+      pixelSize?: number;
+      headAngle?: number;
+      polygon?: boolean;
+      pathOptions?: PathOptions;
+    }
+
+    function arrowHead(options?: ArrowHeadOptions): Symbol;
+  }
 
   interface PolylineDecoratorPattern {
     offset?: number | string;
     endOffset?: number | string;
     repeat?: number | string;
-    symbol: L.Symbol;
+    symbol: Symbol;
   }
 
   interface PolylineDecoratorOptions {
     patterns: PolylineDecoratorPattern[];
   }
 
-  interface PolylineDecorator extends L.Layer {}
+  interface PolylineDecorator extends Layer {}
 
   function polylineDecorator(
     leafletObject:
-      | L.Polyline
-      | L.Polygon
-      | L.MultiPolyline
-      | L.MultiPolygon
-      | L.LatLngExpression[]
-      | L.LatLngExpression[][],
+      | Polyline
+      | Polygon
+      | MultiPolyline
+      | MultiPolygon
+      | LatLngExpression[]
+      | LatLngExpression[][],
     options: PolylineDecoratorOptions
   ): PolylineDecorator;
+}
 
-  namespace Symbol {
-    interface ArrowHeadOptions {
-      pixelSize?: number;
-      headAngle?: number;
-      polygon?: boolean;
-      pathOptions?: L.PathOptions;
-    }
-
-    function arrowHead(options?: ArrowHeadOptions): L.Symbol;
-  }
+declare namespace L {
+  type Symbol = any;
 }

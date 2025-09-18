@@ -16,8 +16,11 @@ module.exports = {
         use: {
           loader: 'ts-loader',
           options: {
-            transpileOnly: true, // Skip type checking for now
-          }
+            compilerOptions: {
+              declaration: false,
+              declarationMap: false,
+            },
+          },
         },
         exclude: /node_modules/,
       },

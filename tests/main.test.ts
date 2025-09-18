@@ -390,8 +390,8 @@ describe('Core Logic Functions', () => {
     });
 
     it('skips records without timestamps', () => {
-      const records = [
-        { timestamp: null, distance: 1000 },
+      const records: TestFitRecord[] = [
+        { distance: 1000 },
         { timestamp: new Date('2024-01-01T10:00:00Z'), distance: 1000 }
       ];
 
@@ -422,6 +422,10 @@ describe('Core Logic Functions', () => {
       const result = processSlowSequence(mockSlowRecords, selectedRanges);
 
       expect(result).not.toBeNull();
+      if (!result) {
+        throw new Error('Expected slow period result');
+      }
+
       expect(result.startTime).toEqual(mockSlowRecords[0].timestamp);
       expect(result.endTime).toEqual(mockSlowRecords[1].timestamp);
       expect(result.recordCount).toBe(2);
@@ -461,6 +465,11 @@ describe('Core Logic Functions', () => {
       ];
 
       const result = processSlowSequence(recordsWithoutEndDistance, ['2to5']);
+      expect(result).not.toBeNull();
+      if (!result) {
+        throw new Error('Expected slow period result');
+      }
+
       expect(result.endDistance).toBe(1000); // Should use start distance as fallback
     });
   });

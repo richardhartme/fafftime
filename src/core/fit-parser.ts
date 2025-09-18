@@ -25,26 +25,34 @@ export async function decodeFitFile(file: File): Promise<FitData> {
  * Extracts basic activity timing and distance information from sessions and records
  */
 export function extractActivityTimes(sessions: FitSession[], records: FitRecord[]): ActivityTimes {
-  let startTime = null;
-  let endTime = null;
-  let movingTime = null;
-  let totalDistance = null;
+  let startTime: Date | null = null;
+  let endTime: Date | null = null;
+  let movingTime: number | null = null;
+  let totalDistance: number | null = null;
 
   if (sessions.length > 0) {
     const session = sessions[0];
-    startTime = session.startTime;
-    movingTime = session.totalTimerTime;
-    totalDistance = session.totalDistance;
+    startTime = session.startTime ?? null;
+    movingTime = typeof session.totalTimerTime === 'number' ? session.totalTimerTime : null;
+    totalDistance = typeof session.totalDistance === 'number' ? session.totalDistance : null;
 
-    if (session.totalElapsedTime) {
+    if (startTime && typeof session.totalElapsedTime === 'number') {
       endTime = new Date(startTime.getTime() + (session.totalElapsedTime * 1000));
     }
   }
 
   // If no session data, try to get from records
   if (records.length > 0) {
-    startTime = records[0].timestamp;
-    endTime = records[records.length - 1].timestamp;
+    const firstRecordWithTimestamp = records.find(record => record.timestamp);
+    const lastRecordWithTimestamp = [...records].reverse().find(record => record.timestamp);
+
+    if (firstRecordWithTimestamp?.timestamp) {
+      startTime = firstRecordWithTimestamp.timestamp;
+    }
+
+    if (lastRecordWithTimestamp?.timestamp) {
+      endTime = lastRecordWithTimestamp.timestamp;
+    }
   }
 
   return { startTime, endTime, movingTime, totalDistance };
