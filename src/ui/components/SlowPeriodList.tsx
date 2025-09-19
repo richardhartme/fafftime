@@ -211,7 +211,7 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
                     <input
                       id={checkboxId}
                       type="checkbox"
-                      className="h-4 w-4 rounded border-slate-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-slate-700 dark:bg-transparent accent-emerald-600"
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600 shadow-sm focus:ring-blue-500 dark:border-slate-700 dark:bg-transparent accent-blue-600"
                       data-role="full-route-toggle"
                       data-mini-map-id={miniMapId}
                     />
@@ -313,7 +313,7 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
                   <input
                     id={checkboxId}
                     type="checkbox"
-                    className="h-4 w-4 rounded border-amber-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-amber-800 dark:bg-transparent accent-emerald-600"
+                    className="h-4 w-4 rounded border-amber-300 text-blue-600 shadow-sm focus:ring-blue-500 dark:border-amber-800 dark:bg-transparent accent-blue-600"
                     data-role="full-route-toggle"
                     data-mini-map-id={miniMapId}
                   />

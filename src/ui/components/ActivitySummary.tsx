@@ -86,7 +86,7 @@ export function ActivitySummary({ analysisResult }: ActivitySummaryProps): JSX.E
           className="relative h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
           style={ratioStyle}
         >
-          <div className="h-full w-[var(--move)] rounded-full bg-emerald-500" />
+          <div className="h-full w-[var(--move)] rounded-full bg-blue-500" />
         </div>
         <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
           ~{movingPercentLabel}% moving, ~{stoppedPercentLabel}% stopped

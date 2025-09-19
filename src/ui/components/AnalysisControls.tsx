@@ -68,7 +68,7 @@ export function AnalysisControls({
                   <input
                     id={checkboxId}
                     type="checkbox"
-                    className="mt-1 h-4 w-4 rounded border-zinc-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 accent-emerald-600"
+                    className="mt-1 h-4 w-4 rounded border-zinc-300 text-blue-600 shadow-sm focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 accent-blue-600"
                     value={option.value}
                     checked={selectedRanges.includes(option.value)}
                     onChange={() => onToggleRange(option.value)}
@@ -99,7 +99,7 @@ export function AnalysisControls({
                 value={gapThreshold}
                 onChange={handleGapThresholdChange}
                 title="Increase if you have excessive recording gaps"
-                className="w-full appearance-none rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                className="w-full appearance-none rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
               >
                 {gapThresholdOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -132,7 +132,7 @@ export function AnalysisControls({
           <input
             id="show-overlays"
             type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-zinc-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 accent-emerald-600"
+            className="mt-1 h-4 w-4 rounded border-zinc-300 text-blue-600 shadow-sm focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 accent-blue-600"
             checked={showOverlays}
             onChange={(event) => onShowOverlaysChange(event.target.checked)}
           />
