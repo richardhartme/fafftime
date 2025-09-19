@@ -107,22 +107,45 @@ export default function App(): JSX.Element {
 
   return (
     <div className="w-full">
-      <div className="w-full mb-[30px]">
-        <header className="flex flex-col gap-3">
-          <div className="flex flex-col items-center gap-5 text-center md:flex-row md:items-center md:text-left">
+      <div className="w-full">
+        <header
+          className="mx-auto max-w-6xl px-6 py-10 sm:flex sm:items-center sm:gap-10"
+          aria-labelledby="site-title"
+        >
+          <div className="flex flex-shrink-0 justify-center sm:justify-start">
             <img
               src={logoImage}
-              alt="Ultra Cycling Faff Time"
-              className="h-auto w-[80px] max-h-[80px] flex-shrink-0 object-contain md:w-auto md:max-h-[190px]"
+              alt="Ultra Cycling Faff Time logo"
+              className="h-28 w-auto sm:h-32"
             />
-            <div className="text-center md:text-left">
-              <h1 className="m-0 mb-1 text-[1.8rem] md:text-[1.6rem] lg:text-[2rem]">Ultra Cycling Faff Time</h1>
-              <h4 className="m-0 mb-2 text-base md:text-lg">Find where you spent time stopped (faffing) instead of riding.</h4>
-              <strong className="my-2 block md:text-left">faff about / around</strong> phrasal verb - to spend your time doing things that are not important instead of the thing that you should be doing.
-              <span className="block py-2 text-sm md:text-left">
-                After realising there was a 20-hour difference between my elapsed time and moving time during my last ultra event. I wanted a tool to be able to see where all that time went. Faff Time shows where you spent time stopped and for how long.
+          </div>
+
+          <div className="mt-6 sm:mt-0">
+            <h1
+              id="site-title"
+              className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
+            >
+              Ultra Cycling Faff Time
+            </h1>
+
+            <p className="mt-2 text-lg text-zinc-700 dark:text-zinc-300">
+              Find where you spent time stopped (faffing) instead of riding.
+            </p>
+
+            <p className="mt-4 text-base">
+              <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                faff about / around
               </span>
-            </div>
+              <span className="text-zinc-700 dark:text-zinc-300">
+                {' '}- phrasal verb: to spend your time doing things that are not important instead of the thing that you should be doing.
+              </span>
+            </p>
+
+            <p className="mt-4 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+              After realising there was a 20-hour difference between my elapsed time and moving time
+              during my last ultra event, I wanted a tool to see where all that time went. Faff Time
+              shows where you spent time stopped and for how long.
+            </p>
           </div>
         </header>
       </div>
@@ -175,12 +198,27 @@ export default function App(): JSX.Element {
 
         <div className="w-full min-w-0 md:flex-1">
           {!parsedFile && status !== 'loading' && (
-            <div id="screenshot">
-              <div className="text-center">
-                <h3>Example Output</h3>
-                <img src="screenshot.png" alt="Example analysis output" className="mx-auto max-w-[660px]" />
-              </div>
-            </div>
+            <section className="mx-auto max-w-6xl px-6 py-2" id="screenshot">
+              <figure className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <div className="flex items-center justify-between rounded-t-2xl border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-red-400"></span>
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+                    <span className="h-2.5 w-2.5 rounded-full bg-green-400"></span>
+                  </div>
+                  <div className="truncate text-xs text-zinc-500 dark:text-zinc-400">example-output.png</div>
+                  <div className="w-10"></div>
+                </div>
+
+                <div className="overflow-hidden rounded-b-2xl">
+                  <img
+                    src="screenshot.png"
+                    className="block h-auto w-full mx-auto max-w-[500px]"
+                    loading="lazy"
+                  />
+                </div>
+              </figure>
+            </section>
           )}
 
           {status === 'loading' && (
@@ -198,17 +236,27 @@ export default function App(): JSX.Element {
           )}
 
           {analysisAvailable && (
-            <div
+            <section
               id="mapContainer"
-              className="my-2 p-4 rounded bg-gray-100"
+              className="mt-2 mb-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/40"
+              aria-labelledby="activity-map-title"
               style={{ display: analysisAvailable ? 'block' : 'none' }}
             >
-              <h3 className="mb-[10px]">
-                <Icon name="location-dot" />
-                Activity Map
-              </h3>
-              <div id="map" className="h-[300px] rounded md:h-[400px]"></div>
-            </div>
+              <header className="flex items-center gap-3">
+                <div className="rounded-full bg-slate-500/15 p-1.5 text-slate-700 dark:text-slate-300">
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
+                  </svg>
+                </div>
+                <h3 id="activity-map-title" className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                  Activity Map
+                </h3>
+              </header>
+
+              <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/30">
+                <div id="activity-map" className="h-[360px] w-full sm:h-[420px] lg:h-[520px]"></div>
+              </div>
+            </section>
           )}
 
           <div id="slowPeriodData">

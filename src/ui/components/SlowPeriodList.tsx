@@ -17,46 +17,6 @@ function formatPeriodTimes(period: SlowPeriod): { startText: string; endText: st
   return {startText, endText};
 }
 
-function createGoogleMapsLink([lat, lng]: [number, number], text = 'View on Google Maps'): JSX.Element {
-  const href = `https://www.google.com/maps?q=${lat},${lng}`;
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 text-sky-600 no-underline"
-    >
-      <Icon name="location-dot"/>
-      {text}
-    </a>
-  );
-}
-
-function createStreetViewLink([lat, lng]: [number, number], text = 'View on Street View'): JSX.Element {
-  const href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 text-sky-600 no-underline"
-    >
-      <Icon name="street-view"/>
-      {text}
-    </a>
-  );
-}
-
-function createLocationLinkGroup(point: [number, number], labelPrefix = ''): JSX.Element {
-  return (
-    <>
-      {createGoogleMapsLink(point, `${labelPrefix}Google Maps`)}
-      <span> | </span>
-      {createStreetViewLink(point, `${labelPrefix}Street View`)}
-    </>
-  );
-}
-
 function formatActivityShare(durationSeconds: number, activityDurationSeconds: number | null | undefined): string {
   if (!activityDurationSeconds || activityDurationSeconds <= 0) {
     return '—';
@@ -69,7 +29,7 @@ function formatActivityShare(durationSeconds: number, activityDurationSeconds: n
 
   const isWholeNumber = Number.isInteger(percentage);
   const percentageText = isWholeNumber ? `${percentage}%` : `${percentage.toFixed(1)}%`;
-  return `${percentageText} of activity`;
+  return `${percentageText}`;
 }
 
 interface SlowPeriodListProps {
@@ -98,47 +58,90 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
   const activityDurationSeconds = analysisResult.durationSeconds ?? null;
   const gapPercentageText = formatActivityShare(analysisResult.stats.gapDurationSeconds, activityDurationSeconds);
   const totalPercentageText = formatActivityShare(analysisResult.stats.totalDurationSeconds, activityDurationSeconds);
+  const totalPercentageValue = totalPercentageText !== '—'
+    ? totalPercentageText.replace(' of activity', '')
+    : null;
+  const gapPercentageValue = gapPercentageText !== '—' ? gapPercentageText : null;
+  const totalPeriodCount = analysisResult.slowPeriods.length;
+  const totalDurationText = formatDuration(analysisResult.stats.totalDurationSeconds);
+  const gapDurationText = formatDuration(analysisResult.stats.gapDurationSeconds);
 
   return (
     <div>
-      <div className="rounded bg-amber-100 p-4">
-        <strong className="block mb-2">
-          <Icon name="stopwatch"/>
-          Faff Periods &amp; Recording Gaps
-        </strong>
-        <p>
-          Found <strong>{analysisResult.slowPeriods.length}</strong> period(s)
-          totalling <strong>{formatDuration(analysisResult.stats.totalDurationSeconds)}</strong>
-          {totalPercentageText !== '—' ? <span> ({totalPercentageText})</span> : null}.
-        </p>
-        <p>
-          <strong>Recording gaps:</strong>{' '}
-          <span>{analysisResult.stats.gapCount}</span>{' '}
-          <span>
-            (
-            {formatDuration(analysisResult.stats.gapDurationSeconds)} ·{' '}
-            {gapPercentageText}
-            )
-          </span>
-        </p>
-        <p><strong>Faff periods:</strong> <span>{analysisResult.stats.slowCount}</span> (speed {'<'} 1 m/s)</p>
-        <div className="mt-4">
-          <ul className="ml-5 list-disc">
+      <section
+        className="rounded-2xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm dark:border-amber-900/40 dark:bg-amber-950/30"
+        aria-labelledby="faff-summary-title"
+      >
+        <header className="flex items-start gap-3">
+          <div className="mt-0.5 rounded-full bg-amber-500/15 p-1.5 text-amber-700 dark:text-amber-300">
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm.75 5.5a.75.75 0 0 0-1.5 0v5.19l-3 1.74a.75.75 0 1 0 .75 1.3l3.375-1.96A.75.75 0 0 0 12.75 13V7.5Z" />
+            </svg>
+          </div>
+          <div>
+            <h3 id="faff-summary-title" className="text-base font-semibold text-amber-900 dark:text-amber-100">
+              Faff Periods &amp; Recording Gaps
+            </h3>
+            <p className="mt-1 text-sm text-amber-900/80 dark:text-amber-200/90">
+              Found <span className="font-semibold">{totalPeriodCount}</span> period(s) totalling{' '}
+              <span className="font-semibold">{totalDurationText}</span>
+              {totalPercentageValue ? (
+                <>
+                  {' '}
+                  (<span className="font-medium">{totalPercentageValue}</span> of activity).
+                </>
+              ) : (
+                <>.</>
+              )}
+            </p>
+          </div>
+        </header>
+
+        <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+          <div className="flex items-center justify-between rounded-xl border border-amber-200 bg-white/70 px-3 py-2 dark:border-amber-900/30 dark:bg-amber-950/20">
+            <dt className="text-amber-800 dark:text-amber-100">Faff periods</dt>
+            <dd className="flex items-center gap-2">
+              <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-300">
+                speed {'<'} 1 m/s
+              </span>
+              <span className="font-semibold text-amber-900 dark:text-amber-50">
+                {analysisResult.stats.slowCount}
+              </span>
+            </dd>
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-amber-200 bg-white/70 px-3 py-2 dark:border-amber-900/30 dark:bg-amber-950/20">
+            <dt className="text-amber-800 dark:text-amber-100">Recording gaps</dt>
+            <dd className="flex items-center gap-2">
+              <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-300">
+                {gapPercentageValue ?? '—'}
+              </span>
+              <span className="font-semibold text-amber-900 dark:text-amber-50" title={gapDurationText}>
+                {analysisResult.stats.gapCount}
+              </span>
+            </dd>
+          </div>
+        </dl>
+
+        <div className="mt-4 rounded-2xl border border-amber-200 bg-white/70 p-3 dark:border-amber-900/30 dark:bg-amber-950/20">
+          <ul className="space-y-2 text-sm">
             {analysisResult.stats.rangeBreakdown.length === 0 && (
-              <li>No thresholds selected</li>
+              <li className="text-amber-900/80 dark:text-amber-200/90">No thresholds selected</li>
             )}
             {analysisResult.stats.rangeBreakdown.map(entry => {
               const totalDuration = formatDuration(entry.totalDurationSeconds);
               const percentageText = formatActivityShare(entry.totalDurationSeconds, activityDurationSeconds);
               return (
-                <li key={entry.range}>
-                  <strong>{entry.label}:</strong> {entry.count} <span>({totalDuration} · {percentageText})</span>
+                <li key={entry.range} className="flex items-baseline justify-between gap-4">
+                  <span className="font-medium text-amber-900 dark:text-amber-50">{entry.label}</span>
+                  <span className="text-amber-900/80 dark:text-amber-200/90">
+                    <strong>{entry.count}</strong> ({totalDuration} · {percentageText})
+                  </span>
                 </li>
               );
             })}
           </ul>
         </div>
-      </div>
+      </section>
 
       <div className="mt-5">
         {analysisResult.slowPeriods.map((period, index) => {
@@ -150,50 +153,211 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
 
           if (period.isGap && period.gapData) {
             const endDistanceKm = (period.endDistance / 1000).toFixed(2);
+            const gapNumber = index + 1;
+            const titleId = `recording-gap-${gapNumber}-title`;
+            const checkboxId = `show-route-gap-${gapNumber}`;
+            const locationCoords = period.gapData.startGpsPoint ?? null;
+            const googleMapsHref = locationCoords
+              ? `https://www.google.com/maps?q=${locationCoords[0]},${locationCoords[1]}`
+              : null;
+            const streetViewHref = locationCoords
+              ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${locationCoords[0]},${locationCoords[1]}`
+              : null;
 
             return (
-              <div className="mt-4 p-4 rounded bg-gray-100" key={miniMapId}>
-                <strong className="block mb-2">
-                  <Icon name="circle-pause"/>
-                  Recording Gap {index + 1}
-                </strong>
-                <strong>Time:</strong> <span>{startText} - {endText}</span><br/>
-                <strong>Duration:</strong> <span>{durationText}</span> (no data recorded)<br/>
-                <strong>Distance:</strong> <span>{startDistanceKm} km → {endDistanceKm} km</span><br/>
-                <label className="my-2 inline-flex items-center gap-2">
-                  <input type="checkbox" data-role="full-route-toggle" data-mini-map-id={miniMapId}/>
-                  Show activity route on map
-                </label><br/>
-                <span className="inline-flex flex-wrap items-center gap-1 text-sky-600">
-                {period.gapData.startGpsPoint && createLocationLinkGroup(period.gapData.startGpsPoint)}
-                </span><br/>
-                <div className="mt-4 h-[250px] w-full rounded border border-gray-300 md:h-[300px]" id={miniMapId}></div>
-              </div>
+              <section
+                key={miniMapId}
+                className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/40"
+                aria-labelledby={titleId}
+              >
+                <header className="flex items-start gap-3">
+                  <div className="mt-0.5 rounded-full bg-slate-500/15 p-1.5 text-slate-700 dark:text-slate-300">
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M8 5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H8Zm7 0a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1Z" />
+                    </svg>
+                  </div>
+
+                  <div className="flex-1">
+                    <h3 id={titleId} className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                      Recording Gap {gapNumber}
+                    </h3>
+
+                    <dl className="mt-2 grid gap-1 text-sm">
+                      <div className="flex gap-2">
+                        <dt className="font-semibold text-slate-900 dark:text-slate-50">Time:</dt>
+                        <dd className="text-slate-700 dark:text-slate-300">{startText} - {endText}</dd>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <dt className="font-semibold text-slate-900 dark:text-slate-50">Duration:</dt>
+                        <dd className="text-slate-700 dark:text-slate-300">
+                          {durationText}{' '}
+                          <span className="text-slate-500 dark:text-slate-400">(no data recorded)</span>
+                        </dd>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <dt className="font-semibold text-slate-900 dark:text-slate-50">Distance:</dt>
+                        <dd className="text-slate-700 dark:text-slate-300">
+                          {startDistanceKm} km → {endDistanceKm} km
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </header>
+
+                <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
+                  <label className="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300" htmlFor={checkboxId}>
+                    <input
+                      id={checkboxId}
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-slate-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-slate-700 dark:bg-transparent accent-emerald-600"
+                      data-role="full-route-toggle"
+                      data-mini-map-id={miniMapId}
+                    />
+                    Show activity route on map
+                  </label>
+
+                  {locationCoords ? (
+                    <nav className="flex items-center gap-4 text-sm">
+                      <a
+                        href={googleMapsHref ?? '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 font-medium text-blue-700 hover:underline dark:text-blue-400"
+                      >
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
+                        </svg>
+                        Google Maps
+                      </a>
+                      <span className="text-slate-600/60 dark:text-slate-400/40">|</span>
+                      <a
+                        href={streetViewHref ?? '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 font-medium text-blue-700 hover:underline dark:text-blue-400"
+                      >
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path d="M12 12a3.5 3.5 0 1 0-3.5-3.5A3.5 3.5 0 0 0 12 12Zm0 2c-3 0-6 1.5-6 3.5V20h12v-2.5C18 15.5 15 14 12 14Z" />
+                        </svg>
+                        Street View
+                      </a>
+                    </nav>
+                  ) : (
+                    <span className="text-sm text-slate-600/70 dark:text-slate-400/70">No GPS data</span>
+                  )}
+                </div>
+
+                <div className="mt-4">
+                  <div
+                    id={miniMapId}
+                    className="h-[320px] w-full overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900/30"
+                  ></div>
+                </div>
+              </section>
             );
           }
 
-          const locationLink = period.gpsPoints[0]
-            ? createLocationLinkGroup(period.gpsPoints[0])
+          const faffNumber = index + 1;
+          const titleId = `faff-period-${faffNumber}-title`;
+          const checkboxId = `show-route-${faffNumber}`;
+          const hasLocation = Boolean(period.gpsPoints[0]);
+          const locationCoords = hasLocation ? period.gpsPoints[0] : null;
+          const googleMapsHref = locationCoords
+            ? `https://www.google.com/maps?q=${locationCoords[0]},${locationCoords[1]}`
+            : null;
+          const streetViewHref = locationCoords
+            ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${locationCoords[0]},${locationCoords[1]}`
             : null;
 
           return (
-            <div className="mt-4 p-4 rounded bg-amber-100" key={miniMapId}>
-              <strong className="block mb-2">
-                <Icon name="stopwatch"/>
-                Faff Period {index + 1}
-              </strong>
-              <strong>Time:</strong> <span>{startText} - {endText}</span><br/>
-              <strong>Duration:</strong> <span>{durationText}</span> (<span>{period.recordCount}</span> records)<br/>
-              <strong>Distance:</strong> <span>{startDistanceKm}</span> km<br/>
-              <label className="my-2 inline-flex items-center gap-2">
-                <input type="checkbox" data-role="full-route-toggle" data-mini-map-id={miniMapId}/>
-                Show activity route on map
-              </label><br/>
-              <span className="inline-flex flex-wrap items-center gap-1 text-sky-600">
-                {locationLink ?? 'No GPS data'}
-              </span><br/>
-              <div className="mt-4 h-[250px] w-full rounded border border-gray-300 md:h-[300px]" id={miniMapId}></div>
-            </div>
+            <section
+              key={miniMapId}
+              className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm dark:border-amber-900/40 dark:bg-amber-950/30"
+              aria-labelledby={titleId}
+            >
+              <header className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-full bg-amber-500/15 p-1.5 text-amber-700 dark:text-amber-300">
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm.75 5.5a.75.75 0 0 0-1.5 0v5.2l-3 1.74a.75.75 0 0 0 .75 1.3l3.38-1.96a.75.75 0 0 0 .37-.65V7.5Z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 id={titleId} className="text-base font-semibold text-amber-900 dark:text-amber-100">
+                    Faff Period {faffNumber}
+                  </h3>
+                  <dl className="mt-2 grid gap-1 text-sm">
+                    <div className="flex gap-2">
+                      <dt className="font-semibold text-amber-900 dark:text-amber-50">Time:</dt>
+                      <dd className="text-amber-900/90 dark:text-amber-200/90">
+                        {startText} - {endText}
+                      </dd>
+                    </div>
+                    <div className="flex gap-2">
+                      <dt className="font-semibold text-amber-900 dark:text-amber-50">Duration:</dt>
+                      <dd className="text-amber-900/90 dark:text-amber-200/90">
+                        {durationText}{' '}
+                      </dd>
+                    </div>
+                    <div className="flex gap-2">
+                      <dt className="font-semibold text-amber-900 dark:text-amber-50">Distance:</dt>
+                      <dd className="text-amber-900/90 dark:text-amber-200/90">{startDistanceKm} km</dd>
+                    </div>
+                  </dl>
+                </div>
+              </header>
+
+              <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
+                <label className="inline-flex items-center gap-2 text-sm text-amber-900/90 dark:text-amber-200/90" htmlFor={checkboxId}>
+                  <input
+                    id={checkboxId}
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-amber-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-amber-800 dark:bg-transparent accent-emerald-600"
+                    data-role="full-route-toggle"
+                    data-mini-map-id={miniMapId}
+                  />
+                  Show activity route on map
+                </label>
+
+                {hasLocation ? (
+                  <nav className="flex items-center gap-4 text-sm">
+                    <a
+                      href={googleMapsHref ?? '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 font-medium text-blue-700 hover:underline dark:text-blue-400"
+                    >
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
+                      </svg>
+                      Google Maps
+                    </a>
+                    <span className="text-amber-800/50 dark:text-amber-300/40">|</span>
+                    <a
+                      href={streetViewHref ?? '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 font-medium text-blue-700 hover:underline dark:text-blue-400"
+                    >
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 12a3.5 3.5 0 1 0-3.5-3.5A3.5 3.5 0 0 0 12 12Zm0 2c-3 0-6 1.5-6 3.5V20h12v-2.5C18 15.5 15 14 12 14Z" />
+                      </svg>
+                      Street View
+                    </a>
+                  </nav>
+                ) : (
+                  <span className="text-sm text-amber-900/60 dark:text-amber-300/70">No GPS data</span>
+                )}
+              </div>
+
+              <div className="mt-4">
+                <div
+                  id={miniMapId}
+                  className="h-[320px] w-full overflow-hidden rounded-2xl border border-amber-200 bg-white dark:border-amber-900/30 dark:bg-amber-950/20"
+                ></div>
+              </div>
+            </section>
           );
         })}
       </div>

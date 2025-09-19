@@ -1,5 +1,4 @@
 import { ChangeEvent, DragEvent, MouseEvent, useRef, useState } from 'react';
-import { Icon } from './Icon';
 
 interface FileDropzoneProps {
   onFileSelected: (file: File) => Promise<void> | void;
@@ -50,7 +49,7 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
     setIsDragActive(false);
   };
 
-  const handleExampleLoadClick = async (event: MouseEvent<HTMLAnchorElement>) => {
+  const handleExampleLoadClick = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (!isLoading) {
       await onExampleLoad();
@@ -66,66 +65,96 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
   };
 
   const dropAreaClasses = [
-    'relative cursor-pointer rounded-lg border-2 border-dashed border-blue-600 bg-white p-5 text-center transition-all duration-300 ease-in-out hover:border-blue-700 hover:bg-blue-50',
-    isDragActive ? 'scale-105 border-blue-800 bg-blue-100' : '',
+    'group relative cursor-pointer rounded-2xl border-2 border-dashed border-blue-400/80 bg-white/80 p-8 text-center transition',
+    'hover:bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500',
+    'dark:bg-zinc-900/60 dark:border-blue-800/70 dark:hover:bg-zinc-900/80',
+    isDragActive ? 'is-dragover border-blue-500 ring-2 ring-blue-500' : '',
+  ].filter(Boolean).join(' ');
+
+  const overlayClasses = [
+    'pointer-events-none absolute inset-0 rounded-2xl opacity-0 ring-2 ring-blue-500 transition',
+    isDragActive ? 'opacity-100' : '',
   ].filter(Boolean).join(' ');
 
   return (
     <div className="w-full">
-      <div className="mb-5 w-full rounded-lg border-2 border-blue-600 bg-blue-50 p-5">
+      <section className="max-w-xl rounded-2xl border border-blue-300 bg-blue-50/60 p-5 shadow-sm backdrop-blur dark:border-blue-900/60 dark:bg-blue-950/30">
+        <h2 className="sr-only">Upload FIT file</h2>
+
         <div
+          id="fit-dropzone"
           className={dropAreaClasses}
-          id="fileDropArea"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={openFilePicker}
           aria-busy={isLoading}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (isLoading) {
+              return;
+            }
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
         >
-          <div className="pointer-events-none">
-            <h3 className="m-0 mb-2.5 text-[1.2rem] text-gray-800">Drop your FIT file here</h3>
-            <p className="my-2 text-gray-600">
-              or{' '}
-              <button
-                type="button"
-                className="pointer-events-auto rounded border-none bg-blue-600 px-4 py-2 text-[0.9rem] text-white transition-colors duration-200 hover:bg-blue-800"
-                id="fileSelectButton"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  if (!isLoading) {
-                    fileInputRef.current?.click();
-                  }
-                }}
-              >
-                choose a file
-              </button>
-            </p>
-            <p className="text-xs text-gray-400">Accepts .fit files</p>
-          </div>
           <input
-            type="file"
-            id="fitFile"
-            accept=".fit"
-            style={{ display: 'none' }}
+            id="fit-file"
             ref={fileInputRef}
+            type="file"
+            accept=".fit"
+            className="sr-only"
             onChange={handleFileInputChange}
             onClick={resetDragState}
+            disabled={isLoading}
           />
+
+          <p className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Drop your FIT file here</p>
+
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">or</span>
+            <label
+              htmlFor="fit-file"
+              className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              onClick={(event) => {
+                event.stopPropagation();
+                if (isLoading) {
+                  event.preventDefault();
+                }
+              }}
+            >
+              choose a file
+            </label>
+          </div>
+
+          <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">Accepts .fit files</p>
+
+          <div aria-hidden="true" className={overlayClasses}></div>
         </div>
 
-        <div className="mt-5 text-[0.9em]">
-          <a
-            href="#"
-            id="loadExampleFile"
-            onClick={handleExampleLoadClick}
-            aria-disabled={isLoading}
-            className="block rounded border border-gray-300 bg-gray-50 px-2.5 py-1.5 text-blue-600 transition-colors duration-200 hover:bg-gray-100"
+        <div className="mt-4"></div>
+
+        <button
+          type="button"
+          onClick={handleExampleLoadClick}
+          className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          disabled={isLoading}
+        >
+          <svg
+            className="h-4 w-4 text-blue-600 dark:text-blue-400"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
           >
-            <Icon name="file-lines" />
-            Load example FIT file
-          </a>
-        </div>
-      </div>
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <path d="M14 2v6h6" className="opacity-80" />
+          </svg>
+          Load example FIT file
+        </button>
+      </section>
     </div>
   );
 }

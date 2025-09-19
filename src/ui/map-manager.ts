@@ -64,7 +64,7 @@ export function initializeMap(fitData: FitData): void {
   // Initialize map if not already created
   if (!activityMap) {
     // Center map on first GPS point
-    activityMap = L.map('map').setView(gpsPoints[0], 13);
+    activityMap = L.map('activity-map').setView(gpsPoints[0], 13);
 
     // Add tile layer (OpenStreetMap)
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
