@@ -1,6 +1,6 @@
 import { CSSProperties, useMemo } from 'react';
 import { AnalysisResult } from '../../types/analysis';
-import { formatDuration } from '../../core/time-utils';
+import { formatDuration } from '../../utils/time-utils';
 
 interface ActivitySummaryProps {
   analysisResult: AnalysisResult;

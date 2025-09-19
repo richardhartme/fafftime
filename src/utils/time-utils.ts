@@ -3,7 +3,7 @@
 // =============================================================================
 
 import { TimeRange } from '../types/app-types';
-import { RANGE_LABELS } from '../utils/constants';
+import { RANGE_LABELS } from './constants';
 
 /**
  * Formats a duration in seconds to a human-readable string

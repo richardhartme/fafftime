@@ -1,6 +1,6 @@
 import {AnalysisResult} from '../../types/analysis';
 import {SlowPeriod} from '../../types/app-types';
-import {formatDuration} from '../../core/time-utils';
+import {formatDuration} from '../../utils/time-utils';
 import {Icon} from './Icon';
 
 function formatPeriodTimes(period: SlowPeriod): { startText: string; endText: string } {

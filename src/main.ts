@@ -8,5 +8,5 @@ export {
   formatDuration,
   getSelectedRangeText,
   matchesTimeRange
-} from './core/time-utils';
+} from './utils/time-utils';
 export {convertGpsCoordinates} from './utils/gps-utils';

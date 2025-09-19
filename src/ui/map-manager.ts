@@ -5,7 +5,7 @@
 import type { Layer, Map as LeafletMap, Polyline as LeafletPolyline, PolylineOptions } from 'leaflet';
 import { FitData, SlowPeriod, TimestampGap } from '../types/app-types';
 import { convertGpsCoordinates } from '../utils/gps-utils';
-import { formatDuration } from '../core/time-utils';
+import { formatDuration } from '../utils/time-utils';
 
 declare const L: typeof import('leaflet');
 
@@ -633,13 +633,6 @@ function addDirectionalChevrons(miniMap: LeafletMap, polyline: LeafletPolyline):
 
   decorator.addTo(miniMap);
   return decorator;
-}
-
-/**
- * Gets the current activity map instance
- */
-export function getActivityMap(): LeafletMap | null {
-  return activityMap;
 }
 
 function destroyMiniMap(mapId: string): void {

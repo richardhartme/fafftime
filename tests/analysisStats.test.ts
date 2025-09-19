@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { calculateSlowPeriodStatistics, buildAnalysisResult } from '../src/core/analysis';
-import { getSelectedRangeText } from '../src/core/time-utils';
+import { getSelectedRangeText } from '../src/utils/time-utils';
 import { SEMICIRCLE_TO_DEGREES } from '../src/utils/gps-utils';
 import type { SlowPeriod, TimeRange, FitData, FitRecord, FitSession } from '../src/types/app-types';
 

@@ -5,7 +5,7 @@
 import { FitRecord, TimestampGap, SlowPeriod, TimeRange } from '../types/app-types';
 import { SPEED_THRESHOLD, DEFAULT_GAP_THRESHOLD_MS } from '../utils/constants';
 import { convertGpsCoordinates, SEMICIRCLE_TO_DEGREES } from '../utils/gps-utils';
-import { matchesTimeRange } from './time-utils';
+import { matchesTimeRange } from '../utils/time-utils';
 
 function toGpsPoint(record: FitRecord): [number, number] | null {
   const { positionLat, positionLong } = record;

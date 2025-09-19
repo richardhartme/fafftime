@@ -8,7 +8,7 @@ import { findSlowPeriodsWithRanges, findTimestampGaps } from './data-analyzer';
 import { extractActivityTimes } from './fit-parser';
 import { convertGpsCoordinates } from '../utils/gps-utils';
 import { RANGE_LABELS } from '../utils/constants';
-import { getSelectedRangeText, matchesTimeRange } from './time-utils';
+import { getSelectedRangeText, matchesTimeRange } from '../utils/time-utils';
 
 export function calculateSlowPeriodStatistics(
   slowPeriods: SlowPeriod[],
