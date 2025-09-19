@@ -26,15 +26,15 @@ export function ActivitySummary({ analysisResult }: ActivitySummaryProps): JSX.E
   );
 
   return (
-    <div className="activity-times">
+    <div className="mb-4 p-5 rounded bg-gray-100">
       <h3>Activity Summary</h3>
-      <p><strong>Start Time:</strong> <span>{analysisResult.startTime?.toLocaleString() ?? 'Unknown'}</span></p>
-      <p><strong>End Time:</strong> <span>{analysisResult.endTime?.toLocaleString() ?? 'Unknown'}</span></p>
-      <p><strong>Duration:</strong> <span>{formatDuration(totalDurationSeconds)}</span></p>
-      <p><strong>Est. Stopped Time:</strong> <span>{formatDuration(stoppedDuration)}</span></p>
-      <p><strong>Est. Moving Time:</strong> <span>{formatDuration(estimatedMovingTime)}</span></p>
+      <p className="my-1"><strong>Start Time:</strong> <span>{analysisResult.startTime?.toLocaleString() ?? 'Unknown'}</span></p>
+      <p className="my-1"><strong>End Time:</strong> <span>{analysisResult.endTime?.toLocaleString() ?? 'Unknown'}</span></p>
+      <p className="my-1"><strong>Duration:</strong> <span>{formatDuration(totalDurationSeconds)}</span></p>
+      <p className="my-1"><strong>Est. Stopped Time:</strong> <span>{formatDuration(stoppedDuration)}</span></p>
+      <p className="my-1"><strong>Est. Moving Time:</strong> <span>{formatDuration(estimatedMovingTime)}</span></p>
       {activityDistanceText && (
-        <p><strong>Total Distance:</strong> <span>{activityDistanceText}</span></p>
+        <p className="my-1"><strong>Total Distance:</strong> <span>{activityDistanceText}</span></p>
       )}
     </div>
   );

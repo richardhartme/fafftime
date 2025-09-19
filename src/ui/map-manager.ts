@@ -32,6 +32,14 @@ type ToggleInputWithHandler = HTMLInputElement & {
 
 const fullRouteOverlaysByMapId = new Map<string, FullRouteOverlay>();
 
+const GAP_OVERLAY_MARKER_CLASS = 'flex h-[20px] w-[20px] items-center justify-center rounded-full bg-slate-500 text-[12px] text-white shadow-md';
+const SLOW_OVERLAY_MARKER_CLASS = 'flex h-[20px] w-[20px] items-center justify-center rounded-full bg-amber-400 text-[12px] text-white shadow-md';
+const GAP_START_MARKER_CLASS = 'flex items-center justify-center rounded border border-white bg-red-600 px-1.5 py-0.5 text-[11px] font-bold text-white';
+const GAP_END_MARKER_CLASS = 'flex items-center justify-center rounded border border-white bg-green-600 px-1.5 py-0.5 text-[11px] font-bold text-white';
+const START_MARKER_CLASS = 'flex h-[20px] w-[20px] items-center justify-center rounded-full bg-green-600 text-[12px] font-bold text-white';
+const END_MARKER_CLASS = 'flex h-[20px] w-[20px] items-center justify-center rounded-full bg-red-600 text-[12px] font-bold text-white';
+const NO_GPS_MESSAGE_CLASS = 'flex h-full items-center justify-center italic text-gray-500';
+
 /**
  * Initializes the main activity map with GPS route and markers
  */
@@ -150,10 +158,11 @@ function addGapOverlayToMap(period: SlowPeriod, index: number): void {
   }
 
   if (gap.startGpsPoint) {
+    const gapOverlayHtml = `<div class="${GAP_OVERLAY_MARKER_CLASS}"><i class="fa-solid fa-circle-pause" aria-hidden="true"></i></div>`;
     const marker = L.marker(gap.startGpsPoint, {
       icon: L.divIcon({
-        className: 'gap-overlay-marker flex items-center justify-center',
-        html: '<div class="gap-overlay-marker flex items-center justify-center"><i class="fa-solid fa-circle-pause" aria-hidden="true"></i></div>',
+        className: GAP_OVERLAY_MARKER_CLASS,
+        html: gapOverlayHtml,
         iconSize: [20, 20],
       }),
     }).addTo(map).bindPopup(`Recording Gap ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000))}`);
@@ -192,10 +201,11 @@ function addSlowPeriodOverlayToMap(period: SlowPeriod, index: number): void {
   if (period.gpsPoints.length > 0) {
     const centerPoint = period.gpsPoints[Math.floor(period.gpsPoints.length / 2)];
 
+    const slowOverlayHtml = `<div class="${SLOW_OVERLAY_MARKER_CLASS}"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></div>`;
     const marker = L.marker(centerPoint, {
       icon: L.divIcon({
-        className: 'slow-overlay-marker flex items-center justify-center',
-        html: '<div class="slow-overlay-marker flex items-center justify-center"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></div>',
+        className: SLOW_OVERLAY_MARKER_CLASS,
+        html: slowOverlayHtml,
         iconSize: [20, 20]
       })
     }).addTo(map).bindPopup(`Slow Period ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000))}<br>Records: ${period.recordCount}`);
@@ -448,7 +458,7 @@ function showNoGpsMessage(mapElement: HTMLElement, message: string): void {
     mapElement.removeChild(mapElement.firstChild);
   }
   const noGpsElement = document.createElement('div');
-  noGpsElement.className = 'no-gps-message flex items-center justify-center';
+  noGpsElement.className = NO_GPS_MESSAGE_CLASS;
   noGpsElement.textContent = message;
   mapElement.appendChild(noGpsElement);
 }
@@ -475,14 +485,14 @@ function setupSinglePointGapMap(
   const isStartPoint = gap.startGpsPoint && !gap.endGpsPoint;
   const markerConfig = isStartPoint
     ? {
-        className: 'gap-start-marker flex items-center justify-center',
-        html: '<div class="gap-start-marker flex items-center justify-center">Gap Start</div>',
+        className: GAP_START_MARKER_CLASS,
+        html: `<div class="${GAP_START_MARKER_CLASS}">Gap Start</div>`,
         size: [70, 25] as [number, number],
         popup: `Recording Gap ${index + 1} - Recording stopped here`,
       }
     : {
-        className: 'gap-end-marker flex items-center justify-center',
-        html: '<div class="gap-end-marker flex items-center justify-center">Gap End</div>',
+        className: GAP_END_MARKER_CLASS,
+        html: `<div class="${GAP_END_MARKER_CLASS}">Gap End</div>`,
         size: [70, 25] as [number, number],
         popup: `Recording Gap ${index + 1} - Recording resumed here`,
       };
@@ -513,8 +523,8 @@ function setupDualPointGapMap(
   // Add start marker
   L.marker(gap.startGpsPoint, {
     icon: L.divIcon({
-      className: 'gap-start-marker flex items-center justify-center',
-      html: '<div class="gap-start-marker flex items-center justify-center">Stop</div>',
+      className: GAP_START_MARKER_CLASS,
+      html: `<div class="${GAP_START_MARKER_CLASS}">Stop</div>`,
       iconSize: [40, 25]
     })
   }).addTo(miniMap).bindPopup(`Recording Gap ${index + 1} - Recording stopped`);
@@ -522,8 +532,8 @@ function setupDualPointGapMap(
   // Add end marker
   L.marker(gap.endGpsPoint, {
     icon: L.divIcon({
-      className: 'gap-end-marker flex items-center justify-center',
-      html: '<div class="gap-end-marker flex items-center justify-center">Resume</div>',
+      className: GAP_END_MARKER_CLASS,
+      html: `<div class="${GAP_END_MARKER_CLASS}">Resume</div>`,
       iconSize: [50, 25]
     })
   }).addTo(miniMap).bindPopup(`Recording Gap ${index + 1} - Recording resumed`);
@@ -572,8 +582,8 @@ function setupMultiPointSlowPeriodMap(
   // Add start marker
   L.marker(period.gpsPoints[0], {
     icon: L.divIcon({
-      className: 'start-marker flex items-center justify-center',
-      html: '<div class="start-marker flex items-center justify-center">S</div>',
+      className: START_MARKER_CLASS,
+      html: `<div class="${START_MARKER_CLASS}">S</div>`,
       iconSize: [20, 20]
     })
   }).addTo(miniMap);
@@ -581,8 +591,8 @@ function setupMultiPointSlowPeriodMap(
   // Add end marker
   L.marker(period.gpsPoints[period.gpsPoints.length - 1], {
     icon: L.divIcon({
-      className: 'end-marker flex items-center justify-center',
-      html: '<div class="end-marker flex items-center justify-center">E</div>',
+      className: END_MARKER_CLASS,
+      html: `<div class="${END_MARKER_CLASS}">E</div>`,
       iconSize: [20, 20]
     })
   }).addTo(miniMap);

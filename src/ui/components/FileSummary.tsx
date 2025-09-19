@@ -7,7 +7,7 @@ interface FileSummaryProps {
 
 export function FileSummary({ analysisResult }: FileSummaryProps): JSX.Element {
   return (
-    <div id="activityData" className="file-summary">
+    <div id="activityData" className="mt-4 p-4 rounded bg-sky-100">
       <h3>
         <Icon name="chart-column" />
         File Summary
