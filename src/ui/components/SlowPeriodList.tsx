@@ -1,7 +1,6 @@
 import {AnalysisResult} from '../../types/analysis';
 import {SlowPeriod} from '../../types/app-types';
 import {formatDuration} from '../../utils/time-utils';
-import {Icon} from './Icon';
 
 function formatPeriodTimes(period: SlowPeriod): { startText: string; endText: string } {
   const startText = period.startTime.toLocaleString('en-GB', {
@@ -39,19 +38,25 @@ interface SlowPeriodListProps {
 export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Element {
   if (analysisResult.slowPeriods.length === 0) {
     return (
-      <div className="rounded bg-sky-100 p-4">
-        <h3>
-          <Icon name="circle-check"/>
-          No Faff Periods or Recording Gaps Detected
-        </h3>
-        <p>
-          No periods found in selected ranges ({analysisResult.selectedRangeText}) where speed was {'<'} 1 m/s or where
-          recording gaps occurred.
-        </p>
-        <p>
-          Great job maintaining your pace and consistent recording!
-        </p>
-      </div>
+      <section
+        className="flex items-start gap-3 rounded-2xl border border-sky-200 bg-sky-50/80 p-5 shadow-sm dark:border-sky-800 dark:bg-sky-900/30"
+        role="status"
+      >
+        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-sky-500/20 text-sky-600 dark:text-sky-300">
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M10 15.172 5.828 11l-1.414 1.414L10 18l10-10-1.414-1.414z" />
+          </svg>
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-sky-900 dark:text-sky-100">
+            No Faff Periods or Recording Gaps Detected
+          </h3>
+          <p className="mt-2 text-sm font-medium text-sky-900 dark:text-sky-100">
+            Great job maintaining your pace and consistent recording!
+          </p>
+        </div>
+      </section>
     );
   }
 
