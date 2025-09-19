@@ -116,7 +116,7 @@ export default function App(): JSX.Element {
             <img
               src={logoImage}
               alt="Ultra Cycling Faff Time logo"
-              className="h-28 w-auto sm:h-32"
+              className="w-auto h-32 sm:h-48"
             />
           </div>
 
