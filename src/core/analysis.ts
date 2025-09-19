@@ -20,6 +20,11 @@ export function calculateSlowPeriodStatistics(
     const durationSeconds = Math.max(0, Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000));
     return total + durationSeconds;
   }, 0);
+  const gapDurationSeconds = slowPeriods.reduce((total, period) => {
+    if (!period.isGap) return total;
+    const durationSeconds = Math.max(0, Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000));
+    return total + durationSeconds;
+  }, 0);
 
   const rangeBreakdown: RangeBreakdownEntry[] = selectedRanges.map(range => {
     const matchingPeriods = slowPeriods.filter(period => {
@@ -48,6 +53,7 @@ export function calculateSlowPeriodStatistics(
     slowCount,
     gapCount,
     totalDurationSeconds,
+    gapDurationSeconds,
     rangeBreakdown,
   };
 }

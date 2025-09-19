@@ -82,11 +82,23 @@ export default function App(): JSX.Element {
     }
   }, []);
 
+  const sortRanges = useCallback((ranges: TimeRange[]) => (
+    [...ranges].sort((a, b) => {
+      const orderA = DEFAULT_SELECTED_RANGES.indexOf(a);
+      const orderB = DEFAULT_SELECTED_RANGES.indexOf(b);
+      const safeOrderA = orderA === -1 ? Number.MAX_SAFE_INTEGER : orderA;
+      const safeOrderB = orderB === -1 ? Number.MAX_SAFE_INTEGER : orderB;
+      return safeOrderA - safeOrderB;
+    })
+  ), []);
+
   const toggleRangeSelection = (range: TimeRange) => {
     setSelectedRanges(current => (
-      current.includes(range)
-        ? current.filter(item => item !== range)
-        : [...current, range]
+      sortRanges(
+        current.includes(range)
+          ? current.filter(item => item !== range)
+          : [...current, range]
+      )
     ));
   };
 

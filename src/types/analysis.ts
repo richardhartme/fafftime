@@ -16,6 +16,7 @@ export interface SlowPeriodStats {
   gapCount: number;
   totalDurationSeconds: number;
   rangeBreakdown: RangeBreakdownEntry[];
+  gapDurationSeconds: number;
 }
 
 export interface AnalysisResult {

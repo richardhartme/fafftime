@@ -47,6 +47,21 @@ function createLocationLinkGroup(point: [number, number], labelPrefix = ''): JSX
   );
 }
 
+function formatActivityShare(durationSeconds: number, activityDurationSeconds: number | null | undefined): string {
+  if (!activityDurationSeconds || activityDurationSeconds <= 0) {
+    return '—';
+  }
+
+  const percentage = Math.round((durationSeconds / activityDurationSeconds) * 1000) / 10;
+  if (Number.isNaN(percentage)) {
+    return '—';
+  }
+
+  const isWholeNumber = Number.isInteger(percentage);
+  const percentageText = isWholeNumber ? `${percentage}%` : `${percentage.toFixed(1)}%`;
+  return `${percentageText} of activity`;
+}
+
 interface SlowPeriodListProps {
   analysisResult: AnalysisResult;
 }
@@ -70,6 +85,9 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
     );
   }
 
+  const activityDurationSeconds = analysisResult.durationSeconds ?? null;
+  const gapPercentageText = formatActivityShare(analysisResult.stats.gapDurationSeconds, activityDurationSeconds);
+
   return (
     <div>
       <div className="slow-periods">
@@ -81,7 +99,16 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
           Found <strong>{analysisResult.slowPeriods.length}</strong> period(s)
           totalling <strong>{formatDuration(analysisResult.stats.totalDurationSeconds)}</strong>.
         </p>
-        <p><strong>Recording gaps:</strong> <span>{analysisResult.stats.gapCount}</span></p>
+        <p>
+          <strong>Recording gaps:</strong>{' '}
+          <span>{analysisResult.stats.gapCount}</span>{' '}
+          <span>
+            (
+            {formatDuration(analysisResult.stats.gapDurationSeconds)} ·{' '}
+            {gapPercentageText}
+            )
+          </span>
+        </p>
         <p><strong>Faff periods:</strong> <span>{analysisResult.stats.slowCount}</span> (speed {'<'} 1 m/s)</p>
         <div className="threshold-breakdown">
           <ul>
@@ -90,9 +117,10 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
             )}
             {analysisResult.stats.rangeBreakdown.map(entry => {
               const totalDuration = formatDuration(entry.totalDurationSeconds);
+              const percentageText = formatActivityShare(entry.totalDurationSeconds, activityDurationSeconds);
               return (
                 <li key={entry.range}>
-                  <strong>{entry.label}:</strong> {entry.count} <span>({totalDuration})</span>
+                  <strong>{entry.label}:</strong> {entry.count} <span>({totalDuration} · {percentageText})</span>
                 </li>
               );
             })}
