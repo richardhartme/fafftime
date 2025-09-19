@@ -128,7 +128,7 @@ export default function App(): JSX.Element {
       </div>
 
       <div className="flex w-full flex-col gap-[30px] md:flex-row md:items-start md:gap-[30px] lg:gap-10">
-        <aside className="py-2.5 md:sticky md:top-[25px] md:basis-[240px] md:flex-none md:max-h-[calc(100vh-50px)] md:overflow-y-auto lg:top-[30px] lg:basis-[320px] lg:max-h-[calc(100vh-60px)]">
+        <aside className="py-2 scrollbar-hidden md:sticky md:top-[25px] md:basis-[240px] md:flex-none md:max-h-[calc(100vh-50px)] md:overflow-y-auto lg:top-[30px] lg:basis-[320px] lg:max-h-[calc(100vh-60px)]">
           <div className="flex flex-col gap-2.5">
             <FileDropzone onFileSelected={handleFileSelection} onExampleLoad={handleExampleLoad} isLoading={status === 'loading'} />
 
@@ -200,7 +200,7 @@ export default function App(): JSX.Element {
           {analysisAvailable && (
             <div
               id="mapContainer"
-              className="my-[15px] rounded bg-gray-100 p-[10px]"
+              className="my-2 p-4 rounded bg-gray-100"
               style={{ display: analysisAvailable ? 'block' : 'none' }}
             >
               <h3 className="mb-[10px]">

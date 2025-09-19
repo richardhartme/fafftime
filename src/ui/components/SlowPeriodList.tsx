@@ -97,17 +97,19 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
 
   const activityDurationSeconds = analysisResult.durationSeconds ?? null;
   const gapPercentageText = formatActivityShare(analysisResult.stats.gapDurationSeconds, activityDurationSeconds);
+  const totalPercentageText = formatActivityShare(analysisResult.stats.totalDurationSeconds, activityDurationSeconds);
 
   return (
     <div>
       <div className="rounded bg-amber-100 p-4">
-        <strong className="block mb-4">
+        <strong className="block mb-2">
           <Icon name="stopwatch"/>
           Faff Periods &amp; Recording Gaps
         </strong>
         <p>
           Found <strong>{analysisResult.slowPeriods.length}</strong> period(s)
-          totalling <strong>{formatDuration(analysisResult.stats.totalDurationSeconds)}</strong>.
+          totalling <strong>{formatDuration(analysisResult.stats.totalDurationSeconds)}</strong>
+          {totalPercentageText !== '—' ? <span> ({totalPercentageText})</span> : null}.
         </p>
         <p>
           <strong>Recording gaps:</strong>{' '}
@@ -151,10 +153,10 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
 
             return (
               <div className="mt-4 p-4 rounded bg-gray-100" key={miniMapId}>
-                <strong className="mb-2">
+                <strong className="block mb-2">
                   <Icon name="circle-pause"/>
                   Recording Gap {index + 1}
-                </strong><br/>
+                </strong>
                 <strong>Time:</strong> <span>{startText} - {endText}</span><br/>
                 <strong>Duration:</strong> <span>{durationText}</span> (no data recorded)<br/>
                 <strong>Distance:</strong> <span>{startDistanceKm} km → {endDistanceKm} km</span><br/>
@@ -176,10 +178,10 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
 
           return (
             <div className="mt-4 p-4 rounded bg-amber-100" key={miniMapId}>
-              <strong className="mb-2">
+              <strong className="block mb-2">
                 <Icon name="stopwatch"/>
                 Faff Period {index + 1}
-              </strong><br/>
+              </strong>
               <strong>Time:</strong> <span>{startText} - {endText}</span><br/>
               <strong>Duration:</strong> <span>{durationText}</span> (<span>{period.recordCount}</span> records)<br/>
               <strong>Distance:</strong> <span>{startDistanceKm}</span> km<br/>

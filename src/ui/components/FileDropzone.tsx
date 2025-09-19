@@ -72,7 +72,7 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
 
   return (
     <div className="w-full">
-      <div className="mb-5 w-full rounded-lg border-2 border-blue-600 bg-blue-50 p-5 shadow-md">
+      <div className="mb-5 w-full rounded-lg border-2 border-blue-600 bg-blue-50 p-5">
         <div
           className={dropAreaClasses}
           id="fileDropArea"

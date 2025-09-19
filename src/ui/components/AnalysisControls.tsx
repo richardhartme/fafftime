@@ -39,54 +39,108 @@ export function AnalysisControls({
   };
 
   const visibilityClass = isVisible ? 'block' : 'hidden';
+  const sectionClassName = [
+    'mb-4',
+    'max-w-md rounded-2xl border border-zinc-200 bg-white/80 p-5 shadow-sm backdrop-blur',
+    'dark:border-zinc-800 dark:bg-zinc-900/70',
+    visibilityClass,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className="w-full">
-      <div id="analysisControls" className={`mb-4 p-5 rounded bg-gray-100 ${visibilityClass}`}>
-        <label className="mb-1 block text-sm font-medium">Faff Period Thresholds:</label>
-        <div className="mt-2.5 space-y-1">
-          {rangeOptions.map(option => (
-            <label key={option.value} className="mr-2 block items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                id={`threshold_${option.value}`}
-                value={option.value}
-                checked={selectedRanges.includes(option.value)}
-                onChange={() => onToggleRange(option.value)}
-              />
-              {' '}
-              {option.label}
+      <section id="analysisControls" className={sectionClassName}>
+        <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+          Analysis Settings
+        </h2>
+
+        <fieldset className="mt-4">
+          <legend className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Faff Period Thresholds
+          </legend>
+
+          <ul className="mt-3 space-y-2">
+            {rangeOptions.map(option => {
+              const checkboxId = `threshold-${option.value}`;
+              return (
+                <li key={option.value} className="flex items-start gap-3">
+                  <input
+                    id={checkboxId}
+                    type="checkbox"
+                    className="mt-1 h-4 w-4 rounded border-zinc-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 accent-emerald-600"
+                    value={option.value}
+                    checked={selectedRanges.includes(option.value)}
+                    onChange={() => onToggleRange(option.value)}
+                  />
+                  <label htmlFor={checkboxId} className="text-sm text-zinc-800 dark:text-zinc-100">
+                    {option.label}
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </fieldset>
+
+        <hr className="my-5 border-zinc-200 dark:border-zinc-800" />
+
+        <fieldset>
+          <legend className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Gap Threshold
+          </legend>
+
+          <div className="mt-3">
+            <label htmlFor="gap-threshold" className="sr-only">
+              Gap threshold
             </label>
-          ))}
-        </div>
-        <div className="mt-4 pt-4 border-t border-gray-300">
-          <label htmlFor="timestampGapThreshold" className="mb-1 block text-sm font-medium">Gap Threshold:</label>
-          <select
-            id="timestampGapThreshold"
-            value={gapThreshold}
-            onChange={handleGapThresholdChange}
-            title="Increase if you have excessive recording gaps"
-            className="w-full rounded border border-gray-300 p-2 text-sm"
-          >
-            {gapThresholdOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="mt-4 pt-4 border-t border-gray-300">
-          <label className="inline-flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              id="showPeriodsOnMap"
-              checked={showOverlays}
-              onChange={(event) => onShowOverlaysChange(event.target.checked)}
-            />
-            {' '} Show slow periods and gaps on main activity map
+            <div className="relative">
+              <select
+                id="gap-threshold"
+                value={gapThreshold}
+                onChange={handleGapThresholdChange}
+                title="Increase if you have excessive recording gaps"
+                className="w-full appearance-none rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              >
+                {gapThresholdOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <svg
+                className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 10.17l3.71-2.94a.75.75 0 111.04 1.08l-4.24 3.36a.75.75 0 01-.94 0L5.21 8.31a.75.75 0 01.02-1.1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              Periods shorter than this are ignored when detecting gaps.
+            </p>
+          </div>
+        </fieldset>
+
+        <hr className="my-5 border-zinc-200 dark:border-zinc-800" />
+
+        <div className="flex items-start gap-3">
+          <input
+            id="show-overlays"
+            type="checkbox"
+            className="mt-1 h-4 w-4 rounded border-zinc-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 accent-emerald-600"
+            checked={showOverlays}
+            onChange={(event) => onShowOverlaysChange(event.target.checked)}
+          />
+          <label htmlFor="show-overlays" className="text-sm text-zinc-800 dark:text-zinc-100">
+            Show slow periods and gaps on main activity map
           </label>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
