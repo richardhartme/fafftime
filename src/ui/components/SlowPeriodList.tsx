@@ -37,12 +37,12 @@ function createStreetViewLink([lat, lng]: [number, number], text = 'View on Stre
   );
 }
 
-function createLocationLinkGroup(point: [number, number], labelPrefix = 'View'): JSX.Element {
+function createLocationLinkGroup(point: [number, number], labelPrefix = ''): JSX.Element {
   return (
     <>
-      {createGoogleMapsLink(point, `${labelPrefix} on Google Maps`)}
+      {createGoogleMapsLink(point, `${labelPrefix}Google Maps`)}
       <span> | </span>
-      {createStreetViewLink(point, `${labelPrefix} on Street View`)}
+      {createStreetViewLink(point, `${labelPrefix}Street View`)}
     </>
   );
 }
@@ -125,10 +125,7 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
                   Show activity route on map
                 </label><br/>
                 <span className="location-links">
-                  {period.gapData.startGpsPoint && createLocationLinkGroup(period.gapData.startGpsPoint, 'View start')}
-                  {period.gapData.startGpsPoint && period.gapData.endGpsPoint && <span> | </span>}
-                  {period.gapData.endGpsPoint && createLocationLinkGroup(period.gapData.endGpsPoint, 'View end')}
-                  {!period.gapData.startGpsPoint && !period.gapData.endGpsPoint && 'No GPS data'}
+                  {period.gapData.startGpsPoint && createLocationLinkGroup(period.gapData.startGpsPoint)}
                 </span><br/>
                 <div className="mini-map" id={miniMapId}></div>
               </div>
