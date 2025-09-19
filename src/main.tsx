@@ -1,7 +1,7 @@
 import {createRoot} from 'react-dom/client';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import App from './ui/App';
-import './styles.css';
+import './tailwind.css';
 
 const container = document.getElementById('root');
 

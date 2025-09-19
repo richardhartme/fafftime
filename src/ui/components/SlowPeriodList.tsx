@@ -20,7 +20,12 @@ function formatPeriodTimes(period: SlowPeriod): { startText: string; endText: st
 function createGoogleMapsLink([lat, lng]: [number, number], text = 'View on Google Maps'): JSX.Element {
   const href = `https://www.google.com/maps?q=${lat},${lng}`;
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="google-maps-link">
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 text-sky-600 no-underline"
+    >
       <Icon name="location-dot"/>
       {text}
     </a>
@@ -30,7 +35,12 @@ function createGoogleMapsLink([lat, lng]: [number, number], text = 'View on Goog
 function createStreetViewLink([lat, lng]: [number, number], text = 'View on Street View'): JSX.Element {
   const href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="google-street-view-link">
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 text-sky-600 no-underline"
+    >
       <Icon name="street-view"/>
       {text}
     </a>
@@ -69,7 +79,7 @@ interface SlowPeriodListProps {
 export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Element {
   if (analysisResult.slowPeriods.length === 0) {
     return (
-      <div className="no-slow-periods">
+      <div className="rounded bg-sky-100 p-4">
         <h3>
           <Icon name="circle-check"/>
           No Faff Periods or Recording Gaps Detected
@@ -90,11 +100,11 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
 
   return (
     <div>
-      <div className="slow-periods">
-        <h3>
+      <div className="rounded bg-amber-100 p-4">
+        <strong className="block mb-4">
           <Icon name="stopwatch"/>
           Faff Periods &amp; Recording Gaps
-        </h3>
+        </strong>
         <p>
           Found <strong>{analysisResult.slowPeriods.length}</strong> period(s)
           totalling <strong>{formatDuration(analysisResult.stats.totalDurationSeconds)}</strong>.
@@ -110,8 +120,8 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
           </span>
         </p>
         <p><strong>Faff periods:</strong> <span>{analysisResult.stats.slowCount}</span> (speed {'<'} 1 m/s)</p>
-        <div className="threshold-breakdown">
-          <ul>
+        <div className="mt-4">
+          <ul className="ml-5 list-disc">
             {analysisResult.stats.rangeBreakdown.length === 0 && (
               <li>No thresholds selected</li>
             )}
@@ -128,7 +138,7 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
         </div>
       </div>
 
-      <div className="slow-periods-list">
+      <div className="mt-5">
         {analysisResult.slowPeriods.map((period, index) => {
           const {startText, endText} = formatPeriodTimes(period);
           const durationSeconds = Math.max(0, Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000));
@@ -140,22 +150,22 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
             const endDistanceKm = (period.endDistance / 1000).toFixed(2);
 
             return (
-              <div className="timestamp-gap-item" key={miniMapId}>
-                <strong>
+              <div className="mt-4 p-4 rounded bg-gray-100" key={miniMapId}>
+                <strong className="mb-2">
                   <Icon name="circle-pause"/>
                   Recording Gap {index + 1}
                 </strong><br/>
                 <strong>Time:</strong> <span>{startText} - {endText}</span><br/>
                 <strong>Duration:</strong> <span>{durationText}</span> (no data recorded)<br/>
                 <strong>Distance:</strong> <span>{startDistanceKm} km → {endDistanceKm} km</span><br/>
-                <label className="full-route-toggle">
+                <label className="my-2 inline-flex items-center gap-2">
                   <input type="checkbox" data-role="full-route-toggle" data-mini-map-id={miniMapId}/>
                   Show activity route on map
                 </label><br/>
-                <span className="location-links">
-                  {period.gapData.startGpsPoint && createLocationLinkGroup(period.gapData.startGpsPoint)}
+                <span className="inline-flex flex-wrap items-center gap-1 text-sky-600">
+                {period.gapData.startGpsPoint && createLocationLinkGroup(period.gapData.startGpsPoint)}
                 </span><br/>
-                <div className="mini-map" id={miniMapId}></div>
+                <div className="mt-4 h-[250px] w-full rounded border border-gray-300 md:h-[300px]" id={miniMapId}></div>
               </div>
             );
           }
@@ -165,22 +175,22 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
             : null;
 
           return (
-            <div className="slow-period-item" key={miniMapId}>
-              <strong>
+            <div className="mt-4 p-4 rounded bg-amber-100" key={miniMapId}>
+              <strong className="mb-2">
                 <Icon name="stopwatch"/>
                 Faff Period {index + 1}
               </strong><br/>
               <strong>Time:</strong> <span>{startText} - {endText}</span><br/>
               <strong>Duration:</strong> <span>{durationText}</span> (<span>{period.recordCount}</span> records)<br/>
               <strong>Distance:</strong> <span>{startDistanceKm}</span> km<br/>
-              <label className="full-route-toggle">
+              <label className="my-2 inline-flex items-center gap-2">
                 <input type="checkbox" data-role="full-route-toggle" data-mini-map-id={miniMapId}/>
                 Show activity route on map
               </label><br/>
-              <span className="location-link">
+              <span className="inline-flex flex-wrap items-center gap-1 text-sky-600">
                 {locationLink ?? 'No GPS data'}
               </span><br/>
-              <div className="mini-map" id={miniMapId}></div>
+              <div className="mt-4 h-[250px] w-full rounded border border-gray-300 md:h-[300px]" id={miniMapId}></div>
             </div>
           );
         })}

@@ -65,11 +65,16 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
     fileInputRef.current?.click();
   };
 
+  const dropAreaClasses = [
+    'relative cursor-pointer rounded-lg border-2 border-dashed border-blue-600 bg-white p-5 text-center transition-all duration-300 ease-in-out hover:border-blue-700 hover:bg-blue-50',
+    isDragActive ? 'scale-105 border-blue-800 bg-blue-100' : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className="sidebar-section">
-      <div className="file-selection-box">
+    <div className="w-full">
+      <div className="mb-5 w-full rounded-lg border-2 border-blue-600 bg-blue-50 p-5 shadow-md">
         <div
-          className={`file-drop-area${isDragActive ? ' drag-over' : ''}`}
+          className={dropAreaClasses}
           id="fileDropArea"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -77,13 +82,13 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
           onClick={openFilePicker}
           aria-busy={isLoading}
         >
-          <div className="drop-zone-content">
-            <h3>Drop your FIT file here</h3>
-            <p>
+          <div className="pointer-events-none">
+            <h3 className="m-0 mb-2.5 text-[1.2rem] text-gray-800">Drop your FIT file here</h3>
+            <p className="my-2 text-gray-600">
               or{' '}
               <button
                 type="button"
-                className="file-select-button"
+                className="pointer-events-auto rounded border-none bg-blue-600 px-4 py-2 text-[0.9rem] text-white transition-colors duration-200 hover:bg-blue-800"
                 id="fileSelectButton"
                 onClick={(event) => {
                   event.stopPropagation();
@@ -95,7 +100,7 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
                 choose a file
               </button>
             </p>
-            <p className="file-types">Accepts .fit files</p>
+            <p className="text-xs text-gray-400">Accepts .fit files</p>
           </div>
           <input
             type="file"
@@ -108,8 +113,14 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
           />
         </div>
 
-        <div className="example-file-link">
-          <a href="#" id="loadExampleFile" onClick={handleExampleLoadClick} aria-disabled={isLoading}>
+        <div className="mt-5 text-[0.9em]">
+          <a
+            href="#"
+            id="loadExampleFile"
+            onClick={handleExampleLoadClick}
+            aria-disabled={isLoading}
+            className="block rounded border border-gray-300 bg-gray-50 px-2.5 py-1.5 text-blue-600 transition-colors duration-200 hover:bg-gray-100"
+          >
             <Icon name="file-lines" />
             Load example FIT file
           </a>

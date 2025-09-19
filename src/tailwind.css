@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply m-0 min-h-screen p-[15px] font-sans text-gray-800 antialiased md:p-6 lg:p-8 bg-[rgb(254,253,254)];
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h3 {
+    @apply mt-0;
+  }
+
+  h4 {
+    @apply mb-[5px];
+  }
+}

@@ -38,15 +38,15 @@ export function AnalysisControls({
     onGapThresholdChange(parseInt(event.target.value, 10));
   };
 
-  const analysisControlsStyle = { display: isVisible ? 'block' : 'none' };
+  const visibilityClass = isVisible ? 'block' : 'hidden';
 
   return (
-    <div className="sidebar-section">
-      <div id="analysisControls" style={analysisControlsStyle}>
-        <label>Faff Period Thresholds:</label>
-        <div>
+    <div className="w-full">
+      <div id="analysisControls" className={`mb-4 p-5 rounded bg-gray-100 ${visibilityClass}`}>
+        <label className="mb-1 block text-sm font-medium">Faff Period Thresholds:</label>
+        <div className="mt-2.5 space-y-1">
           {rangeOptions.map(option => (
-            <label key={option.value}>
+            <label key={option.value} className="mr-2 block items-center gap-2 text-sm">
               <input
                 type="checkbox"
                 id={`threshold_${option.value}`}
@@ -59,13 +59,14 @@ export function AnalysisControls({
             </label>
           ))}
         </div>
-        <div className="timestamp-gap-control">
-          <label htmlFor="timestampGapThreshold">Gap Threshold:</label>
+        <div className="mt-4 pt-4 border-t border-gray-300">
+          <label htmlFor="timestampGapThreshold" className="mb-1 block text-sm font-medium">Gap Threshold:</label>
           <select
             id="timestampGapThreshold"
             value={gapThreshold}
             onChange={handleGapThresholdChange}
             title="Increase if you have excessive recording gaps"
+            className="w-full rounded border border-gray-300 p-2 text-sm"
           >
             {gapThresholdOptions.map(option => (
               <option key={option.value} value={option.value}>
@@ -74,8 +75,8 @@ export function AnalysisControls({
             ))}
           </select>
         </div>
-        <div className="map-overlay-control">
-          <label>
+        <div className="mt-4 pt-4 border-t border-gray-300">
+          <label className="inline-flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               id="showPeriodsOnMap"
