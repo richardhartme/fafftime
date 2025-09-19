@@ -108,8 +108,8 @@ export default function App(): JSX.Element {
   return (
     <div className="app">
       <div className="page-header">
-        <header className="app-header">
-          <div className="header-brand">
+        <header className="app-header flex flex-col gap-3">
+          <div className="header-brand flex flex-col items-center gap-5 md:flex-row md:items-center">
             <img src={logoImage} alt="Ultra Cycling Faff Time" className="header-logo" />
             <div className="header-copy">
               <h1>Ultra Cycling Faff Time</h1>
@@ -123,9 +123,9 @@ export default function App(): JSX.Element {
         </header>
       </div>
 
-      <div className="app-layout">
-        <aside className="app-sidebar">
-          <div className="app-sidebar-content">
+      <div className="app-layout flex w-full flex-col md:flex-row md:items-start gap-4">
+        <aside className="app-sidebar md:flex-none md:w-[240px] lg:w-[320px]">
+          <div className="app-sidebar-content flex flex-col gap-2.5">
             <FileDropzone onFileSelected={handleFileSelection} onExampleLoad={handleExampleLoad} isLoading={status === 'loading'} />
 
             <div className="sidebar-section">
@@ -170,12 +170,12 @@ export default function App(): JSX.Element {
           </div>
         </aside>
 
-        <div className="app-content">
+        <div className="app-content md:flex-1">
           {!parsedFile && status !== 'loading' && (
             <div id="screenshot">
-              <div className="screenshotContents">
+              <div className="screenshotContents text-center">
                 <h3>Example Output</h3>
-                <img src="screenshot.png" alt="Example analysis output" />
+                <img src="screenshot.png" alt="Example analysis output" className="max-w-[660px] mx-auto" />
               </div>
             </div>
           )}

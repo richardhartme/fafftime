@@ -152,8 +152,8 @@ function addGapOverlayToMap(period: SlowPeriod, index: number): void {
   if (gap.startGpsPoint) {
     const marker = L.marker(gap.startGpsPoint, {
       icon: L.divIcon({
-        className: 'gap-overlay-marker',
-        html: '<div class="gap-overlay-marker"><i class="fa-solid fa-circle-pause" aria-hidden="true"></i></div>',
+        className: 'gap-overlay-marker flex items-center justify-center',
+        html: '<div class="gap-overlay-marker flex items-center justify-center"><i class="fa-solid fa-circle-pause" aria-hidden="true"></i></div>',
         iconSize: [20, 20],
       }),
     }).addTo(map).bindPopup(`Recording Gap ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000))}`);
@@ -194,8 +194,8 @@ function addSlowPeriodOverlayToMap(period: SlowPeriod, index: number): void {
 
     const marker = L.marker(centerPoint, {
       icon: L.divIcon({
-        className: 'slow-overlay-marker',
-        html: '<div class="slow-overlay-marker"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></div>',
+        className: 'slow-overlay-marker flex items-center justify-center',
+        html: '<div class="slow-overlay-marker flex items-center justify-center"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></div>',
         iconSize: [20, 20]
       })
     }).addTo(map).bindPopup(`Slow Period ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000))}<br>Records: ${period.recordCount}`);
@@ -448,7 +448,7 @@ function showNoGpsMessage(mapElement: HTMLElement, message: string): void {
     mapElement.removeChild(mapElement.firstChild);
   }
   const noGpsElement = document.createElement('div');
-  noGpsElement.className = 'no-gps-message';
+  noGpsElement.className = 'no-gps-message flex items-center justify-center';
   noGpsElement.textContent = message;
   mapElement.appendChild(noGpsElement);
 }
@@ -475,14 +475,14 @@ function setupSinglePointGapMap(
   const isStartPoint = gap.startGpsPoint && !gap.endGpsPoint;
   const markerConfig = isStartPoint
     ? {
-        className: 'gap-start-marker',
-        html: '<div class="gap-start-marker">Gap Start</div>',
+        className: 'gap-start-marker flex items-center justify-center',
+        html: '<div class="gap-start-marker flex items-center justify-center">Gap Start</div>',
         size: [70, 25] as [number, number],
         popup: `Recording Gap ${index + 1} - Recording stopped here`,
       }
     : {
-        className: 'gap-end-marker',
-        html: '<div class="gap-end-marker">Gap End</div>',
+        className: 'gap-end-marker flex items-center justify-center',
+        html: '<div class="gap-end-marker flex items-center justify-center">Gap End</div>',
         size: [70, 25] as [number, number],
         popup: `Recording Gap ${index + 1} - Recording resumed here`,
       };
@@ -513,8 +513,8 @@ function setupDualPointGapMap(
   // Add start marker
   L.marker(gap.startGpsPoint, {
     icon: L.divIcon({
-      className: 'gap-start-marker',
-      html: '<div class="gap-start-marker">Stop</div>',
+      className: 'gap-start-marker flex items-center justify-center',
+      html: '<div class="gap-start-marker flex items-center justify-center">Stop</div>',
       iconSize: [40, 25]
     })
   }).addTo(miniMap).bindPopup(`Recording Gap ${index + 1} - Recording stopped`);
@@ -522,8 +522,8 @@ function setupDualPointGapMap(
   // Add end marker
   L.marker(gap.endGpsPoint, {
     icon: L.divIcon({
-      className: 'gap-end-marker',
-      html: '<div class="gap-end-marker">Resume</div>',
+      className: 'gap-end-marker flex items-center justify-center',
+      html: '<div class="gap-end-marker flex items-center justify-center">Resume</div>',
       iconSize: [50, 25]
     })
   }).addTo(miniMap).bindPopup(`Recording Gap ${index + 1} - Recording resumed`);
@@ -572,8 +572,8 @@ function setupMultiPointSlowPeriodMap(
   // Add start marker
   L.marker(period.gpsPoints[0], {
     icon: L.divIcon({
-      className: 'start-marker',
-      html: '<div class="start-marker">S</div>',
+      className: 'start-marker flex items-center justify-center',
+      html: '<div class="start-marker flex items-center justify-center">S</div>',
       iconSize: [20, 20]
     })
   }).addTo(miniMap);
@@ -581,8 +581,8 @@ function setupMultiPointSlowPeriodMap(
   // Add end marker
   L.marker(period.gpsPoints[period.gpsPoints.length - 1], {
     icon: L.divIcon({
-      className: 'end-marker',
-      html: '<div class="end-marker">E</div>',
+      className: 'end-marker flex items-center justify-center',
+      html: '<div class="end-marker flex items-center justify-center">E</div>',
       iconSize: [20, 20]
     })
   }).addTo(miniMap);

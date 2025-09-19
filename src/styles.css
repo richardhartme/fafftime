@@ -14,9 +14,6 @@ body {
   margin: 0;
   padding: 10px;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 h3 {
@@ -27,30 +24,10 @@ h4 {
   margin-bottom: 5px;
 }
 
-.app-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  width: 100%;
-  /*max-width: 1200px;*/
-}
-
 .page-header {
   width: 100%;
   /*max-width: 1200px;*/
   margin: 0 auto 30px auto;
-}
-
-.app-header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 20px;
 }
 
 .header-logo {
@@ -77,12 +54,6 @@ h4 {
   padding: 10px 0;
 }
 
-.app-sidebar-content {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .app-sidebar p {
   margin-bottom: 16px;
   color: #444;
@@ -102,7 +73,6 @@ h4 {
 }
 
 .app-content {
-  flex: 1;
   min-width: 0;
 }
 
@@ -119,10 +89,6 @@ h4 {
     padding: 15px;
   }
 
-  .app-layout {
-    gap: 20px;
-  }
-
   h1 {
     font-size: 1.8rem;
     text-align: center;
@@ -131,11 +97,6 @@ h4 {
   h4 {
     text-align: center;
     font-size: 1rem;
-  }
-
-  .header-brand {
-    flex-direction: column;
-    text-align: center;
   }
 
   .header-logo {
@@ -185,22 +146,11 @@ h4 {
     font-size: 1.6rem;
   }
 
-  .app-layout {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 30px;
-  }
-
   .app-sidebar {
-    flex: 0 0 240px;
     position: sticky;
     top: 25px;
     max-height: calc(100vh - 50px);
     overflow-y: auto;
-  }
-
-  .app-content {
-    flex: 1;
   }
 }
 
@@ -213,22 +163,11 @@ h4 {
     font-size: 2.0rem;
   }
 
-  .app-layout {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 40px;
-  }
-
   .app-sidebar {
-    flex: 0 0 320px;
     position: sticky;
     top: 30px;
     max-height: calc(100vh - 60px);
     overflow-y: auto;
-  }
-
-  .app-content {
-    flex: 1;
   }
 }
 
@@ -357,25 +296,6 @@ h4 {
 }
 
 /* =============================================================================
-   SCREENSHOT & DOCUMENTATION
-   ============================================================================= */
-
-.screenshotContents {
-  padding: 20px;
-  text-align: center;
-}
-
-.screenshotContents img {
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 10px;
-  max-width: 800px;
-  width: 90%;
-  height: auto;
-  box-sizing: border-box;
-}
-
-/* =============================================================================
    ANALYSIS CONTROLS
    ============================================================================= */
 
@@ -448,9 +368,6 @@ h4 {
 }
 
 .no-gps-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   height: 100%;
   color: #666;
   font-style: italic;
@@ -474,9 +391,6 @@ h4 {
   border-radius: 50%;
   width: 20px;
   height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 12px;
   font-weight: bold;
   box-sizing: border-box;
@@ -489,9 +403,6 @@ h4 {
   border-radius: 50%;
   width: 20px;
   height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 12px;
   font-weight: bold;
   box-sizing: border-box;
@@ -503,9 +414,6 @@ h4 {
   color: white;
   border-radius: 4px;
   padding: 2px 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 11px;
   font-weight: bold;
   border: 1px solid #fff;
@@ -516,9 +424,6 @@ h4 {
   color: white;
   border-radius: 4px;
   padding: 2px 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 11px;
   font-weight: bold;
   border: 1px solid #fff;
@@ -529,9 +434,6 @@ h4 {
   border-radius: 50%;
   width: 20px;
   height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
@@ -543,9 +445,6 @@ h4 {
   border-radius: 50%;
   width: 20px;
   height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
