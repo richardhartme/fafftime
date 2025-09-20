@@ -33,43 +33,43 @@ export function ActivitySummary({ analysisResult }: ActivitySummaryProps): JSX.E
   }, [analysisResult.totalDistance]);
 
   return (
-    <section className="max-w-md rounded-2xl border border-zinc-200 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/70">
-      <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+    <section className="max-w-md rounded-2xl border border-zinc-200 bg-white/80 p-5 shadow-sm backdrop-blur">
+      <h2 className="text-lg font-semibold tracking-tight text-zinc-900">
         Activity Summary
       </h2>
 
       <dl className="mt-4 grid grid-cols-[auto,1fr] items-baseline gap-x-4 gap-y-2 text-sm">
-        <dt className="text-zinc-500 dark:text-zinc-400">Start Time</dt>
-        <dd className="font-medium text-zinc-900 dark:text-zinc-100">
+        <dt className="text-zinc-500">Start Time</dt>
+        <dd className="font-medium text-zinc-900">
           {analysisResult.startTime?.toLocaleString() ?? 'Unknown'}
         </dd>
 
-        <dt className="text-zinc-500 dark:text-zinc-400">End Time</dt>
-        <dd className="font-medium text-zinc-900 dark:text-zinc-100">
+        <dt className="text-zinc-500">End Time</dt>
+        <dd className="font-medium text-zinc-900">
           {analysisResult.endTime?.toLocaleString() ?? 'Unknown'}
         </dd>
 
-        <dt className="text-zinc-500 dark:text-zinc-400">Duration</dt>
-        <dd className="font-medium text-zinc-900 dark:text-zinc-100">
+        <dt className="text-zinc-500">Duration</dt>
+        <dd className="font-medium text-zinc-900">
           {formatDuration(totalDurationSeconds)}
         </dd>
 
-        <dt className="text-zinc-500 dark:text-zinc-400">Est. Stopped</dt>
-        <dd className="font-medium text-zinc-900 dark:text-zinc-100">
+        <dt className="text-zinc-500">Est. Stopped</dt>
+        <dd className="font-medium text-zinc-900">
           {formatDuration(stoppedDuration)}
         </dd>
 
-        <dt className="text-zinc-500 dark:text-zinc-400">Est. Moving</dt>
-        <dd className="font-medium text-zinc-900 dark:text-zinc-100">
+        <dt className="text-zinc-500">Est. Moving</dt>
+        <dd className="font-medium text-zinc-900">
           {formatDuration(estimatedMovingTime)}
         </dd>
 
         {activityDistance && (
           <>
-            <dt className="text-zinc-500 dark:text-zinc-400">Total Distance</dt>
-            <dd className="font-semibold text-zinc-900 dark:text-zinc-100">
+            <dt className="text-zinc-500">Total Distance</dt>
+            <dd className="font-semibold text-zinc-900">
               {activityDistance.distanceKm} km{' '}
-              <span className="font-normal text-zinc-500 dark:text-zinc-400">
+              <span className="font-normal text-zinc-500">
                 ({activityDistance.distanceMiles} mi)
               </span>
             </dd>
@@ -78,17 +78,17 @@ export function ActivitySummary({ analysisResult }: ActivitySummaryProps): JSX.E
       </dl>
 
       <div className="mt-5">
-        <div className="mb-1 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+        <div className="mb-1 flex items-center justify-between text-xs text-zinc-500">
           <span>Moving</span>
           <span>Stopped</span>
         </div>
         <div
-          className="relative h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
+          className="relative h-2 w-full overflow-hidden rounded-full bg-zinc-200"
           style={ratioStyle}
         >
           <div className="h-full w-[var(--move)] rounded-full bg-blue-500" />
         </div>
-        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="mt-1 text-xs text-zinc-500">
           ~{movingPercentLabel}% moving, ~{stoppedPercentLabel}% stopped
         </p>
       </div>

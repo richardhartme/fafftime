@@ -67,7 +67,6 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
   const dropAreaClasses = [
     'group relative cursor-pointer rounded-2xl border-2 border-dashed border-blue-400/80 bg-white/80 p-8 text-center transition',
     'hover:bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500',
-    'dark:bg-zinc-900/60 dark:border-blue-800/70 dark:hover:bg-zinc-900/80',
     isDragActive ? 'is-dragover border-blue-500 ring-2 ring-blue-500' : '',
   ].filter(Boolean).join(' ');
 
@@ -78,7 +77,7 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
 
   return (
     <div className="w-full">
-      <section className="max-w-xl rounded-2xl border border-blue-300 bg-blue-50/60 p-5 shadow-sm backdrop-blur dark:border-blue-900/60 dark:bg-blue-950/30">
+      <section className="max-w-xl rounded-2xl border border-blue-300 bg-blue-50/60 p-5 shadow-sm backdrop-blur">
         <h2 className="sr-only">Upload FIT file</h2>
 
         <div
@@ -112,10 +111,10 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
             disabled={isLoading}
           />
 
-          <p className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Drop your FIT file here</p>
+          <p className="text-xl font-semibold text-zinc-900">Drop your FIT file here</p>
 
           <div className="mt-4 flex items-center justify-center gap-3">
-            <span className="text-sm text-zinc-500 dark:text-zinc-400">or</span>
+            <span className="text-sm text-zinc-500">or</span>
             <label
               htmlFor="fit-file"
               className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
@@ -130,7 +129,7 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
             </label>
           </div>
 
-          <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">Accepts .fit files</p>
+          <p className="mt-3 text-xs text-zinc-500">Accepts .fit files</p>
 
           <div aria-hidden="true" className={overlayClasses}></div>
         </div>
@@ -140,11 +139,11 @@ export function FileDropzone({ onFileSelected, onExampleLoad, isLoading }: FileD
         <button
           type="button"
           onClick={handleExampleLoadClick}
-          className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
           disabled={isLoading}
         >
           <svg
-            className="h-4 w-4 text-blue-600 dark:text-blue-400"
+            className="h-4 w-4 text-blue-600"
             viewBox="0 0 24 24"
             fill="currentColor"
             aria-hidden="true"

@@ -125,25 +125,25 @@ export default function App(): JSX.Element {
           <div className="mt-6 sm:mt-0">
             <h1
               id="site-title"
-              className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
+              className="text-3xl font-bold tracking-tight text-zinc-900"
             >
               Ultra Cycling Faff Time
             </h1>
 
-            <p className="mt-2 text-lg text-zinc-700 dark:text-zinc-300">
+            <p className="mt-2 text-lg text-zinc-700">
               Find where you spent time stopped (faffing) instead of riding.
             </p>
 
             <p className="mt-4 text-base">
-              <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+              <span className="font-semibold text-zinc-900">
                 faff about / around
               </span>
-              <span className="text-zinc-700 dark:text-zinc-300">
+              <span className="text-zinc-700">
                 {' '}- phrasal verb: to spend your time doing things that are not important instead of the thing that you should be doing.
               </span>
             </p>
 
-            <p className="mt-4 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+            <p className="mt-4 text-sm leading-relaxed text-zinc-700">
               After realising there was a 20-hour difference between my elapsed time and moving time
               during my last ultra event, I wanted a tool to see where all that time went. Faff Time
               shows where you spent time stopped and for how long.
@@ -201,14 +201,14 @@ export default function App(): JSX.Element {
         <div className="w-full min-w-0 md:flex-1">
           {!parsedFile && status !== 'loading' && (
             <section className="mx-auto max-w-6xl px-6 py-2" id="screenshot">
-              <figure className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="flex items-center justify-between rounded-t-2xl border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
+              <figure className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
+                <div className="flex items-center justify-between rounded-t-2xl border-b border-zinc-200 px-4 py-2">
                   <div className="flex items-center gap-1.5">
                     <span className="h-2.5 w-2.5 rounded-full bg-red-400"></span>
                     <span className="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
                     <span className="h-2.5 w-2.5 rounded-full bg-green-400"></span>
                   </div>
-                  <div className="truncate text-xs text-zinc-500 dark:text-zinc-400">example-output.png</div>
+                  <div className="truncate text-xs text-zinc-500">example-output.png</div>
                   <div className="w-10"></div>
                 </div>
 
@@ -240,22 +240,22 @@ export default function App(): JSX.Element {
           {analysisAvailable && (
             <section
               id="mapContainer"
-              className="mt-2 mb-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/40"
+              className="mt-2 mb-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm"
               aria-labelledby="activity-map-title"
               style={{ display: analysisAvailable ? 'block' : 'none' }}
             >
               <header className="flex items-center gap-3">
-                <div className="rounded-full bg-slate-500/15 p-1.5 text-slate-700 dark:text-slate-300">
+                <div className="rounded-full bg-slate-500/15 p-1.5 text-slate-700">
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
                   </svg>
                 </div>
-                <h3 id="activity-map-title" className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                <h3 id="activity-map-title" className="text-base font-semibold text-slate-900">
                   Activity Map
                 </h3>
               </header>
 
-              <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/30">
+              <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">
                 <div id="activity-map" className="h-[360px] w-full sm:h-[420px] lg:h-[520px]"></div>
               </div>
             </section>
