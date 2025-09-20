@@ -50,6 +50,7 @@ export default function App(): JSX.Element {
       setFileError(null);
       const fitData = await decodeFitFile(file);
       setParsedFile({ fitData, fileName: file.name });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       trackFitFileParsed();
     } catch (error) {
       console.error('Error parsing FIT file', error);
@@ -73,6 +74,7 @@ export default function App(): JSX.Element {
       const file = new File([arrayBuffer], 'GreatBritishEscapades2025.fit', { type: 'application/octet-stream' });
       const fitData = await decodeFitFile(file);
       setParsedFile({ fitData, fileName: file.name });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       trackFitFileParsed();
     } catch (error) {
       console.error('Failed to load example file', error);

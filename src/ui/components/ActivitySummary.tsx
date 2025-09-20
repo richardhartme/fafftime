@@ -34,7 +34,7 @@ export function ActivitySummary({ analysisResult }: ActivitySummaryProps): JSX.E
 
   return (
     <section className="max-w-md rounded-2xl border border-zinc-200 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/70">
-      <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+      <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
         Activity Summary
       </h2>
 
