@@ -74,20 +74,20 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
   return (
     <div>
       <section
-        className="rounded-2xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm dark:border-amber-900/40 dark:bg-amber-950/30"
+        className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/4"
         aria-labelledby="faff-summary-title"
       >
         <header className="flex items-start gap-3">
-          <div className="mt-0.5 rounded-full bg-amber-500/15 p-1.5 text-amber-700 dark:text-amber-300">
+          <div className="mt-0.5 rounded-full bg-slate-500/15 p-1.5 text-slate-700 dark:text-slate-300">
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm.75 5.5a.75.75 0 0 0-1.5 0v5.19l-3 1.74a.75.75 0 1 0 .75 1.3l3.375-1.96A.75.75 0 0 0 12.75 13V7.5Z" />
             </svg>
           </div>
           <div>
-            <h3 id="faff-summary-title" className="text-base font-semibold text-amber-900 dark:text-amber-100">
+            <h3 id="faff-summary-title" className="text-base font-semibold text-slate-900 dark:text-slate-100">
               Faff Periods &amp; Recording Gaps
             </h3>
-            <p className="mt-1 text-sm text-amber-900/80 dark:text-amber-200/90">
+            <p className="mt-1 text-sm text-slate-900/80 dark:text-slate-200/90">
               Found <span className="font-semibold">{totalPeriodCount}</span> period(s) totalling{' '}
               <span className="font-semibold">{totalDurationText}</span>
               {totalPercentageValue ? (
@@ -103,42 +103,42 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
         </header>
 
         <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
-          <div className="flex items-center justify-between rounded-xl border border-amber-200 bg-white/70 px-3 py-2 dark:border-amber-900/30 dark:bg-amber-950/20">
-            <dt className="text-amber-800 dark:text-amber-100">Faff periods</dt>
+          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/70 px-3 py-2 dark:border-slate-900/30 dark:bg-slate-950/20">
+            <dt className="text-slate-800 dark:text-slate-100">Faff periods</dt>
             <dd className="flex items-center gap-2">
-              <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-300">
+              <span className="rounded-md bg-slate-500/15 px-2 py-0.5 text-[11px] font-medium text-slate-700 dark:text-slate-300">
                 speed {'<'} 1 m/s
               </span>
-              <span className="font-semibold text-amber-900 dark:text-amber-50">
+              <span className="font-semibold text-slate-900 dark:text-slate-50">
                 {analysisResult.stats.slowCount}
               </span>
             </dd>
           </div>
-          <div className="flex items-center justify-between rounded-xl border border-amber-200 bg-white/70 px-3 py-2 dark:border-amber-900/30 dark:bg-amber-950/20">
-            <dt className="text-amber-800 dark:text-amber-100">Recording gaps</dt>
+          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/70 px-3 py-2 dark:border-slate-900/30 dark:bg-slate-950/20">
+            <dt className="text-slate-800 dark:text-slate-100">Recording gaps</dt>
             <dd className="flex items-center gap-2">
-              <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-300">
+              <span className="rounded-md bg-slate-500/15 px-2 py-0.5 text-[11px] font-medium text-slate-700 dark:text-slate-300">
                 {gapPercentageValue ?? '—'}
               </span>
-              <span className="font-semibold text-amber-900 dark:text-amber-50" title={gapDurationText}>
+              <span className="font-semibold text-slate-900 dark:text-slate-50" title={gapDurationText}>
                 {analysisResult.stats.gapCount}
               </span>
             </dd>
           </div>
         </dl>
 
-        <div className="mt-4 rounded-2xl border border-amber-200 bg-white/70 p-3 dark:border-amber-900/30 dark:bg-amber-950/20">
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-white/70 p-3 dark:border-slate-900/30 dark:bg-slate-950/20">
           <ul className="space-y-2 text-sm">
             {analysisResult.stats.rangeBreakdown.length === 0 && (
-              <li className="text-amber-900/80 dark:text-amber-200/90">No thresholds selected</li>
+              <li className="text-slate-900/80 dark:text-slate-200/90">No thresholds selected</li>
             )}
             {analysisResult.stats.rangeBreakdown.map(entry => {
               const totalDuration = formatDuration(entry.totalDurationSeconds);
               const percentageText = formatActivityShare(entry.totalDurationSeconds, activityDurationSeconds);
               return (
                 <li key={entry.range} className="flex items-baseline justify-between gap-4">
-                  <span className="font-medium text-amber-900 dark:text-amber-50">{entry.label}</span>
-                  <span className="text-amber-900/80 dark:text-amber-200/90">
+                  <span className="font-medium text-slate-900 dark:text-slate-50">{entry.label}</span>
+                  <span className="text-slate-900/80 dark:text-slate-200/90">
                     <strong>{entry.count}</strong> ({totalDuration} · {percentageText})
                   </span>
                 </li>

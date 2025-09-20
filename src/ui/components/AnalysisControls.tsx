@@ -86,12 +86,12 @@ export function AnalysisControls({
 
         <fieldset>
           <legend className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Gap Threshold
+            Recording Gap Threshold
           </legend>
 
           <div className="mt-3">
             <label htmlFor="gap-threshold" className="sr-only">
-              Gap threshold
+              Recording Gap threshold
             </label>
             <div className="relative">
               <select
