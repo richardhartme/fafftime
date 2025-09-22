@@ -21,7 +21,7 @@ vi.mock('@garmin/fitsdk', () => ({
   },
 }));
 
-const { decodeFitFile } = await import('../src/core/fit-parser');
+const { decodeFitFile } = await import('./fit-parser');
 
 describe('decodeFitFile', () => {
   beforeEach(() => {

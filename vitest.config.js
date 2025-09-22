@@ -6,8 +6,11 @@ export default defineConfig({
     // Use jsdom for DOM testing
     environment: 'jsdom',
     
-    // Test file patterns
-    include: ['tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    // Test file patterns now pick up colocated tests under src/
+    include: [
+      'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'
+    ],
     
     // Global test APIs (no need to import describe, it, expect)
     globals: true,
@@ -21,7 +24,9 @@ export default defineConfig({
         'tests/',
         'dist/',
         'webpack.config.js',
-        'vitest.config.js'
+        'vitest.config.js',
+        '**/*.test.*',
+        '**/*.spec.*'
       ]
     }
   },

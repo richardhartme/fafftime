@@ -6,9 +6,9 @@ import {
   findMatchingRecordingGaps,
   convertGapToPeriod,
   buildGpsPointsFromGap,
-} from '../src/core/data-analyzer';
-import { SEMICIRCLE_TO_DEGREES } from '../src/utils/gps-utils';
-import type { FitRecord, TimestampGap } from '../src/types/app-types';
+} from './data-analyzer';
+import { SEMICIRCLE_TO_DEGREES } from '../utils/gps-utils';
+import type { FitRecord, TimestampGap } from '../types/app-types';
 
 const toSemicircle = (degrees: number): number => Math.round(degrees / SEMICIRCLE_TO_DEGREES);
 

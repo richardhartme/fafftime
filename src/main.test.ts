@@ -8,7 +8,7 @@ import {
   formatDuration,
   matchesTimeRange,
   convertGpsCoordinates
-} from '../src/main';
+} from './main';
 
 // Type definitions for test data
 interface TestFitRecord {
@@ -30,7 +30,7 @@ interface TestFitSession {
 type TestTimeRange = '2to5' | '5to10' | '10to30' | '30to60' | '1to2hours' | 'over2hours';
 
 describe('Core Logic Functions', () => {
-  // Tests ordered to match main.js function order
+  // Tests ordered to match main.ts function order
   describe('findSlowPeriodsWithRanges', () => {
     const createTestRecord = (timestamp: Date, speed: number, distance: number = 0): TestFitRecord => ({
       timestamp,

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { calculateSlowPeriodStatistics, buildAnalysisResult } from '../src/core/analysis';
-import { getSelectedRangeText } from '../src/utils/time-utils';
-import { SEMICIRCLE_TO_DEGREES } from '../src/utils/gps-utils';
-import type { SlowPeriod, TimeRange, FitData, FitRecord, FitSession } from '../src/types/app-types';
+import { calculateSlowPeriodStatistics, buildAnalysisResult } from './analysis';
+import { getSelectedRangeText } from '../utils/time-utils';
+import { SEMICIRCLE_TO_DEGREES } from '../utils/gps-utils';
+import type { SlowPeriod, TimeRange, FitData, FitRecord, FitSession } from '../types/app-types';
 
 const toSemicircle = (degrees: number): number => Math.round(degrees / SEMICIRCLE_TO_DEGREES);
 
