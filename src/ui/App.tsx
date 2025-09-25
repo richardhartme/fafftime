@@ -157,20 +157,6 @@ export default function App(): JSX.Element {
           <div className="flex flex-col gap-2.5">
             <FileDropzone onFileSelected={handleFileSelection} onExampleLoad={handleExampleLoad} isLoading={status === 'loading'} />
 
-            <div className="w-full">
-              <div id="activitySummary">
-                {analysisResult && analysisResult.startTime && analysisResult.endTime && (
-                  <ActivitySummary analysisResult={analysisResult} />
-                )}
-                {analysisResult && (!analysisResult.startTime || !analysisResult.endTime) && (
-                  <div className="text-orange-500">
-                    <Icon name="triangle-exclamation" />
-                    Could not determine start/end times from this FIT file.
-                  </div>
-                )}
-              </div>
-            </div>
-
             <AnalysisControls
               isVisible={Boolean(parsedFile)}
               rangeOptions={RANGE_OPTIONS}
@@ -239,12 +225,21 @@ export default function App(): JSX.Element {
 
           <div id="slowPeriodData">
             {analysisAvailable && analysisResult && (
-              <>
+              <div className="flex flex-col gap-5">
+                {analysisResult.startTime && analysisResult.endTime ? (
+                  <ActivitySummary analysisResult={analysisResult} />
+                ) : (
+                  <div className="flex items-center gap-2 rounded-2xl border border-orange-200 bg-orange-50/80 p-4 text-orange-600">
+                    <Icon name="triangle-exclamation" />
+                    <span>Could not determine start/end times from this FIT file.</span>
+                  </div>
+                )}
+
                 <SlowPeriodSummary analysisResult={analysisResult} />
 
                 <section
                   id="mapContainer"
-                  className="mt-5 mb-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm"
+                  className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm"
                   aria-labelledby="activity-map-title"
                 >
                   <header className="flex items-center gap-3">
@@ -264,7 +259,7 @@ export default function App(): JSX.Element {
                 </section>
 
                 <SlowPeriodList analysisResult={analysisResult} />
-              </>
+              </div>
             )}
           </div>
 

@@ -1,4 +1,4 @@
-import { CSSProperties, useMemo } from 'react';
+import { useMemo } from 'react';
 import { AnalysisResult } from '../../types/analysis';
 import { formatDuration } from '../../utils/time-utils';
 
@@ -10,18 +10,6 @@ export function ActivitySummary({ analysisResult }: ActivitySummaryProps): JSX.E
   const totalDurationSeconds = analysisResult.durationSeconds ?? 0;
   const stoppedDuration = analysisResult.stats.totalDurationSeconds;
   const estimatedMovingTime = Math.max(0, totalDurationSeconds - stoppedDuration);
-  const moveFraction = totalDurationSeconds > 0 ? estimatedMovingTime / totalDurationSeconds : 0;
-  const movePercent = Math.min(100, Math.max(0, moveFraction * 100));
-  const stopPercent = Math.max(0, 100 - movePercent);
-
-  const ratioStyle = useMemo(
-    () => ({ '--move': `${movePercent.toFixed(1)}%` } as CSSProperties),
-    [movePercent]
-  );
-
-  const movingPercentLabel = Math.round(movePercent);
-  const stoppedPercentLabel = Math.round(stopPercent);
-
   const activityDistance = useMemo(() => {
     const distanceMeters = analysisResult.totalDistance;
     if (distanceMeters == null) {
@@ -33,65 +21,69 @@ export function ActivitySummary({ analysisResult }: ActivitySummaryProps): JSX.E
   }, [analysisResult.totalDistance]);
 
   return (
-    <section className="max-w-md rounded-2xl border border-zinc-200 bg-white/80 p-5 shadow-sm backdrop-blur">
-      <h2 className="text-lg font-semibold tracking-tight text-zinc-900">
-        Activity Summary
-      </h2>
+    <section
+      className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm"
+      aria-labelledby="activity-summary-title"
+    >
+      <header className="flex items-start gap-3">
+        <div className="mt-0.5 rounded-full bg-slate-500/15 p-1.5 text-slate-700">
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 2a8 8 0 1 1-8 8 8 8 0 0 1 8-8Zm-.75 2.5a.75.75 0 0 0-1.5 0v4.69a.75.75 0 0 0 .33.62l3 2a.75.75 0 0 0 .84-1.24l-2.67-1.78V6.5Z" />
+          </svg>
+        </div>
+        <div>
+          <h3 id="activity-summary-title" className="text-base font-semibold text-slate-900">
+            Activity Summary
+          </h3>
+          <p className="mt-1 text-sm text-slate-900/80">
+            Overall timings, stops, and distance for the loaded ride.
+          </p>
+        </div>
+      </header>
 
-      <dl className="mt-4 grid grid-cols-[auto,1fr] items-baseline gap-x-4 gap-y-2 text-sm">
-        <dt className="text-zinc-500">Start Time</dt>
-        <dd className="font-medium text-zinc-900">
-          {analysisResult.startTime?.toLocaleString() ?? 'Unknown'}
-        </dd>
-
-        <dt className="text-zinc-500">End Time</dt>
-        <dd className="font-medium text-zinc-900">
-          {analysisResult.endTime?.toLocaleString() ?? 'Unknown'}
-        </dd>
-
-        <dt className="text-zinc-500">Duration</dt>
-        <dd className="font-medium text-zinc-900">
-          {formatDuration(totalDurationSeconds)}
-        </dd>
-
-        <dt className="text-zinc-500">Est. Stopped</dt>
-        <dd className="font-medium text-zinc-900">
-          {formatDuration(stoppedDuration)}
-        </dd>
-
-        <dt className="text-zinc-500">Est. Moving</dt>
-        <dd className="font-medium text-zinc-900">
-          {formatDuration(estimatedMovingTime)}
-        </dd>
-
-        {activityDistance && (
-          <>
-            <dt className="text-zinc-500">Total Distance</dt>
-            <dd className="font-semibold text-zinc-900">
-              {activityDistance.distanceKm} km{' '}
-              <span className="font-normal text-zinc-500">
-                ({activityDistance.distanceMiles} mi)
+      <div className="mt-4 rounded-2xl border border-slate-200 bg-white/70 p-3">
+      <ul className="space-y-2 text-sm">
+          <li className="flex items-baseline justify-between gap-4">
+            <span className="font-medium text-slate-900">Start time</span>
+            <span className="text-slate-900/80">
+              <strong>{analysisResult.startTime?.toLocaleString() ?? 'Unknown'}</strong>
+            </span>
+          </li>
+          <li className="flex items-baseline justify-between gap-4">
+            <span className="font-medium text-slate-900">End time</span>
+            <span className="text-slate-900/80">
+                <strong>{analysisResult.endTime?.toLocaleString() ?? 'Unknown'}</strong>
               </span>
-            </dd>
-          </>
+          </li>
+          <li className="flex items-baseline justify-between gap-4">
+            <span className="font-medium text-slate-900">Duration</span>
+            <span className="text-slate-900/80">
+                <strong>{formatDuration(totalDurationSeconds)}</strong>
+              </span>
+          </li>
+          <li className="flex items-baseline justify-between gap-4">
+            <span className="font-medium text-slate-900">Est. stopped</span>
+            <span className="text-slate-900/80">
+                <strong>{formatDuration(stoppedDuration)}</strong>
+              </span>
+          </li>
+          <li className="flex items-baseline justify-between gap-4">
+            <span className="font-medium text-slate-900">Est. moving</span>
+            <span className="text-slate-900/80">
+                  <strong>{formatDuration(estimatedMovingTime)}</strong>
+                </span>
+          </li>
+        {activityDistance && (
+          <li className="flex items-baseline justify-between gap-4">
+            <span className="font-medium text-slate-900">Total distance</span>
+            <span className="text-slate-900/80">
+                <strong>{activityDistance.distanceKm} km{' '}</strong> ({activityDistance.distanceMiles} mi)
+              </span>
+          </li>
         )}
-      </dl>
-
-      <div className="mt-5">
-        <div className="mb-1 flex items-center justify-between text-xs text-zinc-500">
-          <span>Moving</span>
-          <span>Stopped</span>
-        </div>
-        <div
-          className="relative h-2 w-full overflow-hidden rounded-full bg-zinc-200"
-          style={ratioStyle}
-        >
-          <div className="h-full w-[var(--move)] rounded-full bg-blue-500" />
-        </div>
-        <p className="mt-1 text-xs text-zinc-500">
-          ~{movingPercentLabel}% moving, ~{stoppedPercentLabel}% stopped
-        </p>
+      </ul>
       </div>
+
     </section>
   );
 }

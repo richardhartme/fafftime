@@ -1,3 +1,4 @@
+import {CSSProperties} from 'react';
 import {AnalysisResult} from '../../types/analysis';
 import {SlowPeriod} from '../../types/app-types';
 import {formatDuration} from '../../utils/time-utils';
@@ -75,6 +76,17 @@ export function SlowPeriodSummary({analysisResult}: SlowPeriodSummaryProps): JSX
   const totalDurationText = formatDuration(analysisResult.stats.totalDurationSeconds);
   const gapDurationText = formatDuration(analysisResult.stats.gapDurationSeconds);
 
+  const totalDurationSeconds = activityDurationSeconds ?? 0;
+  const movingDurationSeconds = Math.max(0, totalDurationSeconds - analysisResult.stats.totalDurationSeconds);
+  const moveFraction = totalDurationSeconds > 0 ? movingDurationSeconds / totalDurationSeconds : 0;
+  const movePercent = Math.min(100, Math.max(0, moveFraction * 100));
+  const stopPercent = Math.max(0, 100 - movePercent);
+  const ratioStyle = {
+    '--move': `${movePercent.toFixed(1)}%`,
+  } as CSSProperties;
+  const movingPercentLabel = Math.round(movePercent);
+  const stoppedPercentLabel = Math.round(stopPercent);
+
   return (
     <section
       className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm"
@@ -148,6 +160,20 @@ export function SlowPeriodSummary({analysisResult}: SlowPeriodSummaryProps): JSX
             );
           })}
         </ul>
+
+        <div className="my-2 flex items-center justify-between text-xs text-slate-600">
+          <span>Moving</span>
+          <span>Stopped</span>
+        </div>
+        <div
+          className="relative h-2 w-full overflow-hidden rounded-full bg-slate-200"
+          style={ratioStyle}
+        >
+          <div className="h-full w-[var(--move)] rounded-full bg-blue-500" />
+        </div>
+        <p className="mt-1 text-xs text-slate-600">
+          ~{movingPercentLabel}% moving, ~{stoppedPercentLabel}% stopped
+        </p>
       </div>
     </section>
   );
@@ -159,7 +185,7 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
   }
 
   return (
-    <div className="mt-5">
+    <div>
       {analysisResult.slowPeriods.map((period, index) => {
         const {startText, endText} = formatPeriodTimes(period);
         const durationSeconds = Math.max(0, Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000));
