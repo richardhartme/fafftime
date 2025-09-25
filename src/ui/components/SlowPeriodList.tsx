@@ -83,7 +83,7 @@ export function SlowPeriodSummary({analysisResult}: SlowPeriodSummaryProps): JSX
       <header className="flex items-start gap-3">
         <div className="mt-0.5 rounded-full bg-slate-500/15 p-1.5 text-slate-700">
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm.75 5.5a.75.75 0 0 0-1.5 0v5.19l-3 1.74a.75.75 0 1 0 .75 1.3l3.375-1.96A.75.75 0 0 0 12.75 13V7.5Z" />
+            <path d="M9 2a1 1 0 0 0 0 2h1v1.1a8 8 0 1 0 4 0V4h1a1 1 0 1 0 0-2H9Zm3 5a6 6 0 1 1-6 6 6 6 0 0 1 6-6Zm-.5 1.5a.5.5 0 0 0-.5.5v3.88l-1.44 1.44a.5.5 0 0 0 .7.7l1.5-1.5a.5.5 0 0 0 .14-.35V9a.5.5 0 0 0-.5-.5Z" />
           </svg>
         </div>
         <div>
