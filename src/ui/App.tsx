@@ -9,7 +9,7 @@ import { useMapManager } from './hooks/useMapManager';
 import { FileDropzone } from './components/FileDropzone';
 import { AnalysisControls, GapThresholdOption, RangeOption } from './components/AnalysisControls';
 import { ActivitySummary } from './components/ActivitySummary';
-import { SlowPeriodList } from './components/SlowPeriodList';
+import { SlowPeriodList, SlowPeriodSummary } from './components/SlowPeriodList';
 import { FileSummary } from './components/FileSummary';
 import { Icon } from './components/Icon';
 import logoImage from '../assets/images/logo.png';
@@ -237,32 +237,35 @@ export default function App(): JSX.Element {
             </div>
           )}
 
-          {analysisAvailable && (
-            <section
-              id="mapContainer"
-              className="mt-2 mb-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm"
-              aria-labelledby="activity-map-title"
-              style={{ display: analysisAvailable ? 'block' : 'none' }}
-            >
-              <header className="flex items-center gap-3">
-                <div className="rounded-full bg-slate-500/15 p-1.5 text-slate-700">
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
-                  </svg>
-                </div>
-                <h3 id="activity-map-title" className="text-base font-semibold text-slate-900">
-                  Activity Map
-                </h3>
-              </header>
-
-              <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                <div id="activity-map" className="h-[360px] w-full sm:h-[420px] lg:h-[520px]"></div>
-              </div>
-            </section>
-          )}
-
           <div id="slowPeriodData">
-            {analysisAvailable && analysisResult && <SlowPeriodList analysisResult={analysisResult} />}
+            {analysisAvailable && analysisResult && (
+              <>
+                <SlowPeriodSummary analysisResult={analysisResult} />
+
+                <section
+                  id="mapContainer"
+                  className="mt-5 mb-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm"
+                  aria-labelledby="activity-map-title"
+                >
+                  <header className="flex items-center gap-3">
+                    <div className="rounded-full bg-slate-500/15 p-1.5 text-slate-700">
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
+                      </svg>
+                    </div>
+                    <h3 id="activity-map-title" className="text-base font-semibold text-slate-900">
+                      Activity Map
+                    </h3>
+                  </header>
+
+                  <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                    <div id="activity-map" className="h-[360px] w-full sm:h-[420px] lg:h-[520px]"></div>
+                  </div>
+                </section>
+
+                <SlowPeriodList analysisResult={analysisResult} />
+              </>
+            )}
           </div>
 
           {analysisResult && (
