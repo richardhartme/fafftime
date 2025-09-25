@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TimeRange } from '../types/app-types';
 import { DEFAULT_GAP_THRESHOLD_MS, DEFAULT_SELECTED_RANGES, RANGE_LABELS } from '../utils/constants';
 import { decodeFitFile } from '../core/fit-parser';
@@ -34,6 +34,7 @@ export default function App(): JSX.Element {
   const [showOverlays, setShowOverlays] = useState<boolean>(true);
   const [status, setStatus] = useState<'idle' | 'loading'>('idle');
   const [fileError, setFileError] = useState<string | null>(null);
+  const [isDropzoneOpen, setIsDropzoneOpen] = useState<boolean>(true);
 
   const { analysisResult, analysisError } = useAnalysisResult({ parsedFile, selectedRanges, gapThreshold });
 
@@ -50,6 +51,7 @@ export default function App(): JSX.Element {
       setFileError(null);
       const fitData = await decodeFitFile(file);
       setParsedFile({ fitData, fileName: file.name });
+      setIsDropzoneOpen(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       trackFitFileParsed();
     } catch (error) {
@@ -74,6 +76,7 @@ export default function App(): JSX.Element {
       const file = new File([arrayBuffer], 'GreatBritishEscapades2025.fit', { type: 'application/octet-stream' });
       const fitData = await decodeFitFile(file);
       setParsedFile({ fitData, fileName: file.name });
+      setIsDropzoneOpen(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       trackFitFileParsed();
     } catch (error) {
@@ -102,6 +105,16 @@ export default function App(): JSX.Element {
           : [...current, range]
       )
     ));
+  };
+
+  useEffect(() => {
+    if (!parsedFile) {
+      setIsDropzoneOpen(true);
+    }
+  }, [parsedFile]);
+
+  const handleDropzoneReveal = () => {
+    setIsDropzoneOpen(true);
   };
 
   const analysisAvailable = Boolean(analysisResult && analysisResult.records.length > 0);
@@ -155,7 +168,38 @@ export default function App(): JSX.Element {
       <div className="flex w-full flex-col gap-[30px] md:flex-row md:items-start md:gap-[30px] lg:gap-10">
         <aside className="py-2 scrollbar-hidden md:sticky md:top-[25px] md:basis-[240px] md:flex-none md:max-h-[calc(100vh-50px)] md:overflow-y-auto lg:top-[30px] lg:basis-[320px] lg:max-h-[calc(100vh-60px)]">
           <div className="flex flex-col gap-2.5">
-            <FileDropzone onFileSelected={handleFileSelection} onExampleLoad={handleExampleLoad} isLoading={status === 'loading'} />
+            {isDropzoneOpen || !parsedFile ? (
+              <FileDropzone
+                onFileSelected={handleFileSelection}
+                onExampleLoad={handleExampleLoad}
+                isLoading={status === 'loading'}
+              />
+            ) : (
+              <section className="flex flex-col gap-3 rounded-2xl border border-blue-300 bg-blue-50/60 p-5 shadow-sm">
+                <header className="flex items-start gap-3">
+                  <div className="rounded-full bg-blue-500/15 p-2 text-blue-700">
+                    <Icon name="file" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-semibold text-blue-900">
+                      Loaded FIT File
+                    </h2>
+                    <p className="mt-1 truncate text-sm text-blue-900/80" title={parsedFile.fileName}>
+                      {parsedFile.fileName}
+                    </p>
+                  </div>
+                </header>
+
+                <button
+                  type="button"
+                  onClick={handleDropzoneReveal}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-800 shadow-sm transition hover:bg-blue-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                >
+                  <Icon name="rotate-left" />
+                  Analyse Another FIT File
+                </button>
+              </section>
+            )}
 
             <AnalysisControls
               isVisible={Boolean(parsedFile)}
