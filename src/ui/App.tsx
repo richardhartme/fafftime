@@ -111,14 +111,14 @@ export default function App(): JSX.Element {
     <div className="w-full">
       <div className="w-full">
         <header
-          className="mx-auto max-w-6xl px-6 py-10 sm:flex sm:items-center sm:gap-10"
+          className="mx-auto max-w-6xl px-4 pt-6 pb-8 sm:flex sm:items-center sm:gap-10"
           aria-labelledby="site-title"
         >
           <div className="flex flex-shrink-0 justify-center sm:justify-start">
             <img
               src={logoImage}
               alt="Ultra Cycling Faff Time logo"
-              className="w-auto h-32 sm:h-48"
+              className="w-auto h-28 sm:h-32"
             />
           </div>
 
@@ -141,12 +141,6 @@ export default function App(): JSX.Element {
               <span className="text-zinc-700">
                 {' '}- phrasal verb: to spend your time doing things that are not important instead of the thing that you should be doing.
               </span>
-            </p>
-
-            <p className="mt-4 text-sm leading-relaxed text-zinc-700">
-              After realising there was a 20-hour difference between my elapsed time and moving time
-              during my last ultra event, I wanted a tool to see where all that time went. Faff Time
-              shows where you spent time stopped and for how long.
             </p>
           </div>
         </header>
