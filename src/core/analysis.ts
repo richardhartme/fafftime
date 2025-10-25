@@ -28,12 +28,14 @@ export function calculateSlowPeriodStatistics(
 
   const rangeBreakdown: RangeBreakdownEntry[] = selectedRanges.map(range => {
     const matchingPeriods = slowPeriods.filter(period => {
-      if (period.isGap) return false;
       const durationMs = period.endTime.getTime() - period.startTime.getTime();
       const durationMinutes = durationMs / (1000 * 60);
       const durationHours = durationMinutes / 60;
       return matchesTimeRange(range, durationMinutes, durationHours);
     });
+
+    const slowCount = matchingPeriods.filter(period => !period.isGap).length;
+    const gapCount = matchingPeriods.filter(period => period.isGap).length;
 
     const totalDurationSeconds = matchingPeriods.reduce((total, period) => {
       const durationMs = period.endTime.getTime() - period.startTime.getTime();
@@ -45,6 +47,8 @@ export function calculateSlowPeriodStatistics(
       range,
       label: RANGE_LABELS[range],
       count: matchingPeriods.length,
+      slowCount,
+      gapCount,
       totalDurationSeconds,
     };
   });

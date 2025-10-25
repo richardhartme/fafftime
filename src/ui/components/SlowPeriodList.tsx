@@ -150,11 +150,16 @@ export function SlowPeriodSummary({analysisResult}: SlowPeriodSummaryProps): JSX
           {analysisResult.stats.rangeBreakdown.map(entry => {
             const totalDuration = formatDuration(entry.totalDurationSeconds);
             const percentageText = formatActivityShare(entry.totalDurationSeconds, activityDurationSeconds);
+            const breakdownText = entry.slowCount > 0 && entry.gapCount > 0
+              ? `${entry.slowCount} slow + ${entry.gapCount} gaps`
+              : entry.slowCount > 0
+                ? `${entry.slowCount} slow periods`
+                : `${entry.gapCount} gaps`;
             return (
               <li key={entry.range} className="flex items-baseline justify-between gap-4">
                 <span className="font-medium text-slate-900">{entry.label}</span>
                 <span className="text-slate-900/80">
-                  <strong>{entry.count}</strong> ({totalDuration} · {percentageText})
+                  <strong>{breakdownText}</strong> · {totalDuration} · {percentageText}
                 </span>
               </li>
             );

@@ -8,6 +8,8 @@ export interface RangeBreakdownEntry {
   range: TimeRange;
   label: string;
   count: number;
+  slowCount: number;
+  gapCount: number;
   totalDurationSeconds: number;
 }
 

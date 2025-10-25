@@ -45,13 +45,17 @@ describe('calculateSlowPeriodStatistics', () => {
         range: '2to5',
         label: '2-5 minutes',
         count: 1,
+        slowCount: 1,
+        gapCount: 0,
         totalDurationSeconds: 3 * 60,
       },
       {
         range: '5to10',
         label: '5-10 minutes',
-        count: 1,
-        totalDurationSeconds: 7 * 60,
+        count: 2,
+        slowCount: 1,
+        gapCount: 1,
+        totalDurationSeconds: (7 + 6) * 60,
       },
     ]);
   });
@@ -64,6 +68,8 @@ describe('calculateSlowPeriodStatistics', () => {
         range: '30to60',
         label: '30-60 minutes',
         count: 0,
+        slowCount: 0,
+        gapCount: 0,
         totalDurationSeconds: 0,
       },
     ]);
@@ -149,6 +155,8 @@ describe('buildAnalysisResult', () => {
     expect(result.stats.rangeBreakdown[0]).toMatchObject({
       range: '2to5',
       count: 1,
+      slowCount: 1,
+      gapCount: 0,
       totalDurationSeconds: 120,
     });
 
