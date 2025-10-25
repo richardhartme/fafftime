@@ -29,9 +29,14 @@ This file contains project-specific information for Claude Code to help with dev
 
 ## Project Structure
 
-- `src/` - TypeScript source code
+- `src/` - TypeScript/React source code
 - `src/main.ts` - Main entry point
+- `src/main.tsx` - React entry point
 - `src/index.html` - HTML template
+- `src/core/` - Core business logic
+- `src/ui/` - React UI components
+- `src/utils/` - Utility functions
+- `src/types/` - TypeScript type definitions
 - Uses Webpack for bundling
 - Vitest for testing
 - TypeScript for type safety
@@ -39,21 +44,32 @@ This file contains project-specific information for Claude Code to help with dev
 ## Key Technologies
 
 - **TypeScript** - Main language
+- **React** - UI framework
 - **Webpack** - Module bundler and dev server
 - **Vitest** - Testing framework
+- **Tailwind CSS** - Utility-first CSS framework
+- **PostCSS** - CSS processing tool
 - **@garmin/fitsdk** - Garmin FIT file parsing
-- **Leaflet** - Maps (inferred from types)
+- **Leaflet** - Maps library
+- **FontAwesome** - Icon library
 
 ## Code Quality
 
 When making changes:
 - Use TypeScript for type safety
+- Follow React best practices and existing component patterns
+- Use Tailwind CSS for styling
 - Follow existing code patterns and conventions
 - Order methods in a top-down fashion
 - Run `npm test` to ensure all tests pass
 - Test coverage is tracked via `npm run test:coverage`
 
 ## Styling
+
+The project uses Tailwind CSS for styling. Styles are configured via:
+- `tailwind.config.js` - Tailwind configuration
+- `postcss.config.js` - PostCSS configuration
+- `src/tailwind.css` - Main CSS file with Tailwind imports
 
 ## Deployment
 
