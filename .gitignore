@@ -12,6 +12,7 @@ dist/
 .env.production.local
 
 # Deployment configuration
+deploy.sh
 deploy.config.sh
 deploy.staging.sh
 deploy.production.sh
