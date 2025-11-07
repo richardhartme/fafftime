@@ -169,11 +169,10 @@ export default function App(): JSX.Element {
             />
 
             <span className="block text-xs text-gray-500">
-              <strong className="block">Use the feedback link below to share any files that aren’t behaving so I can fix them.</strong>
-              <br />
-              FIT files are processed in your browser.<br />
+              <p className="mb-2">FIT files are processed in your browser.</p>
+              <p className="mb-2"><strong>Use the feedback link below to share any files that aren’t behaving so I can fix them.</strong></p>
               <a href="https://github.com/Hates/fafftime" target="_blank" rel="noopener noreferrer" className="text-gray-800">
-                <Icon name="github" prefix="brands" className="text-gray-800" />github.com/Hates/fafftime
+                <Icon name="github" prefix="brands" className="text-gray-800" />View on Github
               </a>
               {' | '}
               <a href="mailto:info@fafftime.com?subject=Faff%20Time%20Feedback" className="text-gray-800">
