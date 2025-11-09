@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { existsSync } from 'fs';
+import path from 'path';
 
 // Helper to create copy target only if file exists
 const optionalCopy = (src: string, dest: string = '.') =>
@@ -31,6 +32,11 @@ export default defineConfig({
       targets: copyTargets,
     }),
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   server: {
     port: 3000,
     open: true,
