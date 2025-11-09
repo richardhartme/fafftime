@@ -10,9 +10,10 @@ This file contains project-specific information for Claude Code to help with dev
 
 ### Build & Development
 - `npm run build` - Production build
-- `npm run dev` - Development build with watch
-- `npm run serve` - Development server with hot reload
-- `npm start` - Alias for serve
+- `npm run dev` - Development server with hot reload
+- `npm run serve` - Development server with hot reload (alias for dev)
+- `npm start` - Development server with hot reload (alias for dev)
+- `npm run preview` - Preview production build locally
 
 ### Testing
 - `npm test` - Run tests
@@ -30,14 +31,13 @@ This file contains project-specific information for Claude Code to help with dev
 ## Project Structure
 
 - `src/` - TypeScript/React source code
-- `src/main.ts` - Main entry point
 - `src/main.tsx` - React entry point
-- `src/index.html` - HTML template
+- `index.html` - HTML template (root directory)
 - `src/core/` - Core business logic
 - `src/ui/` - React UI components
 - `src/utils/` - Utility functions
 - `src/types/` - TypeScript type definitions
-- Uses Webpack for bundling
+- Uses Vite for bundling and dev server
 - Vitest for testing
 - TypeScript for type safety
 
@@ -45,7 +45,7 @@ This file contains project-specific information for Claude Code to help with dev
 
 - **TypeScript** - Main language
 - **React** - UI framework
-- **Webpack** - Module bundler and dev server
+- **Vite** - Build tool and dev server
 - **Vitest** - Testing framework
 - **Tailwind CSS** - Utility-first CSS framework
 - **PostCSS** - CSS processing tool
