@@ -40,8 +40,7 @@ export function AnalysisControls({
 
   const visibilityClass = isVisible ? 'block' : 'hidden';
   const sectionClassName = [
-    'mb-4',
-    'max-w-md rounded-2xl border border-zinc-200 bg-white/80 p-5 shadow-sm backdrop-blur',
+    'rounded-2xl border border-zinc-200 bg-white/80 p-5 shadow-sm backdrop-blur',
     visibilityClass,
   ]
     .filter(Boolean)
