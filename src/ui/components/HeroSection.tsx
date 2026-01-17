@@ -68,14 +68,12 @@ export function HeroSection({ onFileSelected, onExampleLoad, isLoading }: HeroSe
         <div className="text-center max-w-4xl mx-auto">
           {/* Main Headline */}
           <h1 className="mt-2 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-slate-900 opacity-0 animate-fade-up animate-delay-100">
-            Find your <span className="text-blue-600 italic">faff time</span> and
-            <br className="hidden sm:block" />
-            {' '}ride smarter
+            Find your <span className="text-blue-600 italic">faff time</span>
           </h1>
 
           {/* Subtitle */}
           <p className="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed opacity-0 animate-fade-up animate-delay-200">
-            Discover where you spent time stopped instead of riding. Upload your Garmin FIT file and uncover opportunities to improve your ultra-cycling performance.
+            Discover where you spent time stopped instead of riding. Analyse your FIT files and uncover opportunities to improve your ultra-cycling performance.
           </p>
 
           {/* Definition */}
@@ -113,7 +111,7 @@ export function HeroSection({ onFileSelected, onExampleLoad, isLoading }: HeroSe
                     <polyline points="17,8 12,3 7,8" />
                     <line x1="12" y1="3" x2="12" y2="15" />
                   </svg>
-                  Upload FIT File
+                  Analyse FIT File
                 </>
               )}
             </button>
@@ -126,7 +124,7 @@ export function HeroSection({ onFileSelected, onExampleLoad, isLoading }: HeroSe
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <path d="M14 2v6h6" className="opacity-60" />
               </svg>
-              Try Example
+              View Example Analysis
             </button>
           </div>
 
