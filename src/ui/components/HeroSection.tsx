@@ -73,7 +73,7 @@ export function HeroSection({ onFileSelected, onExampleLoad, isLoading }: HeroSe
 
           {/* Subtitle */}
           <p className="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed opacity-0 animate-fade-up animate-delay-200">
-            Discover where you spent time stopped instead of riding. Analyse your FIT files and uncover opportunities to improve your ultra-cycling performance.
+            Discover where you spent time stopped instead of riding.
           </p>
 
           {/* Definition */}
