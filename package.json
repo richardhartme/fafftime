@@ -2,8 +2,7 @@
   "name": "fafftime-analyser",
   "version": "1.0.0",
   "description": "Ultra Cycling Fafftime Analyser - Find where you spent time stopped instead of riding",
-  "main": "src/main.ts",
-  "scripts": {
+"scripts": {
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
