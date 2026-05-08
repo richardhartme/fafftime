@@ -35,8 +35,12 @@ This file contains project-specific information for Claude Code to help with dev
 - `index.html` - HTML template (root directory)
 - `src/core/` - Core business logic
 - `src/ui/` - React UI components
+- `src/components/` - shadcn/ui component library components
+- `src/lib/` - Shared utilities (clsx/tailwind-merge helpers)
 - `src/utils/` - Utility functions
 - `src/types/` - TypeScript type definitions
+- `src/assets/` - Static assets (data, icons, images)
+- `components.json` - shadcn/ui configuration
 - Uses Vite for bundling and dev server
 - Vitest for testing
 - TypeScript for type safety
@@ -49,8 +53,13 @@ This file contains project-specific information for Claude Code to help with dev
 - **Vitest** - Testing framework
 - **Tailwind CSS** - Utility-first CSS framework
 - **PostCSS** - CSS processing tool
+- **shadcn/ui** - UI component library
+- **class-variance-authority** - Component variant utility
+- **clsx** + **tailwind-merge** - className merging utilities
+- **tailwindcss-animate** - Tailwind animation plugin
 - **@garmin/fitsdk** - Garmin FIT file parsing
-- **Leaflet** - Maps library
+- **Leaflet** - Maps library (loaded via CDN, not npm)
+- **leaflet-polylinedecorator** - Leaflet plugin for polyline arrows (loaded via CDN)
 - **FontAwesome** - Icon library
 
 ## Code Quality
