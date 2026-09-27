@@ -5,7 +5,7 @@
   "engines": {
     "node": ">=26"
   },
-"scripts": {
+  "scripts": {
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
@@ -15,11 +15,8 @@
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
     "test:ui": "vitest --ui",
-    "deploy": "./deploy.sh staging",
-    "deploy:staging": "./deploy.sh staging",
-    "deploy:production": "./deploy.sh production",
-    "build:deploy": "npm run build && npm run deploy:staging",
-    "build:deploy:production": "npm run build && npm run deploy:production"
+    "deploy": "./deploy.sh",
+    "deploy:production": "./deploy.sh"
   },
   "keywords": [
     "cycling",

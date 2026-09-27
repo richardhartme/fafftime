@@ -1,213 +1,89 @@
 # Testing Guide
 
-This project uses **Vitest** for testing, providing fast and modern test execution with excellent TypeScript support and DOM testing capabilities. The project has been converted to TypeScript, enhancing type safety and developer experience.
+This project uses **Vitest** with a **jsdom** environment. Tests are written in TypeScript and live next to the code they cover.
 
-## Getting Started
+## Running Tests
 
-### Run Tests
 ```bash
-npm test                # Run all tests once
-npm run test:watch      # Run tests in watch mode (re-runs on file changes)
-npm run test:coverage   # Run tests with coverage report
-npm run test:ui         # Open Vitest UI (if installed)
+npm test                # Run the suite (watches for changes in an interactive terminal)
+npm run test:watch      # Explicit watch mode
+npm run test:coverage   # Run with V8 coverage; reports are written to coverage/
+npm run test:ui         # Open the Vitest UI (requires @vitest/ui, which is not installed by default)
+```
+
+To run a single file or filter by test name:
+
+```bash
+npx vitest run src/core/data-analyzer.test.ts
+npx vitest run -t "findTimestampGaps"
 ```
 
 ## Test Structure
 
-### Test Files
-- `tests/utils.test.ts` - Tests for utility and DOM helper functions (formatDuration, createElementFromTemplate, etc.)
-- `tests/analysis.test.ts` - Tests for data analysis functions (findTimestampGaps, extractActivityTimes, etc.)
+Tests are colocated with their source files and picked up by the `src/**/*.test.ts` pattern in `vitest.config.js`:
 
-### Test Configuration
-- `vitest.config.js` - Main test configuration with TypeScript support
-- `tests/test-setup.js` - Test environment setup (mocks, global setup)
+| Test file | Covers |
+| --- | --- |
+| `src/main.test.ts` | The exported analysis API in `src/main.ts` (timestamp gaps, slow periods, formatting helpers) |
+| `src/core/analysis.test.ts` | `buildAnalysisResult` and `calculateSlowPeriodStatistics` |
+| `src/core/data-analyzer.test.ts` | Slow period and recording gap detection helpers |
+| `src/core/fit-parser.test.ts` | `decodeFitFile` and `extractActivityTimes` (with `@garmin/fitsdk` mocked) |
+| `src/utils/gps-utils.test.ts` | Semicircle → degree conversion and GPS helpers |
+| `src/utils/time-utils.test.ts` | Duration formatting and time range matching |
+
+### Configuration
+
+- `vitest.config.js` sets up the jsdom environment, global test APIs, the `@` → `src/` alias, and coverage settings.
+- There is no global setup file. Any mocks are declared in the test file that needs them.
 
 ## Coverage
 
-The current test coverage focuses on:
-- **Utility & DOM Functions** (~99% coverage) - Pure functions like formatDuration, GPS conversion, DOM helpers
-- **Data Analysis** (~98% coverage) - Core business logic for FIT file processing  
-- **Main Application** (0% coverage) - Event handlers and UI coordination (harder to test)
+Coverage focuses on the pure analysis pipeline (`src/core/`) and utilities (`src/utils/`). The React UI (`src/ui/`) and the Leaflet map integration have no automated tests at the moment. Check them manually with `npm run dev`, or use the **Load example FIT file** button, which loads `src/assets/data/GreatBritishEscapades2025.fit`.
 
 ## Writing Tests
 
-### Basic Test Structure
+Put new tests beside the module they cover, named `<module>.test.ts`:
+
 ```typescript
-import { functionToTest } from '../src/module';
+import { describe, expect, it } from 'vitest';
 
-describe('Module Name', () => {
-  describe('functionToTest', () => {
-    it('should do something specific', () => {
-      const result = functionToTest(input);
-      expect(result).toBe(expectedOutput);
-    });
-  });
-});
-```
+import { formatDuration } from './time-utils';
 
-### Testing DOM Functions
-```typescript
-import { createElementFromTemplate } from '../src/utils';
-
-describe('createElementFromTemplate', () => {
-  it('creates element from template', () => {
-    // Mock setup is handled in test-setup.js
-    const result = createElementFromTemplate('test-template', { 
-      'field': 'value' 
-    });
-    
-    expect(result).toBeDefined();
-  });
-});
-```
-
-### Testing Data Analysis
-```typescript
-import { findTimestampGaps } from '../src/analysis';
-import type { RecordMessage } from '../src/types';
-
-describe('findTimestampGaps', () => {
-  it('identifies gaps larger than 5 minutes', () => {
-    const records: RecordMessage[] = [
-      { timestamp: new Date('2024-01-01T10:00:00Z') },
-      { timestamp: new Date('2024-01-01T10:10:00Z') } // 10 min gap
-    ];
-    
-    const gaps = findTimestampGaps(records);
-    
-    expect(gaps).toHaveLength(1);
-    expect(gaps[0].gapDurationMinutes).toBe(10);
-  });
-});
-```
-
-## Mocking
-
-### Global Mocks (in test-setup.js)
-- **Leaflet** - Maps library is mocked since it's not available in jsdom
-- **DOM Elements** - Common elements like `fitFile`, `parseButton` are mocked
-- **Fetch API** - For testing example file loading
-- **Console methods** - To reduce noise during testing
-
-### Custom Mocks
-```typescript
-// In individual test files
-const mockFunction = vi.fn();
-mockFunction.mockReturnValue('test value');
-
-expect(mockFunction).toHaveBeenCalledWith(expectedArg);
-```
-
-## Best Practices
-
-### 1. Test Pure Functions First
-Start with utility functions and data processing functions as they're easiest to test:
-```typescript
-// Easy to test
-function formatDuration(seconds: number): string {
-  return `${seconds}s`;
-}
-
-// Harder to test (has side effects)
-function updateUI(data: string): void {
-  document.getElementById('result')!.innerHTML = data;
-}
-```
-
-### 2. Use Descriptive Test Names
-```typescript
-// Good
-it('returns null when no GPS coordinates are provided')
-
-// Avoid doing this
-it('handles edge case')
-```
-
-### 3. Test Edge Cases
-```typescript
 describe('formatDuration', () => {
-  it('handles zero seconds', () => {
-    expect(formatDuration(0)).toBe('0m 0s');
-  });
-  
-  it('handles very large durations', () => {
+  it('formats hours, minutes and seconds', () => {
     expect(formatDuration(7322)).toBe('2h 2m 2s');
   });
 });
 ```
 
-### 4. Keep Tests Independent
-Each test should be able to run in isolation:
+### Mocking
+
+Use `vi.mock` inside the test file. For an example, see how `src/core/fit-parser.test.ts` mocks `@garmin/fitsdk` to control what the decoder returns:
+
 ```typescript
-describe('function tests', () => {
-  beforeEach(() => {
-    // Reset state before each test
-    vi.clearAllMocks();
-  });
-});
+vi.mock('@garmin/fitsdk', () => ({
+  Stream: { fromByteArray: vi.fn() },
+  Decoder: class {
+    read() {
+      return { messages: {}, errors: [] };
+    }
+  },
+}));
 ```
 
-## Adding New Tests
+Leaflet is loaded from a CDN at runtime and is not available under jsdom. Code that touches the global `L` needs a stub (for example `vi.stubGlobal('L', ...)`).
 
-### For a New Utility or DOM Function
-1. Add the function to `src/utils.ts` with proper TypeScript types
-2. Export it with type information
-3. Add tests to `tests/utils.test.ts`
-4. Run `npm test` to verify
+## Best Practices
 
-### For a New Analysis Function
-1. Add the function to `src/analysis.ts` with proper TypeScript types
-2. Export it and any dependencies with type information
-3. Add tests to `tests/analysis.test.ts`
-4. Include edge cases and error handling
-
-### For Integration Tests
-Consider testing entire workflows:
-```typescript
-it('processes complete FIT file workflow', () => {
-  const mockFitData = createMockFitData();
-  const result = processFitFile(mockFitData);
-  
-  expect(result.slowPeriods).toBeDefined();
-  expect(result.timestampGaps).toBeDefined();
-});
-```
-
-## Continuous Integration
-
-Tests should run automatically in CI/CD:
-```yaml
-# Example GitHub Actions
-- name: Run tests
-  run: npm test
-
-- name: Check coverage
-  run: npm run test:coverage
-```
-
-## Debugging Tests
-
-### Running Single Tests
-```bash
-npx vitest tests/utils.test.ts         # Run specific file
-npx vitest -t "formatDuration"         # Run tests matching pattern
-```
-
-### Debug Mode
-```bash
-npx vitest --inspect-brk    # Start with debugger
-```
-
-### Common Issues
-1. **Mock not working** - Check `tests/test-setup.js` for proper mock setup
-2. **DOM not available** - Ensure `environment: 'jsdom'` in vitest config
-3. **Import errors** - Check that functions are properly exported from TypeScript modules and import paths use `../src/`
-4. **Type errors** - Ensure TypeScript types are correctly defined and imported where needed
+- **Test pure functions first.** The analysis modules in `src/core/` and `src/utils/` take plain data and return plain data, so they are the easiest to test.
+- **Use descriptive names**, e.g. `it('returns null when no GPS coordinates are provided')` rather than `it('handles edge case')`.
+- **Cover edge cases** such as empty record arrays, missing GPS data, zero durations, and gaps exactly at the threshold.
+- **Keep tests independent.** Reset mocks in `beforeEach` with `vi.clearAllMocks()` when a file shares mock state.
+- **Export new analysis helpers through `src/main.ts`** if they are part of the public analysis API, and add matching cases to `src/main.test.ts`.
 
 ## Future Testing Goals
 
-- [ ] Add integration tests for complete FIT file processing
-- [ ] Add visual regression tests for UI components  
-- [ ] Add performance tests for large FIT files
-- [ ] Add E2E tests using Playwright
-- [ ] Increase main.ts coverage by extracting testable functions
+- [ ] Component tests for the React UI (e.g. with `@testing-library/react`)
+- [ ] Integration test that runs the bundled example FIT file through the full pipeline
+- [ ] Performance tests for large FIT files
+- [ ] E2E tests using Playwright

@@ -22,11 +22,8 @@ This file contains project-specific information for Claude Code to help with dev
 - `npm run test:ui` - Run tests with UI interface
 
 ### Deployment
-- `npm run deploy` - Deploy to staging
-- `npm run deploy:staging` - Deploy to staging
-- `npm run deploy:production` - Deploy to production
-- `npm run build:deploy` - Build and deploy to staging
-- `npm run build:deploy:production` - Build and deploy to production
+- `npm run deploy` - Build and deploy to production
+- `npm run deploy:production` - Build and deploy to production (alias)
 
 ## Project Structure
 
@@ -35,14 +32,15 @@ This file contains project-specific information for Claude Code to help with dev
 - `index.html` - HTML template (root directory)
 - `src/core/` - Core business logic
 - `src/ui/` - React UI components
-- `src/components/` - shadcn/ui component library components
+- `src/components/ui/` - shadcn/ui components (created when first added via the shadcn CLI)
 - `src/lib/` - Shared utilities (clsx/tailwind-merge helpers)
 - `src/utils/` - Utility functions
 - `src/types/` - TypeScript type definitions
 - `src/assets/` - Static assets (data, icons, images)
+- `src/site.webmanifest` - Web app manifest (copied to `dist/` by vite-plugin-static-copy)
 - `components.json` - shadcn/ui configuration
 - Uses Vite for bundling and dev server
-- Vitest for testing
+- Vitest for testing (tests are colocated as `src/**/*.test.ts`)
 - TypeScript for type safety
 
 ## Key Technologies
@@ -82,4 +80,4 @@ The project uses Tailwind CSS for styling. Styles are configured via:
 
 ## Deployment
 
-The project has automated deployment scripts (`deploy.sh`) for both staging and production environments. Always test changes in staging before production deployment.
+`deploy.sh` builds the app and rsyncs `dist/` to production (fafftime.com). There is no staging environment, so verify changes locally with `npm run build && npm run preview` before deploying.
