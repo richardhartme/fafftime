@@ -4,8 +4,6 @@ Ultra Cycling Faff Time Analyser helps ultra-distance riders understand where th
 
 Use the tool live at [https://fafftime.com](https://fafftime.com)
 
-> Built with a good mix of elbow grease, [Claude Code](https://claude.ai/code), and [OpenAI Codex](https://openai.com/codex/).
-
 ## Screenshot
 
 ![Fafftime Analyser Screenshot](src/assets/images/screenshot.png)
