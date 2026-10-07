@@ -52,3 +52,6 @@ Thumbs.db
 
 coverage/
 *.iml
+
+# Node version manager
+.nvmrc
