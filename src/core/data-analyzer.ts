@@ -3,7 +3,7 @@
 // =============================================================================
 
 import { FitRecord, TimestampGap, SlowPeriod, TimeRange } from '../types/app-types';
-import { SPEED_THRESHOLD, DEFAULT_GAP_THRESHOLD_MS } from '../utils/constants';
+import { SPEED_THRESHOLD, DEFAULT_GAP_THRESHOLD_MS, MS_PER_MINUTE } from '../utils/constants';
 import { convertGpsCoordinates, SEMICIRCLE_TO_DEGREES } from '../utils/gps-utils';
 import { matchesTimeRange } from '../utils/time-utils';
 
@@ -123,7 +123,7 @@ export function findMatchingRecordingGaps(
 
   timestampGaps.forEach(gap => {
     const matchesRange = selectedRanges.some(range =>
-      matchesTimeRange(range, gap.gapDurationMinutes * 60 * 1000)
+      matchesTimeRange(range, gap.gapDurationMinutes * MS_PER_MINUTE)
     );
 
     if (matchesRange) {

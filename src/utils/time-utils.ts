@@ -3,9 +3,7 @@
 // =============================================================================
 
 import { TimeRange } from '../types/app-types';
-import { TIME_RANGES } from './constants';
-
-const MS_PER_MINUTE = 60 * 1000;
+import { MS_PER_MINUTE, TIME_RANGES } from './constants';
 
 /**
  * Formats a duration in seconds to a human-readable string
