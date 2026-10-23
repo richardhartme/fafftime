@@ -142,6 +142,14 @@ describe('data-analyzer helpers', () => {
         expect(findMatchingRecordingGaps(gapRecords(fourMinutesForty), ['5to10'], 60_000)).toHaveLength(0);
       });
 
+      it('still reports gapDurationMinutes rounded to whole minutes', () => {
+        const fourMinutesForty = (4 * 60 + 40) * 1000;
+
+        const [gap] = findMatchingRecordingGaps(gapRecords(fourMinutesForty), ['2to5'], 60_000);
+
+        expect(gap.gapData?.gapDurationMinutes).toBe(5);
+      });
+
       it.each([
         { label: 'just under 5 minutes', durationMs: 5 * 60_000 - 1, range: '2to5' },
         { label: 'exactly 5 minutes', durationMs: 5 * 60_000, range: '5to10' },
