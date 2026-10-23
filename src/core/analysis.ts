@@ -13,46 +13,41 @@ export function calculateSlowPeriodStatistics(
   slowPeriods: SlowPeriod[],
   selectedRanges: TimeRange[]
 ): SlowPeriodStats {
-  const slowCount = slowPeriods.filter(period => !period.isGap).length;
-  const gapCount = slowPeriods.filter(period => period.isGap).length;
-  const totalDurationSeconds = slowPeriods.reduce((total, period) => {
-    return total + periodDurationSeconds(period);
-  }, 0);
-  const gapDurationSeconds = slowPeriods.reduce((total, period) => {
-    if (!period.isGap) return total;
-    return total + periodDurationSeconds(period);
-  }, 0);
+  const timed = slowPeriods.map(period => ({
+    period,
+    durationMs: period.endTime.getTime() - period.startTime.getTime(),
+    durationSeconds: periodDurationSeconds(period),
+  }));
+
+  const summarise = (entries: typeof timed) => {
+    const gaps = entries.filter(({ period }) => period.isGap);
+    return {
+      slowCount: entries.length - gaps.length,
+      gapCount: gaps.length,
+      totalDurationSeconds: sumDurations(entries),
+      gapDurationSeconds: sumDurations(gaps),
+    };
+  };
 
   const rangeBreakdown: RangeBreakdownEntry[] = selectedRanges.map(range => {
-    const matchingPeriods = slowPeriods.filter(period => {
-      const durationMs = period.endTime.getTime() - period.startTime.getTime();
-      return matchesTimeRange(range, durationMs);
-    });
-
-    const slowCount = matchingPeriods.filter(period => !period.isGap).length;
-    const gapCount = matchingPeriods.filter(period => period.isGap).length;
-
-    const totalDurationSeconds = matchingPeriods.reduce((total, period) => {
-      return total + periodDurationSeconds(period);
-    }, 0);
+    const matching = timed.filter(({ durationMs }) => matchesTimeRange(range, durationMs));
+    const { slowCount, gapCount, totalDurationSeconds } = summarise(matching);
 
     return {
       range,
       label: getRangeLabel(range),
-      count: matchingPeriods.length,
+      count: matching.length,
       slowCount,
       gapCount,
       totalDurationSeconds,
     };
   });
 
-  return {
-    slowCount,
-    gapCount,
-    totalDurationSeconds,
-    gapDurationSeconds,
-    rangeBreakdown,
-  };
+  return { ...summarise(timed), rangeBreakdown };
+}
+
+function sumDurations(entries: { durationSeconds: number }[]): number {
+  return entries.reduce((total, { durationSeconds }) => total + durationSeconds, 0);
 }
 
 export function buildAnalysisResult(
@@ -64,8 +59,8 @@ export function buildAnalysisResult(
   const sessions = fitData.sessionMesgs || [];
   const records = fitData.recordMesgs || [];
   const { startTime, endTime, movingTime, totalDistance } = extractActivityTimes(sessions, records);
-  const slowPeriods = findSlowPeriodsWithRanges(records, selectedRanges, gapThreshold);
   const timestampGaps = findTimestampGaps(records, gapThreshold);
+  const slowPeriods = findSlowPeriodsWithRanges(records, selectedRanges, gapThreshold, timestampGaps);
   const activityRoute = convertGpsCoordinates(records);
   const stats = calculateSlowPeriodStatistics(slowPeriods, selectedRanges);
   const selectedRangeText = selectedRanges.length > 0 ? getSelectedRangeText(selectedRanges) : 'None selected';
@@ -77,8 +72,6 @@ export function buildAnalysisResult(
   return {
     fitData,
     fileName,
-    records,
-    sessions,
     timestampGaps,
     slowPeriods,
     activityRoute,

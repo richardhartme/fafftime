@@ -1,20 +1,47 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 
-import {
-  findSpeedBasedSlowPeriods,
-  shouldBreakSequenceForTimestampGap,
-  findMatchingRecordingGaps,
-  processSlowSequence,
-  convertGapToPeriod,
-  buildGpsPointsFromGap,
-} from './data-analyzer';
+import { findSlowPeriodsWithRanges, processSlowSequence } from './data-analyzer';
 import { SEMICIRCLE_TO_DEGREES } from '../utils/gps-utils';
-import type { FitRecord, TimestampGap } from '../types/app-types';
+import type { FitRecord, TimeRange, TimestampGap } from '../types/app-types';
 
 const toSemicircle = (degrees: number): number => Math.round(degrees / SEMICIRCLE_TO_DEGREES);
 
+const speedBasedPeriods = (records: FitRecord[], ranges: TimeRange[], gapThreshold: number) =>
+  findSlowPeriodsWithRanges(records, ranges, gapThreshold).filter(period => !period.isGap);
+
+const gapPeriods = (records: FitRecord[], ranges: TimeRange[], gapThreshold: number) =>
+  findSlowPeriodsWithRanges(records, ranges, gapThreshold).filter(period => period.isGap);
+
+const periodsFromGap = (gap: TimestampGap) => findSlowPeriodsWithRanges([], ['2to5', '5to10', '10to30'], 120_000, [gap]);
+
 describe('data-analyzer helpers', () => {
-  describe('findSpeedBasedSlowPeriods', () => {
+  describe('findSlowPeriodsWithRanges with precomputed gaps', () => {
+    it('derives recording-gap periods from the supplied gaps rather than rescanning records', () => {
+      const baseTime = new Date('2024-01-01T05:00:00Z');
+      const records: FitRecord[] = [
+        { timestamp: baseTime, speed: 5, distance: 0 },
+        { timestamp: new Date(baseTime.getTime() + 60_000), speed: 5, distance: 100 },
+      ];
+      const suppliedGap: TimestampGap = {
+        startTime: baseTime,
+        endTime: new Date(baseTime.getTime() + 8 * 60_000),
+        gapDuration: 8 * 60_000,
+        gapDurationMinutes: 8,
+        gapDurationHours: 8 / 60,
+        startDistance: 0,
+        endDistance: 1000,
+        startGpsPoint: null,
+        endGpsPoint: null,
+      };
+
+      const periods = findSlowPeriodsWithRanges(records, ['5to10'], 120_000, [suppliedGap]);
+
+      expect(periods).toHaveLength(1);
+      expect(periods[0].gapData).toBe(suppliedGap);
+    });
+  });
+
+  describe('speed-based slow periods', () => {
     const baseTime = new Date('2024-01-01T00:00:00Z');
 
     const createRecord = (offsetMs: number, speed: number, extras: Partial<FitRecord> = {}): FitRecord => ({
@@ -37,7 +64,7 @@ describe('data-analyzer helpers', () => {
         createRecord(720_000, 0.3, { positionLat: toSemicircle(52.011), positionLong: toSemicircle(-1.011) }),
       ];
 
-      const periods = findSpeedBasedSlowPeriods(records, ['2to5'], 120_000);
+      const periods = speedBasedPeriods(records, ['2to5'], 120_000);
 
       expect(periods).toHaveLength(2);
 
@@ -51,39 +78,36 @@ describe('data-analyzer helpers', () => {
     });
   });
 
-  describe('shouldBreakSequenceForTimestampGap', () => {
+  describe('splitting slow sequences on timestamp gaps', () => {
     const baseTime = new Date('2024-01-01T00:00:00Z');
-
-    it('returns false for empty sequences', () => {
-      expect(shouldBreakSequenceForTimestampGap([], {
-        timestamp: new Date(baseTime.getTime() + 1_000_000),
-      }, 120_000)).toBe(false);
+    const slowRecord = (offsetMs: number): FitRecord => ({
+      timestamp: new Date(baseTime.getTime() + offsetMs),
+      speed: 0.2,
+      distance: 0,
     });
 
-    it('returns false when the gap is within the threshold', () => {
-      const sequence: FitRecord[] = [
-        { timestamp: baseTime },
-        { timestamp: new Date(baseTime.getTime() + 30_000) },
-      ];
+    it('keeps slow records whose spacing is within the threshold in one period', () => {
+      const records = [slowRecord(0), slowRecord(100_000), slowRecord(200_000)];
 
-      const nextRecord: FitRecord = { timestamp: new Date(baseTime.getTime() + 110_000) };
+      const periods = speedBasedPeriods(records, ['2to5'], 120_000);
 
-      expect(shouldBreakSequenceForTimestampGap(sequence, nextRecord, 120_000)).toBe(false);
+      expect(periods).toHaveLength(1);
+      expect(periods[0].recordCount).toBe(3);
     });
 
-    it('returns true when the gap exceeds the threshold', () => {
-      const sequence: FitRecord[] = [
-        { timestamp: baseTime },
-        { timestamp: new Date(baseTime.getTime() + 30_000) },
+    it('starts a new period when the spacing exceeds the threshold', () => {
+      const records = [
+        slowRecord(0), slowRecord(100_000), slowRecord(200_000),
+        slowRecord(500_000), slowRecord(600_000), slowRecord(700_000),
       ];
 
-      const nextRecord: FitRecord = { timestamp: new Date(baseTime.getTime() + 200_000) };
+      const periods = speedBasedPeriods(records, ['2to5'], 120_000);
 
-      expect(shouldBreakSequenceForTimestampGap(sequence, nextRecord, 120_000)).toBe(true);
+      expect(periods.map(period => period.recordCount)).toEqual([3, 3]);
     });
   });
 
-  describe('findMatchingRecordingGaps', () => {
+  describe('recording gaps', () => {
     const baseTime = new Date('2024-01-01T05:00:00Z');
 
     const lat1 = 52.0;
@@ -107,7 +131,7 @@ describe('data-analyzer helpers', () => {
     ];
 
     it('converts qualifying recording gaps into slow-period objects', () => {
-      const gaps = findMatchingRecordingGaps(records, ['5to10'], 120_000);
+      const gaps = gapPeriods(records, ['5to10'], 120_000);
 
       expect(gaps).toHaveLength(1);
 
@@ -125,7 +149,7 @@ describe('data-analyzer helpers', () => {
     });
 
     it('returns an empty list when no gaps match the selected ranges', () => {
-      const gaps = findMatchingRecordingGaps(records, ['2to5'], 120_000);
+      const gaps = gapPeriods(records, ['2to5'], 120_000);
       expect(gaps).toHaveLength(0);
     });
 
@@ -138,14 +162,14 @@ describe('data-analyzer helpers', () => {
       it('buckets a 4m40s gap into 2to5, not 5to10', () => {
         const fourMinutesForty = (4 * 60 + 40) * 1000;
 
-        expect(findMatchingRecordingGaps(gapRecords(fourMinutesForty), ['2to5'], 60_000)).toHaveLength(1);
-        expect(findMatchingRecordingGaps(gapRecords(fourMinutesForty), ['5to10'], 60_000)).toHaveLength(0);
+        expect(gapPeriods(gapRecords(fourMinutesForty), ['2to5'], 60_000)).toHaveLength(1);
+        expect(gapPeriods(gapRecords(fourMinutesForty), ['5to10'], 60_000)).toHaveLength(0);
       });
 
       it('still reports gapDurationMinutes rounded to whole minutes', () => {
         const fourMinutesForty = (4 * 60 + 40) * 1000;
 
-        const [gap] = findMatchingRecordingGaps(gapRecords(fourMinutesForty), ['2to5'], 60_000);
+        const [gap] = gapPeriods(gapRecords(fourMinutesForty), ['2to5'], 60_000);
 
         expect(gap.gapData?.gapDurationMinutes).toBe(5);
       });
@@ -157,8 +181,8 @@ describe('data-analyzer helpers', () => {
       ] as const)('buckets a gap of $label into $range', ({ durationMs, range }) => {
         const otherRange = range === '2to5' ? '5to10' : '2to5';
 
-        expect(findMatchingRecordingGaps(gapRecords(durationMs), [range], 60_000)).toHaveLength(1);
-        expect(findMatchingRecordingGaps(gapRecords(durationMs), [otherRange], 60_000)).toHaveLength(0);
+        expect(gapPeriods(gapRecords(durationMs), [range], 60_000)).toHaveLength(1);
+        expect(gapPeriods(gapRecords(durationMs), [otherRange], 60_000)).toHaveLength(0);
       });
     });
   });
@@ -184,7 +208,7 @@ describe('data-analyzer helpers', () => {
     });
   });
 
-  describe('convertGapToPeriod', () => {
+  describe('recording gap periods', () => {
     let gap: TimestampGap;
 
     beforeEach(() => {
@@ -202,7 +226,7 @@ describe('data-analyzer helpers', () => {
     });
 
     it('wraps a timestamp gap in a slow-period compatible object', () => {
-      const period = convertGapToPeriod(gap);
+      const [period] = periodsFromGap(gap);
 
       expect(period.isGap).toBe(true);
       expect(period.recordCount).toBe(0);
@@ -214,7 +238,7 @@ describe('data-analyzer helpers', () => {
     });
   });
 
-  describe('buildGpsPointsFromGap', () => {
+  describe('recording gap GPS points', () => {
     const baseGap: TimestampGap = {
       startTime: new Date('2024-01-01T09:00:00Z'),
       endTime: new Date('2024-01-01T09:05:00Z'),
@@ -228,7 +252,7 @@ describe('data-analyzer helpers', () => {
     };
 
     it('returns both start and end points when available', () => {
-      const points = buildGpsPointsFromGap({
+      const [{ gpsPoints: points }] = periodsFromGap({
         ...baseGap,
         startGpsPoint: [1, 2],
         endGpsPoint: [3, 4],
@@ -237,7 +261,7 @@ describe('data-analyzer helpers', () => {
     });
 
     it('falls back to single start point when end point missing', () => {
-      const points = buildGpsPointsFromGap({
+      const [{ gpsPoints: points }] = periodsFromGap({
         ...baseGap,
         startGpsPoint: [5, 6],
       });
@@ -245,7 +269,7 @@ describe('data-analyzer helpers', () => {
     });
 
     it('falls back to single end point when start point missing', () => {
-      const points = buildGpsPointsFromGap({
+      const [{ gpsPoints: points }] = periodsFromGap({
         ...baseGap,
         endGpsPoint: [7, 8],
       });
@@ -253,7 +277,7 @@ describe('data-analyzer helpers', () => {
     });
 
     it('returns an empty array when no GPS points exist', () => {
-      const points = buildGpsPointsFromGap(baseGap);
+      const [{ gpsPoints: points }] = periodsFromGap(baseGap);
       expect(points).toEqual([]);
     });
   });

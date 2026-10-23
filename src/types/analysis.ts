@@ -2,7 +2,7 @@
 // ANALYSIS-SPECIFIC TYPE DEFINITIONS
 // =============================================================================
 
-import { FitData, FitRecord, FitSession, SlowPeriod, TimeRange, TimestampGap } from './app-types';
+import { FitData, SlowPeriod, TimeRange, TimestampGap } from './app-types';
 
 export interface RangeBreakdownEntry {
   range: TimeRange;
@@ -24,8 +24,6 @@ export interface SlowPeriodStats {
 export interface AnalysisResult {
   fitData: FitData;
   fileName: string;
-  records: FitRecord[];
-  sessions: FitSession[];
   timestampGaps: TimestampGap[];
   slowPeriods: SlowPeriod[];
   activityRoute: [number, number][];
