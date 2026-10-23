@@ -123,7 +123,7 @@ export function findMatchingRecordingGaps(
 
   timestampGaps.forEach(gap => {
     const matchesRange = selectedRanges.some(range =>
-      matchesTimeRange(range, gap.gapDurationMinutes, gap.gapDurationHours)
+      matchesTimeRange(range, gap.gapDurationMinutes * 60 * 1000)
     );
 
     if (matchesRange) {
@@ -244,13 +244,11 @@ export function processSlowSequence(currentSlowSequence: FitRecord[], selectedRa
   }
 
   const durationMs = endTimestamp - startTimestamp;
-  const durationMinutes = durationMs / (1000 * 60);
-  const durationHours = durationMinutes / 60;
 
   // Check if this slow period's duration falls within any of the user's selected time ranges
   // This filtering allows users to focus on specific types of stops (e.g., only long breaks)
   const matchesRange = selectedRanges.some(range =>
-    matchesTimeRange(range, durationMinutes, durationHours)
+    matchesTimeRange(range, durationMs)
   );
 
   // Only create a period object if it matches the user's filtering criteria

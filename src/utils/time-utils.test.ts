@@ -75,122 +75,56 @@ describe('time-utils', () => {
   });
 
   describe('matchesTimeRange', () => {
-    describe('2to5 range (2-5 minutes)', () => {
-      const range: TimeRange = '2to5';
+    const MINUTE_MS = 60 * 1000;
+    const ms = (minutes: number) => minutes * MINUTE_MS;
 
-      it('returns false for durations under 2 minutes', () => {
-        expect(matchesTimeRange(range, 0, 0)).toBe(false);
-        expect(matchesTimeRange(range, 1, 1 / 60)).toBe(false);
-        expect(matchesTimeRange(range, 1.99, 1.99 / 60)).toBe(false);
+    const edges: [TimeRange, number, number | null][] = [
+      ['2to5', 2, 5],
+      ['5to10', 5, 10],
+      ['10to30', 10, 30],
+      ['30to60', 30, 60],
+      ['1to2hours', 60, 120],
+      ['over2hours', 120, null],
+    ];
+
+    describe.each(edges)('%s', (range, lower, upper) => {
+      it('excludes durations just under the lower bound', () => {
+        expect(matchesTimeRange(range, ms(lower) - 1)).toBe(false);
       });
 
-      it('returns true for durations at or above 2 minutes', () => {
-        expect(matchesTimeRange(range, 2, 2 / 60)).toBe(true);
-        expect(matchesTimeRange(range, 2.5, 2.5 / 60)).toBe(true);
-        expect(matchesTimeRange(range, 3, 3 / 60)).toBe(true);
-        expect(matchesTimeRange(range, 4.99, 4.99 / 60)).toBe(true);
+      it('includes a duration exactly at the lower bound', () => {
+        expect(matchesTimeRange(range, ms(lower))).toBe(true);
       });
 
-      it('returns false for durations at or above 5 minutes', () => {
-        expect(matchesTimeRange(range, 5, 5 / 60)).toBe(false);
-        expect(matchesTimeRange(range, 6, 6 / 60)).toBe(false);
+      it('includes durations just over the lower bound', () => {
+        expect(matchesTimeRange(range, ms(lower) + 1)).toBe(true);
+      });
+
+      if (upper !== null) {
+        it('includes durations just under the upper bound', () => {
+          expect(matchesTimeRange(range, ms(upper) - 1)).toBe(true);
+        });
+
+        it('excludes a duration exactly at the upper bound', () => {
+          expect(matchesTimeRange(range, ms(upper))).toBe(false);
+        });
+      } else {
+        it('has no upper bound', () => {
+          expect(matchesTimeRange(range, ms(10_000))).toBe(true);
+        });
+      }
+    });
+
+    it('excludes durations under 2 minutes from every range', () => {
+      edges.forEach(([range]) => {
+        expect(matchesTimeRange(range, 0)).toBe(false);
+        expect(matchesTimeRange(range, ms(1))).toBe(false);
       });
     });
 
-    describe('5to10 range (5-10 minutes)', () => {
-      const range: TimeRange = '5to10';
-
-      it('returns false for durations under 5 minutes', () => {
-        expect(matchesTimeRange(range, 4.99, 4.99 / 60)).toBe(false);
-      });
-
-      it('returns true for durations from 5 to under 10 minutes', () => {
-        expect(matchesTimeRange(range, 5, 5 / 60)).toBe(true);
-        expect(matchesTimeRange(range, 7, 7 / 60)).toBe(true);
-        expect(matchesTimeRange(range, 9.99, 9.99 / 60)).toBe(true);
-      });
-
-      it('returns false for durations at or above 10 minutes', () => {
-        expect(matchesTimeRange(range, 10, 10 / 60)).toBe(false);
-      });
-    });
-
-    describe('10to30 range (10-30 minutes)', () => {
-      const range: TimeRange = '10to30';
-
-      it('returns false for durations under 10 minutes', () => {
-        expect(matchesTimeRange(range, 9.99, 9.99 / 60)).toBe(false);
-      });
-
-      it('returns true for durations from 10 to under 30 minutes', () => {
-        expect(matchesTimeRange(range, 10, 10 / 60)).toBe(true);
-        expect(matchesTimeRange(range, 20, 20 / 60)).toBe(true);
-        expect(matchesTimeRange(range, 29.99, 29.99 / 60)).toBe(true);
-      });
-
-      it('returns false for durations at or above 30 minutes', () => {
-        expect(matchesTimeRange(range, 30, 30 / 60)).toBe(false);
-      });
-    });
-
-    describe('30to60 range (30-60 minutes)', () => {
-      const range: TimeRange = '30to60';
-
-      it('returns false for durations under 30 minutes', () => {
-        expect(matchesTimeRange(range, 29.99, 29.99 / 60)).toBe(false);
-      });
-
-      it('returns true for durations from 30 to under 60 minutes', () => {
-        expect(matchesTimeRange(range, 30, 30 / 60)).toBe(true);
-        expect(matchesTimeRange(range, 45, 45 / 60)).toBe(true);
-        expect(matchesTimeRange(range, 59.99, 59.99 / 60)).toBe(true);
-      });
-
-      it('returns false for durations at or above 60 minutes', () => {
-        expect(matchesTimeRange(range, 60, 1)).toBe(false);
-      });
-    });
-
-    describe('1to2hours range (1-2 hours)', () => {
-      const range: TimeRange = '1to2hours';
-
-      it('returns false for durations under 1 hour', () => {
-        expect(matchesTimeRange(range, 59, 59 / 60)).toBe(false);
-        expect(matchesTimeRange(range, 59.99, 0.999)).toBe(false);
-      });
-
-      it('returns true for durations from 1 to under 2 hours', () => {
-        expect(matchesTimeRange(range, 60, 1)).toBe(true);
-        expect(matchesTimeRange(range, 90, 1.5)).toBe(true);
-        expect(matchesTimeRange(range, 119, 1.98)).toBe(true);
-      });
-
-      it('returns false for durations at or above 2 hours', () => {
-        expect(matchesTimeRange(range, 120, 2)).toBe(false);
-        expect(matchesTimeRange(range, 150, 2.5)).toBe(false);
-      });
-    });
-
-    describe('over2hours range (2+ hours)', () => {
-      const range: TimeRange = 'over2hours';
-
-      it('returns false for durations under 2 hours', () => {
-        expect(matchesTimeRange(range, 119, 1.98)).toBe(false);
-        expect(matchesTimeRange(range, 119.99, 1.999)).toBe(false);
-      });
-
-      it('returns true for durations at or above 2 hours', () => {
-        expect(matchesTimeRange(range, 120, 2)).toBe(true);
-        expect(matchesTimeRange(range, 150, 2.5)).toBe(true);
-        expect(matchesTimeRange(range, 600, 10)).toBe(true);
-      });
-    });
-
-    describe('unknown range handling', () => {
-      it('returns false for unknown range values', () => {
-        expect(matchesTimeRange('invalid' as TimeRange, 30, 0.5)).toBe(false);
-        expect(matchesTimeRange('' as TimeRange, 30, 0.5)).toBe(false);
-      });
+    it('returns false for unknown range values', () => {
+      expect(matchesTimeRange('invalid' as TimeRange, ms(30))).toBe(false);
+      expect(matchesTimeRange('' as TimeRange, ms(30))).toBe(false);
     });
   });
 

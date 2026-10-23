@@ -7,8 +7,7 @@ import { AnalysisResult, RangeBreakdownEntry, SlowPeriodStats } from '../types/a
 import { findSlowPeriodsWithRanges, findTimestampGaps } from './data-analyzer';
 import { extractActivityTimes } from './fit-parser';
 import { convertGpsCoordinates } from '../utils/gps-utils';
-import { RANGE_LABELS } from '../utils/constants';
-import { getSelectedRangeText, matchesTimeRange, periodDurationSeconds } from '../utils/time-utils';
+import { getRangeLabel, getSelectedRangeText, matchesTimeRange, periodDurationSeconds } from '../utils/time-utils';
 
 export function calculateSlowPeriodStatistics(
   slowPeriods: SlowPeriod[],
@@ -27,9 +26,7 @@ export function calculateSlowPeriodStatistics(
   const rangeBreakdown: RangeBreakdownEntry[] = selectedRanges.map(range => {
     const matchingPeriods = slowPeriods.filter(period => {
       const durationMs = period.endTime.getTime() - period.startTime.getTime();
-      const durationMinutes = durationMs / (1000 * 60);
-      const durationHours = durationMinutes / 60;
-      return matchesTimeRange(range, durationMinutes, durationHours);
+      return matchesTimeRange(range, durationMs);
     });
 
     const slowCount = matchingPeriods.filter(period => !period.isGap).length;
@@ -41,7 +38,7 @@ export function calculateSlowPeriodStatistics(
 
     return {
       range,
-      label: RANGE_LABELS[range],
+      label: getRangeLabel(range),
       count: matchingPeriods.length,
       slowCount,
       gapCount,

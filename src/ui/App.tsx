@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { TimeRange } from '../types/app-types';
-import { DEFAULT_GAP_THRESHOLD_MS, DEFAULT_SELECTED_RANGES, GAP_THRESHOLD_OPTIONS, RANGE_LABELS } from '../utils/constants';
+import { DEFAULT_GAP_THRESHOLD_MS, DEFAULT_SELECTED_RANGES, GAP_THRESHOLD_OPTIONS, TIME_RANGES } from '../utils/constants';
 import { decodeFitFile } from '../core/fit-parser';
 import { trackExampleFileLoaded, trackFitFileParsed } from '../utils/analytics';
 import { ParsedFileState } from '../types/analysis';
@@ -15,9 +15,9 @@ import { UploadPanel } from './components/UploadPanel';
 import { HeroSection } from './components/HeroSection';
 import logoImage from '../assets/images/logo.png';
 
-const RANGE_OPTIONS: RangeOption[] = DEFAULT_SELECTED_RANGES.map(range => ({
-  value: range,
-  label: RANGE_LABELS[range],
+const RANGE_OPTIONS: RangeOption[] = TIME_RANGES.map(({ id, label }) => ({
+  value: id,
+  label,
 }));
 
 export default function App(): JSX.Element {
@@ -77,24 +77,14 @@ export default function App(): JSX.Element {
     }
   }, []);
 
-  const sortRanges = useCallback((ranges: TimeRange[]) => (
-    [...ranges].sort((a, b) => {
-      const orderA = DEFAULT_SELECTED_RANGES.indexOf(a);
-      const orderB = DEFAULT_SELECTED_RANGES.indexOf(b);
-      const safeOrderA = orderA === -1 ? Number.MAX_SAFE_INTEGER : orderA;
-      const safeOrderB = orderB === -1 ? Number.MAX_SAFE_INTEGER : orderB;
-      return safeOrderA - safeOrderB;
-    })
-  ), []);
-
   const toggleRangeSelection = (range: TimeRange) => {
-    setSelectedRanges(current => (
-      sortRanges(
-        current.includes(range)
-          ? current.filter(item => item !== range)
-          : [...current, range]
-      )
-    ));
+    // Filtering the table keeps the selection in canonical order
+    setSelectedRanges(current => {
+      const selected = current.includes(range)
+        ? current.filter(item => item !== range)
+        : [...current, range];
+      return TIME_RANGES.map(({ id }) => id).filter(id => selected.includes(id));
+    });
   };
 
   const analysisAvailable = Boolean(analysisResult && analysisResult.records.length > 0);
