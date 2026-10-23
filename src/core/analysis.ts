@@ -8,7 +8,7 @@ import { findSlowPeriodsWithRanges, findTimestampGaps } from './data-analyzer';
 import { extractActivityTimes } from './fit-parser';
 import { convertGpsCoordinates } from '../utils/gps-utils';
 import { RANGE_LABELS } from '../utils/constants';
-import { getSelectedRangeText, matchesTimeRange } from '../utils/time-utils';
+import { getSelectedRangeText, matchesTimeRange, periodDurationSeconds } from '../utils/time-utils';
 
 export function calculateSlowPeriodStatistics(
   slowPeriods: SlowPeriod[],
@@ -17,13 +17,11 @@ export function calculateSlowPeriodStatistics(
   const slowCount = slowPeriods.filter(period => !period.isGap).length;
   const gapCount = slowPeriods.filter(period => period.isGap).length;
   const totalDurationSeconds = slowPeriods.reduce((total, period) => {
-    const durationSeconds = Math.max(0, Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000));
-    return total + durationSeconds;
+    return total + periodDurationSeconds(period);
   }, 0);
   const gapDurationSeconds = slowPeriods.reduce((total, period) => {
     if (!period.isGap) return total;
-    const durationSeconds = Math.max(0, Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000));
-    return total + durationSeconds;
+    return total + periodDurationSeconds(period);
   }, 0);
 
   const rangeBreakdown: RangeBreakdownEntry[] = selectedRanges.map(range => {
@@ -38,9 +36,7 @@ export function calculateSlowPeriodStatistics(
     const gapCount = matchingPeriods.filter(period => period.isGap).length;
 
     const totalDurationSeconds = matchingPeriods.reduce((total, period) => {
-      const durationMs = period.endTime.getTime() - period.startTime.getTime();
-      const durationSeconds = Math.max(0, Math.round(durationMs / 1000));
-      return total + durationSeconds;
+      return total + periodDurationSeconds(period);
     }, 0);
 
     return {
@@ -78,7 +74,7 @@ export function buildAnalysisResult(
   const selectedRangeText = selectedRanges.length > 0 ? getSelectedRangeText(selectedRanges) : 'None selected';
 
   const durationSeconds = startTime && endTime
-    ? Math.max(0, Math.round((endTime.getTime() - startTime.getTime()) / 1000))
+    ? periodDurationSeconds({ startTime, endTime })
     : null;
 
   return {

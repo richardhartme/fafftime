@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDateTime, formatPeriodStart, formatTime, formatDuration, getSelectedRangeText, matchesTimeRange } from './time-utils';
+import { formatDateTime, formatPeriodStart, formatTime, formatDuration, getSelectedRangeText, matchesTimeRange, periodDurationSeconds } from './time-utils';
 import type { TimeRange } from '../types/app-types';
 
 describe('time-utils', () => {
@@ -209,5 +209,22 @@ describe('time-utils', () => {
     it('formats a time of day in 24-hour en-GB', () => {
       expect(formatTime(date)).toBe('14:05:09');
     });
+  });
+});
+
+describe('periodDurationSeconds', () => {
+  it('returns whole seconds between start and end', () => {
+    const period = { startTime: new Date('2024-01-01T10:00:00Z'), endTime: new Date('2024-01-01T10:05:30Z') };
+    expect(periodDurationSeconds(period)).toBe(330);
+  });
+
+  it('rounds to the nearest second', () => {
+    const period = { startTime: new Date('2024-01-01T10:00:00.000Z'), endTime: new Date('2024-01-01T10:00:01.600Z') };
+    expect(periodDurationSeconds(period)).toBe(2);
+  });
+
+  it('clamps a negative duration to zero', () => {
+    const period = { startTime: new Date('2024-01-01T10:05:00Z'), endTime: new Date('2024-01-01T10:00:00Z') };
+    expect(periodDurationSeconds(period)).toBe(0);
   });
 });

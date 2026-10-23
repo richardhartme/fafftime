@@ -1,7 +1,8 @@
 import {CSSProperties} from 'react';
 import {AnalysisResult} from '../../types/analysis';
 import {SlowPeriod} from '../../types/app-types';
-import {formatDuration, formatPeriodStart, formatTime} from '../../utils/time-utils';
+import {formatDuration, formatPeriodStart, formatTime, periodDurationSeconds} from '../../utils/time-utils';
+import {mapLinks} from '../../utils/map-links';
 import {SPEED_THRESHOLD_TEXT} from '../../utils/constants';
 import {generateCsvExport, downloadCsv} from '../../utils/csv-export';
 
@@ -204,7 +205,7 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
     <div>
       {analysisResult.slowPeriods.map((period, index) => {
         const {startText, endText} = formatPeriodTimes(period);
-        const durationSeconds = Math.max(0, Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000));
+        const durationSeconds = periodDurationSeconds(period);
         const durationText = formatDuration(durationSeconds);
         const startDistanceKm = (period.startDistance / 1000).toFixed(2);
         const miniMapId = `miniMap${index}`;
@@ -215,12 +216,9 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
           const titleId = `recording-gap-${gapNumber}-title`;
           const checkboxId = `show-route-gap-${gapNumber}`;
           const locationCoords = period.gapData.startGpsPoint ?? null;
-          const googleMapsHref = locationCoords
-            ? `https://www.google.com/maps?q=${locationCoords[0]},${locationCoords[1]}`
-            : null;
-          const streetViewHref = locationCoords
-            ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${locationCoords[0]},${locationCoords[1]}`
-            : null;
+          const links = mapLinks(locationCoords);
+          const googleMapsHref = links?.googleMaps ?? null;
+          const streetViewHref = links?.streetView ?? null;
 
           return (
             <section
@@ -322,12 +320,9 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
         const checkboxId = `show-route-${faffNumber}`;
         const hasLocation = Boolean(period.gpsPoints[0]);
         const locationCoords = hasLocation ? period.gpsPoints[0] : null;
-        const googleMapsHref = locationCoords
-          ? `https://www.google.com/maps?q=${locationCoords[0]},${locationCoords[1]}`
-          : null;
-        const streetViewHref = locationCoords
-          ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${locationCoords[0]},${locationCoords[1]}`
-          : null;
+        const links = mapLinks(locationCoords);
+        const googleMapsHref = links?.googleMaps ?? null;
+        const streetViewHref = links?.streetView ?? null;
 
         return (
           <section
