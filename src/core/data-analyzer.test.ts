@@ -4,6 +4,7 @@ import {
   findSpeedBasedSlowPeriods,
   shouldBreakSequenceForTimestampGap,
   findMatchingRecordingGaps,
+  processSlowSequence,
   convertGapToPeriod,
   buildGpsPointsFromGap,
 } from './data-analyzer';
@@ -126,6 +127,52 @@ describe('data-analyzer helpers', () => {
     it('returns an empty list when no gaps match the selected ranges', () => {
       const gaps = findMatchingRecordingGaps(records, ['2to5'], 120_000);
       expect(gaps).toHaveLength(0);
+    });
+
+    describe('range boundaries', () => {
+      const gapRecords = (durationMs: number): FitRecord[] => [
+        { timestamp: baseTime, distance: 0 },
+        { timestamp: new Date(baseTime.getTime() + durationMs), distance: 1000 },
+      ];
+
+      it('buckets a 4m40s gap into 2to5, not 5to10', () => {
+        const fourMinutesForty = (4 * 60 + 40) * 1000;
+
+        expect(findMatchingRecordingGaps(gapRecords(fourMinutesForty), ['2to5'], 60_000)).toHaveLength(1);
+        expect(findMatchingRecordingGaps(gapRecords(fourMinutesForty), ['5to10'], 60_000)).toHaveLength(0);
+      });
+
+      it.each([
+        { label: 'just under 5 minutes', durationMs: 5 * 60_000 - 1, range: '2to5' },
+        { label: 'exactly 5 minutes', durationMs: 5 * 60_000, range: '5to10' },
+        { label: 'just over 5 minutes', durationMs: 5 * 60_000 + 1, range: '5to10' },
+      ] as const)('buckets a gap of $label into $range', ({ durationMs, range }) => {
+        const otherRange = range === '2to5' ? '5to10' : '2to5';
+
+        expect(findMatchingRecordingGaps(gapRecords(durationMs), [range], 60_000)).toHaveLength(1);
+        expect(findMatchingRecordingGaps(gapRecords(durationMs), [otherRange], 60_000)).toHaveLength(0);
+      });
+    });
+  });
+
+  describe('processSlowSequence range boundaries', () => {
+    const baseTime = new Date('2024-01-01T05:00:00Z');
+
+    const slowSequence = (durationMs: number): FitRecord[] => [
+      { timestamp: baseTime, speed: 0.2, distance: 0 },
+      { timestamp: new Date(baseTime.getTime() + durationMs), speed: 0.2, distance: 0 },
+    ];
+
+    it.each([
+      { label: '4m40s', durationMs: (4 * 60 + 40) * 1000, range: '2to5' },
+      { label: 'just under 5 minutes', durationMs: 5 * 60_000 - 1, range: '2to5' },
+      { label: 'exactly 5 minutes', durationMs: 5 * 60_000, range: '5to10' },
+      { label: 'just over 5 minutes', durationMs: 5 * 60_000 + 1, range: '5to10' },
+    ] as const)('buckets a slow period of $label into $range', ({ durationMs, range }) => {
+      const otherRange = range === '2to5' ? '5to10' : '2to5';
+
+      expect(processSlowSequence(slowSequence(durationMs), [range])).not.toBeNull();
+      expect(processSlowSequence(slowSequence(durationMs), [otherRange])).toBeNull();
     });
   });
 
