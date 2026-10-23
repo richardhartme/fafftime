@@ -78,6 +78,29 @@ The project uses Tailwind CSS for styling. Styles are configured via:
 - `postcss.config.js` - PostCSS configuration
 - `src/tailwind.css` - Main CSS file with Tailwind imports
 
+## Git workflow
+
+Never commit directly to `main`. For each ticket or change:
+- Start from an up-to-date `main`: run `git fetch origin` and branch from `origin/main` (e.g. `git switch -c issue-<n>-<slug> origin/main`), never from another feature branch or a stale local `main`.
+- Name the branch `issue-<n>-<slug>` (e.g. `issue-8-shared-helpers`).
+- Commit to that branch.
+- Before opening the PR, fetch again and rebase onto `origin/main` if it has moved, so the PR has no conflicts.
+- When finished, push it and open a PR with `gh pr create`, with `Closes #<n>` in the body.
+
 ## Deployment
 
 `deploy.sh` builds the app and rsyncs `dist/` to production (fafftime.com). There is no staging environment, so verify changes locally with `npm run build && npm run preview` before deploying.
+
+## Agent skills
+
+### Issue tracker
+
+Issues are tracked in GitHub Issues for Hates/fafftime (via the `gh` CLI). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
