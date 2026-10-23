@@ -96,7 +96,7 @@ export default function App(): JSX.Element {
       <HeroSection
         onFileSelected={handleFileSelection}
         onExampleLoad={handleExampleLoad}
-        isLoading={status === 'loading'}
+        isLoading={false}
       />
     );
   }
