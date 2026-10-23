@@ -135,8 +135,7 @@ describe('buildAnalysisResult', () => {
     const result = buildAnalysisResult(fitData, 'example.fit', ['2to5'], 120_000);
 
     expect(result.fileName).toBe('example.fit');
-    expect(result.records).toBe(records);
-    expect(result.sessions).toBe(fitData.sessionMesgs);
+    expect(result.fitData).toBe(fitData);
     expect(result.startTime?.getTime()).toBe(session.startTime?.getTime());
 
     const lastRecordTimestamp = records[records.length - 1]?.timestamp;

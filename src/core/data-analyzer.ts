@@ -4,39 +4,30 @@
 
 import { FitRecord, TimestampGap, SlowPeriod, TimeRange } from '../types/app-types';
 import { SPEED_THRESHOLD, DEFAULT_GAP_THRESHOLD_MS } from '../utils/constants';
-import { convertGpsCoordinates, SEMICIRCLE_TO_DEGREES } from '../utils/gps-utils';
+import { convertGpsCoordinates, toGpsPoint } from '../utils/gps-utils';
 import { matchesTimeRange } from '../utils/time-utils';
-
-function toGpsPoint(record: FitRecord): [number, number] | null {
-  const { positionLat, positionLong } = record;
-  if (typeof positionLat !== 'number' || typeof positionLong !== 'number') {
-    return null;
-  }
-  return [
-    positionLat * SEMICIRCLE_TO_DEGREES,
-    positionLong * SEMICIRCLE_TO_DEGREES,
-  ];
-}
 
 /**
  * Finds slow periods and recording gaps from FIT file records that match the selected time ranges.
  * This function combines two types of "faff time":
- * 1. Slow periods: Consecutive sequences where speed < 0.75 m/s (rider is moving slowly or stopped)
- * 2. Recording gaps: Periods where no data was recorded (device off/paused) for 5+ minutes
+ * 1. Slow periods: Consecutive sequences where speed < SPEED_THRESHOLD (rider is moving slowly or stopped)
+ * 2. Recording gaps: Periods where no data was recorded (device off/paused) for longer than the gap threshold
  *
- * @param {Array} records - Array of record messages from FIT file containing timestamps, speeds, GPS, etc.
- * @param {Array} selectedRanges - Array of selected time range strings (e.g., ['5to10', '30to60'])
- * @returns {Array} Array of period objects containing both slow periods and recording gaps, sorted chronologically
+ * Pass `timestampGaps` when the caller has already run `findTimestampGaps` with the same records and
+ * threshold, to avoid scanning the records twice.
+ *
+ * @returns Both kinds of period, sorted chronologically
  */
 export function findSlowPeriodsWithRanges(
   records: FitRecord[],
   selectedRanges: TimeRange[],
-  gapThreshold: number = DEFAULT_GAP_THRESHOLD_MS
+  gapThreshold: number = DEFAULT_GAP_THRESHOLD_MS,
+  timestampGaps: TimestampGap[] = findTimestampGaps(records, gapThreshold)
 ): SlowPeriod[] {
   if (selectedRanges.length === 0) return [];
 
   const slowPeriods = findSpeedBasedSlowPeriods(records, selectedRanges, gapThreshold);
-  const gapPeriods = findMatchingRecordingGaps(records, selectedRanges, gapThreshold);
+  const gapPeriods = findMatchingRecordingGaps(timestampGaps, selectedRanges);
 
   return [...slowPeriods, ...gapPeriods].sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
 }
@@ -44,43 +35,37 @@ export function findSlowPeriodsWithRanges(
 /**
  * Finds slow periods based on speed analysis
  */
-export function findSpeedBasedSlowPeriods(
+function findSpeedBasedSlowPeriods(
   records: FitRecord[],
   selectedRanges: TimeRange[],
-  gapThreshold: number = DEFAULT_GAP_THRESHOLD_MS
+  gapThreshold: number
 ): SlowPeriod[] {
   const slowPeriods: SlowPeriod[] = [];
   let currentSlowSequence: FitRecord[] = [];
 
-  for (let i = 0; i < records.length; i++) {
-    const record = records[i];
+  // Turns the accumulated slow sequence (if it matches a selected range) into a period
+  const flush = () => {
+    const slowPeriod = processSlowSequence(currentSlowSequence, selectedRanges);
+    if (slowPeriod) {
+      slowPeriods.push(slowPeriod);
+    }
+  };
+
+  for (const record of records) {
     const speed = record.enhancedSpeed || record.speed || 0;
 
-    if (speed < SPEED_THRESHOLD) {
-      if (shouldBreakSequenceForTimestampGap(currentSlowSequence, record, gapThreshold)) {
-        const slowPeriod = processSlowSequence(currentSlowSequence, selectedRanges);
-        if (slowPeriod) {
-          slowPeriods.push(slowPeriod);
-        }
-        currentSlowSequence = [record];
-      } else {
-        currentSlowSequence.push(record);
-      }
-    } else {
-      // Record is fast, process any accumulated slow sequence
-      const slowPeriod = processSlowSequence(currentSlowSequence, selectedRanges);
-      if (slowPeriod) {
-        slowPeriods.push(slowPeriod);
-      }
+    if (speed >= SPEED_THRESHOLD) {
+      flush();
       currentSlowSequence = [];
+    } else if (shouldBreakSequenceForTimestampGap(currentSlowSequence, record, gapThreshold)) {
+      flush();
+      currentSlowSequence = [record];
+    } else {
+      currentSlowSequence.push(record);
     }
   }
 
-  // Handle final sequence
-  const finalSlowPeriod = processSlowSequence(currentSlowSequence, selectedRanges);
-  if (finalSlowPeriod) {
-    slowPeriods.push(finalSlowPeriod);
-  }
+  flush();
 
   return slowPeriods;
 }
@@ -88,7 +73,7 @@ export function findSpeedBasedSlowPeriods(
 /**
  * Determines if a slow sequence should be broken due to a timestamp gap
  */
-export function shouldBreakSequenceForTimestampGap(
+function shouldBreakSequenceForTimestampGap(
   currentSlowSequence: FitRecord[],
   record: FitRecord,
   gapThreshold: number
@@ -111,33 +96,21 @@ export function shouldBreakSequenceForTimestampGap(
 }
 
 /**
- * Finds recording gaps that match the selected time ranges
+ * Converts the recording gaps that match the selected time ranges into slow-period form
  */
-export function findMatchingRecordingGaps(
-  records: FitRecord[],
-  selectedRanges: TimeRange[],
-  gapThreshold: number = DEFAULT_GAP_THRESHOLD_MS
+function findMatchingRecordingGaps(
+  timestampGaps: TimestampGap[],
+  selectedRanges: TimeRange[]
 ): SlowPeriod[] {
-  const timestampGaps = findTimestampGaps(records, gapThreshold);
-  const matchingGaps: SlowPeriod[] = [];
-
-  timestampGaps.forEach(gap => {
-    const matchesRange = selectedRanges.some(range =>
-      matchesTimeRange(range, gap.gapDuration)
-    );
-
-    if (matchesRange) {
-      matchingGaps.push(convertGapToPeriod(gap));
-    }
-  });
-
-  return matchingGaps;
+  return timestampGaps
+    .filter(gap => selectedRanges.some(range => matchesTimeRange(range, gap.gapDuration)))
+    .map(convertGapToPeriod);
 }
 
 /**
  * Converts a recording gap to the same format as slow periods for unified handling
  */
-export function convertGapToPeriod(gap: TimestampGap): SlowPeriod {
+function convertGapToPeriod(gap: TimestampGap): SlowPeriod {
   return {
     startTime: gap.startTime,
     endTime: gap.endTime,
@@ -153,7 +126,7 @@ export function convertGapToPeriod(gap: TimestampGap): SlowPeriod {
 /**
  * Builds GPS points array from available gap coordinates
  */
-export function buildGpsPointsFromGap(gap: TimestampGap): [number, number][] {
+function buildGpsPointsFromGap(gap: TimestampGap): [number, number][] {
   if (gap.startGpsPoint && gap.endGpsPoint) {
     return [gap.startGpsPoint, gap.endGpsPoint];
   } else if (gap.startGpsPoint) {
@@ -169,9 +142,8 @@ export function buildGpsPointsFromGap(gap: TimestampGap): [number, number][] {
  * Recording gaps occur when a GPS device is turned off, paused, or loses signal for extended periods.
  * Only gaps longer than the specified threshold are considered significant.
  *
- * @param {Array} records - Array of record messages from FIT file, each containing timestamp and position data
- * @param {Number} threshold - Optional threshold in milliseconds. Defaults to current UI setting or 5 minutes
- * @returns {Array} Array of gap objects with timing, location, and distance information
+ * @param threshold - Optional threshold in milliseconds. Defaults to DEFAULT_GAP_THRESHOLD_MS
+ * @returns Gaps with timing, location, and distance information
  */
 export function findTimestampGaps(records: FitRecord[], threshold?: number | null): TimestampGap[] {
   const gaps: TimestampGap[] = [];
@@ -225,9 +197,8 @@ export function findTimestampGaps(records: FitRecord[], threshold?: number | nul
  * This function validates that the sequence duration matches the user's selected time ranges,
  * and extracts relevant information like GPS coordinates, distances, and timing.
  *
- * @param {Array} currentSlowSequence - Array of consecutive FIT records where speed < SPEED_THRESHOLD
- * @param {Array} selectedRanges - Array of user-selected time range filters (e.g., ['5to10', '30to60'])
- * @returns {Object|null} Slow period object with timing and location data, or null if no match
+ * @param currentSlowSequence - Consecutive FIT records where speed < SPEED_THRESHOLD
+ * @returns The slow period with timing and location data, or null if no selected range matches
  */
 export function processSlowSequence(currentSlowSequence: FitRecord[], selectedRanges: TimeRange[]): SlowPeriod | null {
   // Early return for empty sequences - no slow period to process

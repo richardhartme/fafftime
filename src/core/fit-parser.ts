@@ -41,19 +41,27 @@ export function extractActivityTimes(sessions: FitSession[], records: FitRecord[
     }
   }
 
-  // If no session data, try to get from records
-  if (records.length > 0) {
-    const firstRecordWithTimestamp = records.find(record => record.timestamp);
-    const lastRecordWithTimestamp = [...records].reverse().find(record => record.timestamp);
+  // Record timestamps, when present, override the session-derived times
+  const firstTimestamp = records.find(record => record.timestamp)?.timestamp;
+  const lastTimestamp = findLastTimestamp(records);
 
-    if (firstRecordWithTimestamp?.timestamp) {
-      startTime = firstRecordWithTimestamp.timestamp;
-    }
+  if (firstTimestamp) {
+    startTime = firstTimestamp;
+  }
 
-    if (lastRecordWithTimestamp?.timestamp) {
-      endTime = lastRecordWithTimestamp.timestamp;
-    }
+  if (lastTimestamp) {
+    endTime = lastTimestamp;
   }
 
   return { startTime, endTime, movingTime, totalDistance };
+}
+
+function findLastTimestamp(records: FitRecord[]): Date | undefined {
+  for (let i = records.length - 1; i >= 0; i--) {
+    const { timestamp } = records[i];
+    if (timestamp) {
+      return timestamp;
+    }
+  }
+  return undefined;
 }

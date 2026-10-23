@@ -87,7 +87,7 @@ export default function App(): JSX.Element {
     });
   };
 
-  const analysisAvailable = Boolean(analysisResult && analysisResult.records.length > 0);
+  const analysisAvailable = Boolean(analysisResult && (analysisResult.fitData.recordMesgs?.length ?? 0) > 0);
   const combinedError = fileError ?? analysisError;
 
   // Show hero landing page when no file is loaded

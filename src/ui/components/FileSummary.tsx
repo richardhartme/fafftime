@@ -5,8 +5,8 @@ interface FileSummaryProps {
 }
 
 export function FileSummary({ analysisResult }: FileSummaryProps): JSX.Element {
-  const totalRecords = analysisResult.records.length.toLocaleString();
-  const sessionsFound = analysisResult.sessions.length.toLocaleString();
+  const totalRecords = (analysisResult.fitData.recordMesgs?.length ?? 0).toLocaleString();
+  const sessionsFound = (analysisResult.fitData.sessionMesgs?.length ?? 0).toLocaleString();
   const timestampGaps = analysisResult.timestampGaps.length.toLocaleString();
 
   return (
