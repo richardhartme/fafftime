@@ -15,7 +15,17 @@ export const RANGE_LABELS: Record<TimeRange, string> = {
 
 export const SPEED_THRESHOLD: number = 0.75; // m/s threshold for slow periods
 
+export const SPEED_THRESHOLD_TEXT = `speed < ${SPEED_THRESHOLD} m/s`;
+
 export const DEFAULT_GAP_THRESHOLD_MS = 120000;
+
+export const GAP_THRESHOLD_OPTIONS: { value: number; label: string }[] = [
+  { value: 60000, label: '1 minute' },
+  { value: 120000, label: '2 minutes' },
+  { value: 180000, label: '3 minutes' },
+  { value: 300000, label: '5 minutes' },
+  { value: 600000, label: '10 minutes' },
+];
 
 export const DEFAULT_SELECTED_RANGES: TimeRange[] = [
   '2to5',

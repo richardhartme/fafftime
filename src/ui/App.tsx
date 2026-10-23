@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
 import { TimeRange } from '../types/app-types';
-import { DEFAULT_GAP_THRESHOLD_MS, DEFAULT_SELECTED_RANGES, RANGE_LABELS } from '../utils/constants';
+import { DEFAULT_GAP_THRESHOLD_MS, DEFAULT_SELECTED_RANGES, GAP_THRESHOLD_OPTIONS, RANGE_LABELS } from '../utils/constants';
 import { decodeFitFile } from '../core/fit-parser';
 import { trackExampleFileLoaded, trackFitFileParsed } from '../utils/analytics';
 import { ParsedFileState } from '../types/analysis';
 import { useAnalysisResult } from './hooks/useAnalysisResult';
 import { useMapManager } from './hooks/useMapManager';
-import { AnalysisControls, GapThresholdOption, RangeOption } from './components/AnalysisControls';
+import { AnalysisControls, RangeOption } from './components/AnalysisControls';
 import { ActivitySummary } from './components/ActivitySummary';
 import { SlowPeriodList, SlowPeriodSummary } from './components/SlowPeriodList';
 import { FileSummary } from './components/FileSummary';
@@ -14,14 +14,6 @@ import { Icon } from './components/Icon';
 import { UploadPanel } from './components/UploadPanel';
 import { HeroSection } from './components/HeroSection';
 import logoImage from '../assets/images/logo.png';
-
-const GAP_THRESHOLD_OPTIONS: GapThresholdOption[] = [
-  { value: 60000, label: '1 minute' },
-  { value: 120000, label: '2 minutes' },
-  { value: 240000, label: '3 minutes' },
-  { value: 300000, label: '5 minutes' },
-  { value: 600000, label: '10 minutes' },
-];
 
 const RANGE_OPTIONS: RangeOption[] = DEFAULT_SELECTED_RANGES.map(range => ({
   value: range,

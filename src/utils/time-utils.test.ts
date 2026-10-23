@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDuration, getSelectedRangeText, matchesTimeRange } from './time-utils';
+import { formatDateTime, formatPeriodStart, formatTime, formatDuration, getSelectedRangeText, matchesTimeRange } from './time-utils';
 import type { TimeRange } from '../types/app-types';
 
 describe('time-utils', () => {
@@ -191,6 +191,23 @@ describe('time-utils', () => {
         expect(matchesTimeRange('invalid' as TimeRange, 30, 0.5)).toBe(false);
         expect(matchesTimeRange('' as TimeRange, 30, 0.5)).toBe(false);
       });
+    });
+  });
+
+  describe('date formatting', () => {
+    // Local-time constructor keeps the assertions timezone-independent
+    const date = new Date(2026, 9, 23, 14, 5, 9);
+
+    it('formats a full date and time in en-GB', () => {
+      expect(formatDateTime(date)).toBe('23/10/2026, 14:05:09');
+    });
+
+    it('formats a period start with weekday and month name', () => {
+      expect(formatPeriodStart(date)).toBe('Fri 23 Oct, 14:05:09');
+    });
+
+    it('formats a time of day in 24-hour en-GB', () => {
+      expect(formatTime(date)).toBe('14:05:09');
     });
   });
 });

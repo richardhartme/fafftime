@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { AnalysisResult } from '../../types/analysis';
-import { formatDuration } from '../../utils/time-utils';
+import { formatDateTime, formatDuration } from '../../utils/time-utils';
 
 interface ActivitySummaryProps {
   analysisResult: AnalysisResult;
@@ -46,13 +46,13 @@ export function ActivitySummary({ analysisResult }: ActivitySummaryProps): JSX.E
           <li className="flex items-baseline justify-between gap-4">
             <span className="font-medium text-slate-900">Start time</span>
             <span className="text-slate-900/80">
-              <strong>{analysisResult.startTime?.toLocaleString() ?? 'Unknown'}</strong>
+              <strong>{analysisResult.startTime ? formatDateTime(analysisResult.startTime) : 'Unknown'}</strong>
             </span>
           </li>
           <li className="flex items-baseline justify-between gap-4">
             <span className="font-medium text-slate-900">End time</span>
             <span className="text-slate-900/80">
-                <strong>{analysisResult.endTime?.toLocaleString() ?? 'Unknown'}</strong>
+                <strong>{analysisResult.endTime ? formatDateTime(analysisResult.endTime) : 'Unknown'}</strong>
               </span>
           </li>
           <li className="flex items-baseline justify-between gap-4">

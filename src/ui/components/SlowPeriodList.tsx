@@ -1,21 +1,12 @@
 import {CSSProperties} from 'react';
 import {AnalysisResult} from '../../types/analysis';
 import {SlowPeriod} from '../../types/app-types';
-import {formatDuration} from '../../utils/time-utils';
+import {formatDuration, formatPeriodStart, formatTime} from '../../utils/time-utils';
+import {SPEED_THRESHOLD_TEXT} from '../../utils/constants';
 import {generateCsvExport, downloadCsv} from '../../utils/csv-export';
 
 function formatPeriodTimes(period: SlowPeriod): { startText: string; endText: string } {
-  const startText = period.startTime.toLocaleString('en-GB', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-
-  const endText = period.endTime.toLocaleTimeString('en-GB');
-  return {startText, endText};
+  return {startText: formatPeriodStart(period.startTime), endText: formatTime(period.endTime)};
 }
 
 function formatActivityShare(durationSeconds: number, activityDurationSeconds: number | null | undefined): string {
@@ -142,7 +133,7 @@ export function SlowPeriodSummary({analysisResult}: SlowPeriodSummaryProps): JSX
           <dt className="text-slate-800">Faff periods</dt>
           <dd className="flex items-center gap-2">
             <span className="rounded-md bg-slate-500/15 px-2 py-0.5 text-[11px] font-medium text-slate-700">
-              speed {'<'} 1 m/s
+              {SPEED_THRESHOLD_TEXT}
             </span>
             <span className="font-semibold text-slate-900">
               {analysisResult.stats.slowCount}

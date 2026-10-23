@@ -41,3 +41,24 @@ export function matchesTimeRange(range: TimeRange, durationMinutes: number, dura
     default: return false;
   }
 }
+
+const LOCALE = 'en-GB';
+
+export function formatDateTime(date: Date): string {
+  return date.toLocaleString(LOCALE);
+}
+
+export function formatPeriodStart(date: Date): string {
+  return date.toLocaleString(LOCALE, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+}
+
+export function formatTime(date: Date): string {
+  return date.toLocaleTimeString(LOCALE);
+}
