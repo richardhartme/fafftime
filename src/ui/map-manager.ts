@@ -5,7 +5,7 @@
 import type { Layer, Map as LeafletMap, Polyline as LeafletPolyline, PolylineOptions } from 'leaflet';
 import { FitData, SlowPeriod, TimestampGap } from '../types/app-types';
 import { convertGpsCoordinates } from '../utils/gps-utils';
-import { formatDuration } from '../utils/time-utils';
+import { formatDuration, periodDurationSeconds } from '../utils/time-utils';
 
 declare const L: typeof import('leaflet');
 
@@ -165,7 +165,7 @@ function addGapOverlayToMap(period: SlowPeriod, index: number): void {
         html: gapOverlayHtml,
         iconSize: [20, 20],
       }),
-    }).addTo(map).bindPopup(`Recording Gap ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000))}`);
+    }).addTo(map).bindPopup(`Recording Gap ${index + 1}<br>Duration: ${formatDuration(periodDurationSeconds(period))}`);
     const markerOverlay = marker as OverlayLayer;
     markerOverlay.options = {
       ...(markerOverlay.options ?? {}),
@@ -208,7 +208,7 @@ function addSlowPeriodOverlayToMap(period: SlowPeriod, index: number): void {
         html: slowOverlayHtml,
         iconSize: [20, 20]
       })
-    }).addTo(map).bindPopup(`Slow Period ${index + 1}<br>Duration: ${formatDuration(Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000))}<br>Records: ${period.recordCount}`);
+    }).addTo(map).bindPopup(`Slow Period ${index + 1}<br>Duration: ${formatDuration(periodDurationSeconds(period))}<br>Records: ${period.recordCount}`);
     const markerOverlay = marker as OverlayLayer;
     markerOverlay.options = {
       ...(markerOverlay.options ?? {}),

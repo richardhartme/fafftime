@@ -21,6 +21,13 @@ export function formatDuration(totalSeconds: number): string {
 }
 
 /**
+ * Whole seconds between a period's start and end, never negative
+ */
+export function periodDurationSeconds(period: { startTime: Date; endTime: Date }): number {
+  return Math.max(0, Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000));
+}
+
+/**
  * Converts selected time range keys to human-readable text
  */
 export function getSelectedRangeText(selectedRanges: TimeRange[]): string {

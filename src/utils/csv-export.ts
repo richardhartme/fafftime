@@ -4,7 +4,8 @@
 
 import {AnalysisResult} from '../types/analysis';
 import {SlowPeriod} from '../types/app-types';
-import {formatDuration} from './time-utils';
+import {formatDuration, periodDurationSeconds} from './time-utils';
+import {mapLinks} from './map-links';
 
 const CSV_HEADERS = [
   'type',
@@ -48,7 +49,7 @@ function periodToRow(period: SlowPeriod): string {
   const type = period.isGap ? 'Recording Gap' : 'Faff Period';
   const startTime = period.startTime.toISOString();
   const endTime = period.endTime.toISOString();
-  const durationSeconds = Math.round((period.endTime.getTime() - period.startTime.getTime()) / 1000);
+  const durationSeconds = periodDurationSeconds(period);
   const duration = formatDuration(durationSeconds);
   const startDistanceKm = (period.startDistance / 1000).toFixed(3);
   const endDistanceKm = (period.endDistance / 1000).toFixed(3);
@@ -61,12 +62,9 @@ function periodToRow(period: SlowPeriod): string {
   const endLat = endCoords ? String(endCoords[0]) : '';
   const endLng = endCoords ? String(endCoords[1]) : '';
 
-  const googleMapsUrl = startCoords
-    ? `https://www.google.com/maps?q=${startCoords[0]},${startCoords[1]}`
-    : '';
-  const streetViewUrl = startCoords
-    ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${startCoords[0]},${startCoords[1]}`
-    : '';
+  const links = mapLinks(startCoords);
+  const googleMapsUrl = links?.googleMaps ?? '';
+  const streetViewUrl = links?.streetView ?? '';
 
   const values = [
     type,
