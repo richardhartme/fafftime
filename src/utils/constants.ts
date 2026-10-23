@@ -4,14 +4,22 @@
 
 import { TimeRange } from '../types/app-types';
 
-export const RANGE_LABELS: Record<TimeRange, string> = {
-  '2to5': '2-5 minutes',
-  '5to10': '5-10 minutes',
-  '10to30': '10-30 minutes',
-  '30to60': '30-60 minutes',
-  '1to2hours': '1-2 hours',
-  'over2hours': 'Over 2 hours'
-};
+export interface TimeRangeDefinition {
+  id: TimeRange;
+  label: string;
+  minMinutes: number; // inclusive
+  maxMinutes: number; // exclusive
+}
+
+// Single source of truth for range bounds, labels and display order
+export const TIME_RANGES: readonly TimeRangeDefinition[] = [
+  { id: '2to5', label: '2-5 minutes', minMinutes: 2, maxMinutes: 5 },
+  { id: '5to10', label: '5-10 minutes', minMinutes: 5, maxMinutes: 10 },
+  { id: '10to30', label: '10-30 minutes', minMinutes: 10, maxMinutes: 30 },
+  { id: '30to60', label: '30-60 minutes', minMinutes: 30, maxMinutes: 60 },
+  { id: '1to2hours', label: '1-2 hours', minMinutes: 60, maxMinutes: 120 },
+  { id: 'over2hours', label: 'Over 2 hours', minMinutes: 120, maxMinutes: Infinity },
+];
 
 export const SPEED_THRESHOLD: number = 0.75; // m/s threshold for slow periods
 
@@ -27,11 +35,4 @@ export const GAP_THRESHOLD_OPTIONS: { value: number; label: string }[] = [
   { value: 600000, label: '10 minutes' },
 ];
 
-export const DEFAULT_SELECTED_RANGES: TimeRange[] = [
-  '2to5',
-  '5to10',
-  '10to30',
-  '30to60',
-  '1to2hours',
-  'over2hours'
-];
+export const DEFAULT_SELECTED_RANGES: TimeRange[] = TIME_RANGES.map(range => range.id);

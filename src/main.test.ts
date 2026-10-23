@@ -492,31 +492,29 @@ describe('Core Logic Functions', () => {
   });
 
   describe('matchesTimeRange', () => {
+    const minutes = (value: number) => value * 60 * 1000;
+
     it('correctly identifies 2-5 minute range', () => {
-      expect(matchesTimeRange('2to5', 3, 0.05)).toBe(true);
-      expect(matchesTimeRange('2to5', 1.5, 0.025)).toBe(false);
-      expect(matchesTimeRange('2to5', 5.5, 0.092)).toBe(false);
+      expect(matchesTimeRange('2to5', minutes(3))).toBe(true);
+      expect(matchesTimeRange('2to5', minutes(1.5))).toBe(false);
+      expect(matchesTimeRange('2to5', minutes(5.5))).toBe(false);
     });
 
     it('correctly identifies 5-10 minute range', () => {
-      expect(matchesTimeRange('5to10', 7, 0.117)).toBe(true);
-      expect(matchesTimeRange('5to10', 4, 0.067)).toBe(false);
-      expect(matchesTimeRange('5to10', 11, 0.183)).toBe(false);
+      expect(matchesTimeRange('5to10', minutes(7))).toBe(true);
+      expect(matchesTimeRange('5to10', minutes(4))).toBe(false);
+      expect(matchesTimeRange('5to10', minutes(11))).toBe(false);
     });
 
     it('correctly identifies hour ranges', () => {
-      expect(matchesTimeRange('1to2hours', 90, 1.5)).toBe(true);
-      expect(matchesTimeRange('1to2hours', 45, 0.75)).toBe(false);
-      expect(matchesTimeRange('1to2hours', 130, 2.17)).toBe(false);
+      expect(matchesTimeRange('1to2hours', minutes(90))).toBe(true);
+      expect(matchesTimeRange('1to2hours', minutes(45))).toBe(false);
+      expect(matchesTimeRange('1to2hours', minutes(130))).toBe(false);
     });
 
     it('correctly identifies over 2 hours', () => {
-      expect(matchesTimeRange('over2hours', 150, 2.5)).toBe(true);
-      expect(matchesTimeRange('over2hours', 90, 1.5)).toBe(false);
-    });
-
-    it('returns false for unknown ranges', () => {
-      expect(matchesTimeRange('over2hours' as any, 30, 0.5)).toBe(false);
+      expect(matchesTimeRange('over2hours', minutes(150))).toBe(true);
+      expect(matchesTimeRange('over2hours', minutes(90))).toBe(false);
     });
   });
 
