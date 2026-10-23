@@ -83,7 +83,7 @@ export default function App(): JSX.Element {
       const selected = current.includes(range)
         ? current.filter(item => item !== range)
         : [...current, range];
-      return TIME_RANGES.map(({ id }) => id).filter(id => selected.includes(id));
+      return DEFAULT_SELECTED_RANGES.filter(id => selected.includes(id));
     });
   };
 

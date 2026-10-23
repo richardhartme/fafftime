@@ -61,4 +61,4 @@ export interface SlowPeriod {
   gapData?: TimestampGap;
 }
 
-export type TimeRange = '2to5' | '5to10' | '10to30' | '30to60' | '1to2hours' | 'over2hours';
+export type { TimeRange } from '../utils/constants';
