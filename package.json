@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "serve": "vite",
     "start": "vite",
+    "lint": "eslint .",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
@@ -38,6 +39,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
     "@types/leaflet": "^1.9.20",
@@ -47,11 +49,15 @@
     "@vitejs/plugin-react": "^5.1.0",
     "@vitest/coverage-v8": "^5.0.5",
     "autoprefixer": "^10.4.21",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.6",
     "shadcn": "^3.5.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.9.2",
+    "typescript-eslint": "^8.72.0",
     "vite": "^7.2.2",
     "vite-plugin-static-copy": "^3.1.4",
     "vitest": "^5.0.5"
