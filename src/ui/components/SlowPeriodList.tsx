@@ -308,7 +308,7 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
               <div className="mt-4">
                 <div
                   id={miniMapId}
-                  className="h-[320px] w-full overflow-hidden rounded-2xl border border-slate-200 bg-white"
+                  className="isolate h-[320px] w-full overflow-hidden rounded-2xl border border-slate-200 bg-white"
                 ></div>
               </div>
             </section>
@@ -407,7 +407,7 @@ export function SlowPeriodList({analysisResult}: SlowPeriodListProps): JSX.Eleme
             <div className="mt-4">
               <div
                 id={miniMapId}
-                className="h-[320px] w-full overflow-hidden rounded-2xl border border-amber-200 bg-white"
+                className="isolate h-[320px] w-full overflow-hidden rounded-2xl border border-amber-200 bg-white"
               ></div>
             </div>
           </section>

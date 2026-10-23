@@ -226,7 +226,7 @@ export default function App(): JSX.Element {
                     </header>
 
                     <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                      <div id="activity-map" className="h-[360px] w-full sm:h-[420px] lg:h-[520px]"></div>
+                      <div id="activity-map" className="isolate h-[360px] w-full sm:h-[420px] lg:h-[520px]"></div>
                     </div>
                   </section>
 
