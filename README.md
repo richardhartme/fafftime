@@ -105,4 +105,4 @@ There is no staging environment, so preview the production bundle locally with `
 
 ## License
 
-MIT License. Garmin FIT SDK usage is governed by the Flexible and Interoperable Data Transfer (FIT) Protocol License.
+MIT License, see [LICENSE](LICENSE). Garmin FIT SDK usage is governed by the Flexible and Interoperable Data Transfer (FIT) Protocol License.
